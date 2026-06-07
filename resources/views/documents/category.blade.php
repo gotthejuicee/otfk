@@ -16,7 +16,7 @@
 
     <section class="container-site grid gap-8 py-12 lg:grid-cols-12">
         <aside class="lg:col-span-3">
-            <div class="card p-4 lg:sticky lg:top-28">
+            <div class="card p-4 lg:sticky lg:top-28 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
                 <p class="px-2 pb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Категорії</p>
                 <nav class="space-y-1">
                     @foreach ($categories as $c)
