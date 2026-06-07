@@ -79,8 +79,8 @@
                         </span>
                     @endif
                     <span class="leading-tight">
-                        <span class="block whitespace-nowrap text-lg font-extrabold tracking-tight text-brand-900" style="font-family:var(--font-display)">ОТФК ОНТУ</span>
-                        <span class="hidden whitespace-nowrap text-xs text-slate-500 sm:block">Одеський технічний фаховий коледж</span>
+                        <span class="block whitespace-nowrap text-lg font-extrabold tracking-tight text-brand-900" style="font-family:var(--font-display)">{{ $s['brand_short'] ?? 'ОТФК ОНТУ' }}</span>
+                        <span class="hidden whitespace-nowrap text-xs text-slate-500 sm:block">{{ $s['brand_name'] ?? 'Одеський технічний фаховий коледж' }}</span>
                     </span>
                 </a>
 
@@ -188,7 +188,7 @@
                             <x-ico name="academic-cap" class="h-6 w-6" />
                         </span>
                     @endif
-                    <span class="font-extrabold text-white" style="font-family:var(--font-display)">ОТФК ОНТУ</span>
+                    <span class="font-extrabold text-white" style="font-family:var(--font-display)">{{ $s['brand_short'] ?? 'ОТФК ОНТУ' }}</span>
                 </div>
                 <p class="mt-4 text-sm leading-relaxed text-brand-200">
                     {{ $s['footer_about'] ?? 'Одеський технічний фаховий коледж Одеського національного технологічного університету.' }}

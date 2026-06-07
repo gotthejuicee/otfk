@@ -50,6 +50,8 @@ class SiteSeeder extends Seeder
             ['site_description', 'Офіційний сайт Одеського технічного фахового коледжу ОНТУ - спеціальності, новини, вступ.', 'general', 'textarea'],
             ['footer_about', 'Одеський технічний фаховий коледж - структурний підрозділ Одеського національного технологічного університету.', 'general', 'textarea'],
             ['logo', '', 'general', 'image'],
+            ['brand_short', 'ОТФК ОНТУ', 'general', 'text'],
+            ['brand_name', 'Одеський технічний фаховий коледж', 'general', 'text'],
             ['contact_address', 'м. Одеса, вул. Прикладна, 1', 'contacts', 'text'],
             ['contact_phone', '+38 (048) 000-00-00', 'contacts', 'text'],
             ['contact_email', 'info@otfk.od.ua', 'contacts', 'text'],
