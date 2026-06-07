@@ -33,7 +33,7 @@ class SettingResource extends Resource
                     'html' => 'HTML',
                     'image' => 'Зображення',
                 ]),
-            Forms\Components\FileUpload::make('value')->label('Зображення')->image()->imageEditor()
+            Forms\Components\FileUpload::make('image_value')->label('Зображення')->image()->imageEditor()
                 ->directory('settings')->columnSpanFull()
                 ->visible(fn (Forms\Get $get) => $get('type') === 'image')
                 ->helperText('Напр. логотип сайту. Рекомендований формат - PNG з прозорим тлом.'),
