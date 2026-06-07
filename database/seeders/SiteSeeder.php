@@ -71,7 +71,7 @@ class SiteSeeder extends Seeder
             ['home_tile', 'Абітурієнту', 'Вступ, спеціальності, правила прийому', '/abituriyentu', 'academic-cap', 'brand', 1],
             ['home_tile', 'Студенту', 'Навчання, гуртожиток, життя коледжу', '/studentu', 'user-group', 'gold', 2],
             ['home_tile', 'Про коледж', 'Історія, адміністрація, структура', '/pro-koledzh', 'building-library', 'brand', 3],
-            ['home_tile', 'Публічна інформація', 'Документи, звіти, нормативна база', '/publichna-informatsiya', 'document-text', 'gold', 4],
+            ['home_tile', 'Публічна інформація', 'Документи, звіти, нормативна база', '/dokumenty', 'document-text', 'gold', 4],
             ['footer_partner', 'ОНТУ', null, 'https://onaft.edu.ua', null, 'brand', 1],
             ['footer_partner', 'МОН України', null, 'https://mon.gov.ua', null, 'brand', 2],
         ];

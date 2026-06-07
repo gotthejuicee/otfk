@@ -8,7 +8,9 @@
             <div class="pointer-events-none absolute inset-0">
                 @if ($b->image)
                     <img src="{{ asset('storage/' . $b->image) }}" alt="" class="h-full w-full object-cover">
-                    <div class="absolute inset-0 bg-gradient-to-r from-brand-950/90 via-brand-950/70 to-brand-900/40"></div>
+                    {{-- Затемнення фото: зліва темніше (під текст) + рівномірне приглушення для контрасту --}}
+                    <div class="absolute inset-0 bg-gradient-to-r from-brand-950/95 via-brand-950/80 to-brand-950/55"></div>
+                    <div class="absolute inset-0 bg-brand-950/25"></div>
                 @else
                     <div class="h-full w-full bg-gradient-to-br from-brand-800 via-brand-900 to-brand-950"></div>
                     <div class="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-brand-600/30 blur-3xl"></div>
