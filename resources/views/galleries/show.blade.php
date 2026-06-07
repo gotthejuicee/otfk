@@ -1,0 +1,48 @@
+<x-layouts.app :title="$gallery->title">
+
+    <section class="bg-brand-950">
+        <div class="container-site py-12 lg:py-14">
+            <nav class="flex flex-wrap items-center gap-2 text-sm text-brand-300">
+                <a href="{{ route('home') }}" class="hover:text-white">Головна</a>
+                <x-ico name="chevron-right" class="h-4 w-4" />
+                <a href="{{ route('galleries.index') }}" class="hover:text-white">Галерея</a>
+                <x-ico name="chevron-right" class="h-4 w-4" />
+                <span class="text-white">{{ $gallery->title }}</span>
+            </nav>
+            <h1 class="mt-3 text-3xl font-extrabold text-white sm:text-4xl">{{ $gallery->title }}</h1>
+            @if ($gallery->description)
+                <p class="mt-3 max-w-2xl text-brand-100">{{ $gallery->description }}</p>
+            @endif
+            <div class="accent-rule"></div>
+        </div>
+    </section>
+
+    <section class="container-site py-12" x-data="{ open: false, src: '', cap: '' }">
+        @if ($gallery->photos->isNotEmpty())
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                @foreach ($gallery->photos as $photo)
+                    <button type="button" @click="open = true; src = '{{ $photo->url }}'; cap = @js($photo->caption)"
+                            class="group relative aspect-square overflow-hidden rounded-xl bg-slate-100">
+                        <img src="{{ $photo->url }}" alt="{{ $photo->caption }}" loading="lazy" class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
+                        <span class="absolute inset-0 bg-brand-950/0 transition group-hover:bg-brand-950/20"></span>
+                    </button>
+                @endforeach
+            </div>
+
+            {{-- Лайтбокс --}}
+            <div x-show="open" x-cloak @keydown.escape.window="open = false" @click="open = false"
+                 class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/90 p-4" x-transition.opacity>
+                <button @click="open = false" class="absolute right-5 top-5 text-white/80 hover:text-white"><x-ico name="x-mark" class="h-8 w-8" /></button>
+                <figure @click.stop class="max-h-full max-w-4xl">
+                    <img :src="src" alt="" class="max-h-[80vh] w-auto rounded-lg">
+                    <figcaption x-show="cap" x-text="cap" class="mt-3 text-center text-sm text-white/80"></figcaption>
+                </figure>
+            </div>
+        @else
+            <div class="card p-12 text-center text-slate-500">Фотографій у цьому альбомі ще немає.</div>
+        @endif
+
+        <a href="{{ route('galleries.index') }}" class="btn-outline mt-10"><x-ico name="arrow-left" class="h-4 w-4" /> До галереї</a>
+    </section>
+
+</x-layouts.app>

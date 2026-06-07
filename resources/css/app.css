@@ -1,0 +1,113 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+/* Динамічні акцентні класи (bg-brand-600, text-gold-600 тощо) — safelist */
+@source inline("{bg,text,border,ring,from,to}-{brand,gold}-{50,100,200,300,400,500,600,700,800,900,950}");
+@source inline("{hover,group-hover}:{bg,text,border,ring}-{brand,gold}-{50,100,500,600,700,800}");
+
+@theme {
+    /* Типографіка */
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+    --font-display: 'Manrope', 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+    /* Брендовий синій (інституційний navy) */
+    --color-brand-50: #f0f5fc;
+    --color-brand-100: #dde9f8;
+    --color-brand-200: #c2d6f2;
+    --color-brand-300: #97b8e8;
+    --color-brand-400: #6493db;
+    --color-brand-500: #3f72cf;
+    --color-brand-600: #2f59be;
+    --color-brand-700: #284aaa;
+    --color-brand-800: #25408a;
+    --color-brand-900: #1f3568;
+    --color-brand-950: #16223f;
+
+    /* Золотий акцент */
+    --color-gold-50: #fdf8ed;
+    --color-gold-100: #f9ecca;
+    --color-gold-200: #f3d792;
+    --color-gold-300: #edbf58;
+    --color-gold-400: #e8aa35;
+    --color-gold-500: #d98e1e;
+    --color-gold-600: #c0721a;
+    --color-gold-700: #9f5419;
+    --color-gold-800: #82431b;
+    --color-gold-900: #6e381a;
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+    body {
+        @apply bg-white text-slate-700 antialiased;
+    }
+    h1, h2, h3, h4, h5 {
+        font-family: var(--font-display);
+        @apply font-bold tracking-tight text-slate-900;
+    }
+    ::selection {
+        @apply bg-brand-700 text-white;
+    }
+}
+
+@layer components {
+    .container-site {
+        @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+    }
+
+    /* Кнопки */
+    .btn,
+    .btn-primary,
+    .btn-accent,
+    .btn-outline,
+    .btn-ghost {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold
+               transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-60;
+    }
+    .btn-primary {
+        @apply bg-brand-700 text-white shadow-sm shadow-brand-900/20 hover:bg-brand-800 focus-visible:ring-brand-500;
+    }
+    .btn-accent {
+        @apply bg-gold-500 text-white shadow-sm shadow-gold-700/20 hover:bg-gold-600 focus-visible:ring-gold-400;
+    }
+    .btn-outline {
+        @apply bg-white text-brand-800 ring-1 ring-brand-200 hover:bg-brand-50 focus-visible:ring-brand-400;
+    }
+    .btn-ghost {
+        @apply text-slate-700 hover:bg-slate-100 focus-visible:ring-slate-300;
+    }
+
+    /* Картки */
+    .card {
+        @apply rounded-2xl bg-white ring-1 ring-slate-200/80 shadow-sm;
+    }
+
+    /* Значки */
+    .badge {
+        @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold;
+    }
+
+    /* Поля форм */
+    .label {
+        @apply mb-1.5 block text-sm font-medium text-slate-700;
+    }
+    .input {
+        @apply block w-full rounded-lg border-0 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm
+               ring-1 ring-inset ring-slate-300 placeholder:text-slate-400
+               focus:ring-2 focus:ring-inset focus:ring-brand-500;
+    }
+
+    /* Декоративна золота лінія під заголовками секцій */
+    .accent-rule {
+        @apply mt-3 h-1 w-14 rounded-full bg-gold-500;
+    }
+}
+
+[x-cloak] { display: none !important; }

@@ -1,0 +1,69 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Filament\Resources\DocumentResource\Pages;
+use App\Models\Document;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+
+class DocumentResource extends Resource
+{
+    protected static ?string $model = Document::class;
+
+    protected static ?string $navigationIcon = 'heroicon-o-document-arrow-down';
+    protected static ?string $navigationGroup = 'Публічна інформація';
+    protected static ?int $navigationSort = 2;
+    protected static ?string $navigationLabel = 'Документи';
+    protected static ?string $modelLabel = 'документ';
+    protected static ?string $pluralModelLabel = 'Документи';
+
+    public static function form(Form $form): Form
+    {
+        return $form->schema([
+            Forms\Components\Select::make('document_category_id')->label('Категорія')
+                ->relationship('category', 'title')->searchable()->preload()->required(),
+            Forms\Components\TextInput::make('title')->label('Назва документа')->required()->maxLength(255)->columnSpanFull(),
+            Forms\Components\FileUpload::make('file_path')->label('Файл')->directory('documents')
+                ->downloadable()->openable()->helperText('PDF, DOC тощо. Або вкажіть зовнішнє посилання нижче.'),
+            Forms\Components\TextInput::make('external_url')->label('Зовнішнє посилання')->url()->maxLength(255),
+            Forms\Components\Textarea::make('description')->label('Опис')->rows(2)->columnSpanFull(),
+            Forms\Components\DatePicker::make('published_at')->label('Дата документа')->default(now()),
+            Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0),
+            Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true),
+        ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('title')->label('Назва')->searchable()->weight('bold')->wrap(),
+                Tables\Columns\TextColumn::make('category.title')->label('Категорія')->badge()->sortable(),
+                Tables\Columns\IconColumn::make('file_path')->label('Файл')->boolean()
+                    ->getStateUsing(fn ($record) => filled($record->file_path) || filled($record->external_url)),
+                Tables\Columns\TextColumn::make('published_at')->label('Дата')->date('d.m.Y')->sortable(),
+                Tables\Columns\IconColumn::make('is_published')->label('Опубл.')->boolean(),
+            ])
+            ->defaultSort('sort_order')
+            ->actions([Tables\Actions\EditAction::make()])
+            ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListDocuments::route('/'),
+            'create' => Pages\CreateDocument::route('/create'),
+            'edit' => Pages\EditDocument::route('/{record}/edit'),
+        ];
+    }
+}

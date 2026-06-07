@@ -1,0 +1,94 @@
+@php $s = \App\Models\Setting::map(); @endphp
+
+<x-layouts.app title="Контакти">
+
+    <section class="bg-brand-950">
+        <div class="container-site py-12 lg:py-14">
+            <nav class="flex items-center gap-2 text-sm text-brand-300">
+                <a href="{{ route('home') }}" class="hover:text-white">Головна</a>
+                <x-ico name="chevron-right" class="h-4 w-4" />
+                <span class="text-white">Контакти</span>
+            </nav>
+            <h1 class="mt-3 text-3xl font-extrabold text-white sm:text-4xl">Контакти</h1>
+            <div class="accent-rule"></div>
+        </div>
+    </section>
+
+    <section class="container-site grid gap-10 py-12 lg:grid-cols-2">
+        {{-- Інформація --}}
+        <div>
+            <h2 class="text-2xl font-bold text-slate-900">Звʼяжіться з нами</h2>
+            <p class="mt-2 text-slate-500">Маєте запитання щодо вступу чи навчання? Ми завжди раді допомогти.</p>
+
+            <ul class="mt-8 space-y-5">
+                @foreach (array_filter([
+                    ['map-pin', 'Адреса', $s['contact_address'] ?? null],
+                    ['phone', 'Телефон', $s['contact_phone'] ?? null],
+                    ['envelope', 'Електронна пошта', $s['contact_email'] ?? null],
+                    ['clock', 'Графік роботи', $s['work_hours'] ?? null],
+                ], fn ($r) => ! empty($r[2])) as [$icon, $label, $value])
+                    <li class="flex gap-4">
+                        <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-700"><x-ico :name="$icon" class="h-5 w-5" /></span>
+                        <div>
+                            <p class="text-xs uppercase tracking-wide text-slate-400">{{ $label }}</p>
+                            <p class="font-medium text-slate-800">{{ $value }}</p>
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
+
+            @if (! empty($s['map_embed']))
+                <div class="mt-8 overflow-hidden rounded-2xl ring-1 ring-slate-200">
+                    <iframe src="{{ $s['map_embed'] }}" class="h-64 w-full" style="border:0" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            @endif
+        </div>
+
+        {{-- Форма --}}
+        <div class="card p-6 sm:p-8">
+            <h2 class="text-xl font-bold text-slate-900">Форма зворотного звʼязку</h2>
+
+            @if (session('status'))
+                <div class="mt-5 flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                    <x-ico name="check-circle" variant="solid" class="h-5 w-5 shrink-0 text-emerald-500" />
+                    {{ session('status') }}
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('contacts.store') }}" class="mt-6 space-y-5">
+                @csrf
+                <div class="grid gap-5 sm:grid-cols-2">
+                    <div>
+                        <label for="name" class="label">Ім'я <span class="text-rose-500">*</span></label>
+                        <input id="name" name="name" type="text" value="{{ old('name') }}" required class="input @error('name') ring-rose-400 @enderror">
+                        @error('name') <p class="mt-1.5 text-sm text-rose-600">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label for="phone" class="label">Телефон</label>
+                        <input id="phone" name="phone" type="text" value="{{ old('phone') }}" class="input">
+                    </div>
+                </div>
+                <div class="grid gap-5 sm:grid-cols-2">
+                    <div>
+                        <label for="email" class="label">Електронна пошта</label>
+                        <input id="email" name="email" type="email" value="{{ old('email') }}" class="input @error('email') ring-rose-400 @enderror">
+                        @error('email') <p class="mt-1.5 text-sm text-rose-600">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label for="subject" class="label">Тема</label>
+                        <input id="subject" name="subject" type="text" value="{{ old('subject') }}" class="input">
+                    </div>
+                </div>
+                <div>
+                    <label for="message" class="label">Повідомлення <span class="text-rose-500">*</span></label>
+                    <textarea id="message" name="message" rows="5" required class="input @error('message') ring-rose-400 @enderror">{{ old('message') }}</textarea>
+                    @error('message') <p class="mt-1.5 text-sm text-rose-600">{{ $message }}</p> @enderror
+                </div>
+                <button type="submit" class="btn-primary w-full sm:w-auto">
+                    <x-ico name="paper-airplane" class="h-4 w-4" /> Надіслати звернення
+                </button>
+            </form>
+        </div>
+    </section>
+
+</x-layouts.app>
