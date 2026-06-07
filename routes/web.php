@@ -52,5 +52,5 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
  | виключає службові префікси, щоб не перехоплювати /admin, /livewire тощо.
  */
 Route::get('/{page:slug}', [PageController::class, 'show'])
-    ->where('page', '^(?!admin|livewire|novyny|video|kontakty|dokumenty|spetsialnosti|struktura|administratsiya|halereya|poshuk|sitemap|storage|up|build|vendor).+$')
+    ->where('page', '^(?!(?:admin|livewire|novyny|video|kontakty|dokumenty|spetsialnosti|struktura|administratsiya|halereya|poshuk|sitemap|storage|up|build|vendor)$).+$')
     ->name('pages.show');
