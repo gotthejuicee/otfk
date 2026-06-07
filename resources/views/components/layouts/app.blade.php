@@ -72,7 +72,7 @@
             <div class="mx-auto flex h-20 w-full max-w-[1600px] items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
                 <a href="{{ route('home') }}" class="flex shrink-0 items-center gap-3">
                     @if ($logo)
-                        <img src="{{ $logo }}" alt="ОТФК ОНТУ" class="h-12 w-auto shrink-0">
+                        <img src="{{ $logo }}" alt="ОТФК ОНТУ" class="h-12 w-auto shrink-0 lg:h-16">
                     @else
                         <span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-700 to-brand-900 text-white shadow-sm">
                             <x-ico name="academic-cap" class="h-7 w-7" />
