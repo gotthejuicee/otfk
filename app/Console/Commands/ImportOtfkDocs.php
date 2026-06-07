@@ -64,6 +64,10 @@ class ImportOtfkDocs extends Command
         '/student/selective_disciplines/' => 'vybirkovi-dystsypliny',
         '/student/fire_security/' => 'pozhezhna-bezpeka',
         '/student/lifeguard_security/' => 'ohorona-pratsi',
+        // Структура
+        '/structure/library/' => 'biblioteka',
+        '/structure/student_government/' => 'studentske-samovryaduvannya',
+        '/structure/employment/' => 'vzayemodiya-z-robotodavtsyamy',
     ];
 
     public function handle(): int
