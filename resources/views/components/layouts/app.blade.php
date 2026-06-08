@@ -11,6 +11,7 @@
     $s = Setting::map();
     $partners = QuickLink::visible()->location('footer_partner')->ordered()->get();
     $logo = ! empty($s['logo']) ? asset('storage/' . $s['logo']) : null;
+    $favicon = ! empty($s['favicon']) ? asset('storage/' . $s['favicon']) : $logo;
     $year = date('Y');
 @endphp
 
@@ -20,12 +21,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $title ? $title . ' - ' . config('app.name') : config('app.name') }}</title>
+    @if ($favicon)
+        <link rel="icon" href="{{ $favicon }}">
+        <link rel="apple-touch-icon" href="{{ $favicon }}">
+    @endif
     <meta name="description" content="{{ $s['site_description'] ?? 'Офіційний сайт Одеського технічного фахового коледжу ОНТУ.' }}">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="{{ config('app.name') }}">
     <meta property="og:title" content="{{ $title ?: config('app.name') }}">
     <meta property="og:description" content="{{ $s['site_description'] ?? 'Офіційний сайт Одеського технічного фахового коледжу ОНТУ.' }}">
     <meta property="og:url" content="{{ url()->current() }}">
+    @if ($logo)<meta property="og:image" content="{{ $logo }}">@endif
     <meta property="og:locale" content="uk_UA">
     <meta name="twitter:card" content="summary">
     <link rel="alternate" type="application/xml" title="Sitemap" href="{{ url('/sitemap.xml') }}">
