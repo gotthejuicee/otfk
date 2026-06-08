@@ -36,7 +36,7 @@ class NewsResource extends Resource
             Forms\Components\RichEditor::make('body')
                 ->label('Текст новини')->columnSpanFull(),
             Forms\Components\FileUpload::make('cover_image')
-                ->label('Обкладинка')->image()->directory('news')->imageEditor(),
+                ->label('Обкладинка')->image()->directory('news')->imageEditor()->imageResizeMode('contain')->imageResizeTargetWidth('1600')->imageResizeTargetHeight('1600'),
             Forms\Components\DateTimePicker::make('published_at')
                 ->label('Дата публікації')->default(now())->seconds(false),
             Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true),

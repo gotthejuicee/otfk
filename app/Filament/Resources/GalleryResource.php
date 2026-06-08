@@ -29,13 +29,13 @@ class GalleryResource extends Resource
                 ->helperText('Залиште порожнім - згенерується автоматично.'),
             Forms\Components\DatePicker::make('published_at')->label('Дата')->default(now()),
             Forms\Components\Textarea::make('description')->label('Опис')->rows(2)->columnSpanFull(),
-            Forms\Components\FileUpload::make('cover_image')->label('Обкладинка')->image()->directory('gallery')->imageEditor(),
+            Forms\Components\FileUpload::make('cover_image')->label('Обкладинка')->image()->directory('gallery')->imageEditor()->imageResizeMode('contain')->imageResizeTargetWidth('1600')->imageResizeTargetHeight('1600'),
             Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true),
             Forms\Components\Repeater::make('photos')
                 ->relationship()
                 ->label('Фотографії')
                 ->schema([
-                    Forms\Components\FileUpload::make('image')->label('Зображення')->image()->directory('gallery')->required()->columnSpan(2),
+                    Forms\Components\FileUpload::make('image')->label('Зображення')->image()->directory('gallery')->imageResizeMode('contain')->imageResizeTargetWidth('1600')->imageResizeTargetHeight('1600')->required()->columnSpan(2),
                     Forms\Components\TextInput::make('caption')->label('Підпис')->maxLength(255)->columnSpan(2),
                 ])
                 ->columns(2)

@@ -19,7 +19,7 @@
                     <a href="{{ route('galleries.show', $gallery) }}" class="card group overflow-hidden transition duration-300 hover:-translate-y-1 hover:shadow-xl">
                         <div class="relative aspect-[16/10] overflow-hidden bg-brand-50">
                             @if ($gallery->cover_url)
-                                <img src="{{ $gallery->cover_url }}" alt="{{ $gallery->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                                <img src="{{ $gallery->cover_url }}" alt="{{ $gallery->title }}" loading="lazy" decoding="async" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                             @else
                                 <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-700 to-brand-900 text-white/25"><x-ico name="photo" class="h-14 w-14" /></div>
                             @endif

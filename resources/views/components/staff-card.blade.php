@@ -2,7 +2,7 @@
 
 <div class="card flex flex-col items-center p-6 text-center">
     @if ($person->photo)
-        <img src="{{ asset('storage/' . $person->photo) }}" alt="{{ $person->full_name }}"
+        <img src="{{ asset('storage/' . $person->photo) }}" alt="{{ $person->full_name }}" loading="lazy" decoding="async"
              class="h-24 w-24 rounded-full object-cover ring-4 ring-brand-50">
     @else
         <span class="grid h-24 w-24 place-items-center rounded-full bg-gradient-to-br from-brand-600 to-brand-900 text-2xl font-bold text-white">

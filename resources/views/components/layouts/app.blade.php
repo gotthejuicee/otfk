@@ -198,7 +198,7 @@
                 <div class="flex items-center gap-3">
                     @if ($logo)
                         <span class="grid h-11 place-items-center rounded-xl bg-white px-2 ring-1 ring-white/15">
-                            <img src="{{ $logo }}" alt="ОТФК ОНТУ" class="h-8 w-auto">
+                            <img src="{{ $logo }}" alt="ОТФК ОНТУ" loading="lazy" decoding="async" class="h-8 w-auto">
                         </span>
                     @else
                         <span class="grid h-11 w-11 place-items-center rounded-xl bg-white/10 text-white ring-1 ring-white/15">

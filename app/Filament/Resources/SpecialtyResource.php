@@ -31,7 +31,7 @@ class SpecialtyResource extends Resource
                     ->helperText('Залиште порожнім - згенерується автоматично.'),
                 Forms\Components\Textarea::make('short_description')->label('Короткий опис')->rows(2)->columnSpanFull(),
                 Forms\Components\RichEditor::make('description')->label('Повний опис')->columnSpanFull(),
-                Forms\Components\FileUpload::make('cover_image')->label('Зображення')->image()->directory('specialties')->imageEditor()->columnSpanFull(),
+                Forms\Components\FileUpload::make('cover_image')->label('Зображення')->image()->directory('specialties')->imageEditor()->imageResizeMode('contain')->imageResizeTargetWidth('1600')->imageResizeTargetHeight('1600')->columnSpanFull(),
             ])->columns(2),
             Forms\Components\Section::make('Деталі навчання')->schema([
                 Forms\Components\TextInput::make('degree')->label('Освітній ступінь')->maxLength(255)->placeholder('Фаховий молодший бакалавр'),

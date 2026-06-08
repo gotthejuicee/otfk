@@ -7,7 +7,7 @@
         <section class="relative overflow-hidden bg-brand-950">
             <div class="pointer-events-none absolute inset-0">
                 @if ($b->image)
-                    <img src="{{ asset('storage/' . $b->image) }}" alt="" class="h-full w-full object-cover">
+                    <img src="{{ asset('storage/' . $b->image) }}" alt="" fetchpriority="high" class="h-full w-full object-cover">
                     {{-- Затемнення фото: зліва темніше (під текст) + рівномірне приглушення для контрасту --}}
                     <div class="absolute inset-0 bg-gradient-to-r from-brand-950/95 via-brand-950/80 to-brand-950/55"></div>
                     <div class="absolute inset-0 bg-brand-950/25"></div>
@@ -109,7 +109,7 @@
                     @foreach ($videos as $video)
                         <a href="{{ $video->watch_url }}" target="_blank" rel="noopener" class="card group overflow-hidden">
                             <div class="relative aspect-video overflow-hidden bg-slate-900">
-                                <img src="{{ $video->thumbnail }}" alt="{{ $video->title }}" class="h-full w-full object-cover opacity-90 transition group-hover:scale-105 group-hover:opacity-100">
+                                <img src="{{ $video->thumbnail }}" alt="{{ $video->title }}" loading="lazy" decoding="async" class="h-full w-full object-cover opacity-90 transition group-hover:scale-105 group-hover:opacity-100">
                                 <span class="absolute inset-0 grid place-items-center">
                                     <span class="grid h-14 w-14 place-items-center rounded-full bg-white/90 text-brand-700 shadow-lg transition group-hover:scale-110">
                                         <x-ico name="play" variant="solid" class="h-6 w-6" />

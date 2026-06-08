@@ -30,7 +30,7 @@
     <section class="container-site grid gap-10 py-12 lg:grid-cols-12">
         <div class="lg:col-span-8">
             @if ($specialty->cover_image)
-                <img src="{{ asset('storage/' . $specialty->cover_image) }}" alt="{{ $specialty->title }}" class="mb-8 w-full rounded-2xl object-cover">
+                <img src="{{ asset('storage/' . $specialty->cover_image) }}" alt="{{ $specialty->title }}" loading="lazy" decoding="async" class="mb-8 w-full rounded-2xl object-cover">
             @endif
             @if ($specialty->short_description)
                 <p class="mb-6 text-lg font-medium leading-relaxed text-slate-600">{{ $specialty->short_description }}</p>

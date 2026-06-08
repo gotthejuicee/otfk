@@ -32,7 +32,7 @@ class PageResource extends Resource
                     ->relationship('parent', 'title')->searchable()->preload(),
                 Forms\Components\Textarea::make('excerpt')->label('Короткий опис')->rows(2)->columnSpanFull(),
                 Forms\Components\RichEditor::make('body')->label('Основний текст')->columnSpanFull(),
-                Forms\Components\FileUpload::make('cover_image')->label('Зображення')->image()->directory('pages')->imageEditor()->columnSpanFull(),
+                Forms\Components\FileUpload::make('cover_image')->label('Зображення')->image()->directory('pages')->imageEditor()->imageResizeMode('contain')->imageResizeTargetWidth('1600')->imageResizeTargetHeight('1600')->columnSpanFull(),
             ])->columns(2),
             Forms\Components\Section::make('Налаштування')->schema([
                 Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true),

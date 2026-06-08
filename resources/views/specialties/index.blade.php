@@ -20,7 +20,7 @@
                     <a href="{{ route('specialties.show', $sp) }}" class="card group flex flex-col overflow-hidden transition duration-300 hover:-translate-y-1 hover:shadow-xl">
                         <div class="relative aspect-[16/9] overflow-hidden">
                             @if ($sp->cover_image)
-                                <img src="{{ asset('storage/' . $sp->cover_image) }}" alt="{{ $sp->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+                                <img src="{{ asset('storage/' . $sp->cover_image) }}" alt="{{ $sp->title }}" loading="lazy" decoding="async" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                             @else
                                 <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-700 to-brand-900 text-white/25">
                                     <x-ico name="academic-cap" class="h-14 w-14" />

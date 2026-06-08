@@ -18,7 +18,7 @@
                 @foreach ($videos as $video)
                     <a href="{{ $video->watch_url }}" target="_blank" rel="noopener" class="card group overflow-hidden">
                         <div class="relative aspect-video overflow-hidden bg-slate-900">
-                            <img src="{{ $video->thumbnail }}" alt="{{ $video->title }}" class="h-full w-full object-cover opacity-90 transition group-hover:scale-105 group-hover:opacity-100">
+                            <img src="{{ $video->thumbnail }}" alt="{{ $video->title }}" loading="lazy" decoding="async" class="h-full w-full object-cover opacity-90 transition group-hover:scale-105 group-hover:opacity-100">
                             <span class="absolute inset-0 grid place-items-center">
                                 <span class="grid h-14 w-14 place-items-center rounded-full bg-white/90 text-brand-700 shadow-lg transition group-hover:scale-110">
                                     <x-ico name="play" variant="solid" class="h-6 w-6" />
