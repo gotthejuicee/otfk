@@ -11,7 +11,7 @@
     $s = Setting::map();
     $partners = QuickLink::visible()->location('footer_partner')->ordered()->get();
     $logo = ! empty($s['logo']) ? asset('storage/' . $s['logo']) : null;
-    $favicon = ! empty($s['favicon']) ? asset('storage/' . $s['favicon']) : $logo;
+    $favicon = ! empty($s['favicon']) ? asset('storage/' . $s['favicon']) : asset('favicon.svg');
     $year = date('Y');
 @endphp
 
@@ -21,10 +21,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $title ? $title . ' - ' . config('app.name') : config('app.name') }}</title>
-    @if ($favicon)
-        <link rel="icon" href="{{ $favicon }}">
-        <link rel="apple-touch-icon" href="{{ $favicon }}">
-    @endif
+    <link rel="icon" href="{{ $favicon }}"@if (\Illuminate\Support\Str::endsWith($favicon, '.svg')) type="image/svg+xml"@endif>
+    <link rel="apple-touch-icon" href="{{ $favicon }}">
     <meta name="description" content="{{ $s['site_description'] ?? 'Офіційний сайт Одеського технічного фахового коледжу ОНТУ.' }}">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="{{ config('app.name') }}">
