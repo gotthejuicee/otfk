@@ -1,4 +1,4 @@
-<x-layouts.app :title="$news->title">
+<x-layouts.app :title="$news->title" :description="$news->excerpt">
 
     <section class="bg-brand-950">
         <div class="container-site py-12 lg:py-14">

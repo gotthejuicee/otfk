@@ -1,6 +1,6 @@
 @php $children = $page->children()->published()->ordered()->get(); @endphp
 
-<x-layouts.app :title="$page->meta_title ?: $page->title">
+<x-layouts.app :title="$page->meta_title ?: $page->title" :description="$page->meta_description ?: $page->excerpt">
 
     <section class="bg-brand-950">
         <div class="container-site py-12 lg:py-14">

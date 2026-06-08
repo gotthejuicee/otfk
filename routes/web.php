@@ -42,10 +42,16 @@ Route::get('/halereya/{gallery:slug}', [GalleryController::class, 'show'])->name
 Route::get('/poshuk', [SearchController::class, 'index'])->name('search');
 
 Route::get('/kontakty', [ContactController::class, 'index'])->name('contacts');
-Route::post('/kontakty', [ContactController::class, 'store'])->name('contacts.store');
+Route::post('/kontakty', [ContactController::class, 'store'])->middleware('throttle:5,1')->name('contacts.store');
 
 // SEO
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+
+Route::get('/robots.txt', function () {
+    $body = "User-agent: *\nAllow: /\nDisallow: /admin\nDisallow: /livewire\n\nSitemap: " . url('/sitemap.xml') . "\n";
+
+    return response($body, 200, ['Content-Type' => 'text/plain; charset=utf-8']);
+})->name('robots');
 
 /*
  | Динамічна редагована сторінка (catch-all). Реєструється ОСТАННЬОЮ та

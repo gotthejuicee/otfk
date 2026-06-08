@@ -57,6 +57,11 @@
 
             <form method="POST" action="{{ route('contacts.store') }}" class="mt-6 space-y-5">
                 @csrf
+                {{-- Honeypot (антиспам): приховане поле, яке заповнюють лише боти --}}
+                <div class="hidden" aria-hidden="true">
+                    <label for="website">Не заповнюйте це поле</label>
+                    <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+                </div>
                 <div class="grid gap-5 sm:grid-cols-2">
                     <div>
                         <label for="name" class="label">Ім'я <span class="text-rose-500">*</span></label>

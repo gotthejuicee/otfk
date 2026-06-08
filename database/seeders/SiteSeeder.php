@@ -56,6 +56,7 @@ class SiteSeeder extends Seeder
             ['contact_address', 'м. Одеса, вул. Прикладна, 1', 'contacts', 'text'],
             ['contact_phone', '+38 (048) 000-00-00', 'contacts', 'text'],
             ['contact_email', 'info@otfk.od.ua', 'contacts', 'text'],
+            ['feedback_email', '', 'contacts', 'text'],
             ['work_hours', 'Пн-Пт: 08:00-17:00', 'contacts', 'text'],
             ['social_facebook', 'https://www.facebook.com/', 'social', 'url'],
             ['social_instagram', 'https://www.instagram.com/', 'social', 'url'],

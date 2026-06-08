@@ -1,4 +1,4 @@
-@props(['title' => null])
+@props(['title' => null, 'description' => null])
 
 @php
     use App\Models\MenuItem;
@@ -12,6 +12,7 @@
     $partners = QuickLink::visible()->location('footer_partner')->ordered()->get();
     $logo = ! empty($s['logo']) ? asset('storage/' . $s['logo']) : null;
     $favicon = ! empty($s['favicon']) ? asset('storage/' . $s['favicon']) : asset('favicon.svg');
+    $metaDesc = $description ?: ($s['site_description'] ?? 'Офіційний сайт Одеського технічного фахового коледжу ОНТУ.');
     $year = date('Y');
 @endphp
 
@@ -23,16 +24,28 @@
     <title>{{ $title ? $title . ' - ' . config('app.name') : config('app.name') }}</title>
     <link rel="icon" href="{{ $favicon }}"@if (\Illuminate\Support\Str::endsWith($favicon, '.svg')) type="image/svg+xml"@endif>
     <link rel="apple-touch-icon" href="{{ $favicon }}">
-    <meta name="description" content="{{ $s['site_description'] ?? 'Офіційний сайт Одеського технічного фахового коледжу ОНТУ.' }}">
+    <meta name="description" content="{{ $metaDesc }}">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="{{ config('app.name') }}">
     <meta property="og:title" content="{{ $title ?: config('app.name') }}">
-    <meta property="og:description" content="{{ $s['site_description'] ?? 'Офіційний сайт Одеського технічного фахового коледжу ОНТУ.' }}">
+    <meta property="og:description" content="{{ $metaDesc }}">
     <meta property="og:url" content="{{ url()->current() }}">
     @if ($logo)<meta property="og:image" content="{{ $logo }}">@endif
     <meta property="og:locale" content="uk_UA">
     <meta name="twitter:card" content="summary">
     <link rel="alternate" type="application/xml" title="Sitemap" href="{{ url('/sitemap.xml') }}">
+    <link rel="canonical" href="{{ url()->current() }}">
+    @php $jsonld = array_filter([
+        '@context' => 'https://schema.org',
+        '@type' => 'EducationalOrganization',
+        'name' => config('app.name'),
+        'url' => url('/'),
+        'logo' => $logo ?: asset('favicon.svg'),
+        'email' => $s['contact_email'] ?? null,
+        'telephone' => $s['contact_phone'] ?? null,
+        'address' => $s['contact_address'] ?? null,
+    ]); @endphp
+    <script type="application/ld+json">{!! json_encode($jsonld, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700|manrope:600,700,800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
