@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 
 class ImportOtfkDocs extends Command
 {
-    protected $signature = 'otfk:import-docs {--dry-run : Показати, без завантаження} {--audit : Лише підрахувати всі PDF по розділах}';
+    protected $signature = 'otfk:import-docs {--dry-run : Показати, без завантаження} {--audit : Лише підрахувати всі PDF по розділах} {--fresh : Видалити попередній імпорт перед завантаженням}';
 
     protected $description = 'Імпорт PDF зі старого сайту otfk.od.ua: у Документи (Публічна інформація) та у тіло сторінок (Абітурієнту/Студенту)';
 
@@ -78,6 +78,10 @@ class ImportOtfkDocs extends Command
 
         $dry = (bool) $this->option('dry-run');
 
+        if ($this->option('fresh') && ! $dry) {
+            $this->purge();
+        }
+
         $this->info('=== ДОКУМЕНТИ (Публічна інформація) ===');
         [$f1, $d1] = $this->importDocuments($dry);
 
@@ -89,6 +93,32 @@ class ImportOtfkDocs extends Command
         $this->info('Усього знайдено PDF: ' . ($f1 + $f2) . '. ' . ($dry ? 'Буде оброблено' : 'Оброблено') . ': ' . ($d1 + $d2) . '.');
 
         return self::SUCCESS;
+    }
+
+    private function purge(): void
+    {
+        $this->warn('Очищення попереднього імпорту (документи з файлами + блоки на сторінках)...');
+
+        foreach (array_unique(array_values($this->docMap)) as $slug) {
+            $cat = DocumentCategory::where('slug', $slug)->first();
+            if (! $cat) {
+                continue;
+            }
+            $cat->documents()->whereNotNull('file_path')->delete();
+            Storage::disk('public')->deleteDirectory('documents/' . $slug);
+        }
+
+        foreach (array_unique(array_values($this->pageMap)) as $slug) {
+            Storage::disk('public')->deleteDirectory('page-files/' . $slug);
+            $page = Page::where('slug', $slug)->first();
+            if ($page) {
+                $body = preg_replace('/<!--imported-files-->.*?<!--\/imported-files-->/s', '', $page->body ?? '');
+                $page->body = trim((string) $body);
+                $page->save();
+            }
+        }
+
+        $this->info('Попередній імпорт видалено.');
     }
 
     private function importDocuments(bool $dry): array
@@ -247,8 +277,9 @@ class ImportOtfkDocs extends Command
     {
         try {
             $bytes = Http::withoutVerifying()->timeout(90)->get($url)->body();
-            if (strlen($bytes) < 200) {
-                $this->warn("  ! порожній/недоступний: {$url}");
+            // Зберігаємо лише справжні PDF (а не HTML-сторінки помилок).
+            if (strlen($bytes) < 200 || ! str_starts_with($bytes, '%PDF')) {
+                $this->warn('  ! не PDF (пропущено): ' . $url);
 
                 return false;
             }
@@ -265,6 +296,9 @@ class ImportOtfkDocs extends Command
 
     private function absolute(string $link, string $pagePath): string
     {
+        // Старий сайт інколи використовує зворотні слеші у шляхах (.\files\x.pdf).
+        $link = str_replace('\\', '/', $link);
+
         if (Str::startsWith($link, 'http')) {
             return $link;
         }
