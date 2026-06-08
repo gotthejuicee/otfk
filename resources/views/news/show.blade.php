@@ -28,7 +28,7 @@
             @if ($news->excerpt)
                 <p class="mb-6 text-lg font-medium leading-relaxed text-slate-600">{{ $news->excerpt }}</p>
             @endif
-            <div class="prose prose-slate max-w-none prose-headings:font-display prose-a:text-brand-700">
+            <div class="prose prose-slate max-w-none prose-headings:font-display prose-a:text-brand-700 dark:prose-invert dark:prose-a:text-brand-300">
                 {!! $news->body !!}
             </div>
 

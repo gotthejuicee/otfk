@@ -17,7 +17,7 @@
 
     <section class="container-site py-12">
         @if (filled($department->description))
-            <div class="prose prose-slate max-w-none prose-headings:font-display prose-a:text-brand-700">
+            <div class="prose prose-slate max-w-none prose-headings:font-display prose-a:text-brand-700 dark:prose-invert dark:prose-a:text-brand-300">
                 {!! $department->description !!}
             </div>
         @endif

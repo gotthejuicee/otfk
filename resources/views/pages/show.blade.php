@@ -28,7 +28,7 @@
         @endif
 
         @if (filled($page->body))
-            <div class="prose prose-slate max-w-none prose-headings:font-display prose-a:text-brand-700">
+            <div class="prose prose-slate max-w-none prose-headings:font-display prose-a:text-brand-700 dark:prose-invert dark:prose-a:text-brand-300">
                 {!! $page->body !!}
             </div>
         @endif
