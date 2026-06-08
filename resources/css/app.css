@@ -124,7 +124,7 @@
     opacity: 0;
     transition: opacity 0.4s ease;
 }
-html.night #nightshade { opacity: 0.13; }
+html.night #nightshade { opacity: var(--night-opacity, 0.13); }
 
 @media (prefers-reduced-motion: reduce) {
     #nightshade { transition: none; }

@@ -14,6 +14,8 @@
     $favicon = ! empty($s['favicon']) ? asset('storage/' . $s['favicon']) : asset('favicon.svg');
     $metaDesc = $description ?: ($s['site_description'] ?? 'Офіційний сайт Одеського технічного фахового коледжу ОНТУ.');
     $year = date('Y');
+    // Яскравість нічної підсвітки з адмінки (відсотки → 0..0.4), із захистом від зайвого затемнення
+    $nightOpacity = max(0, min(40, (float) ($s['night_opacity'] ?? 13))) / 100;
 @endphp
 
 <!DOCTYPE html>
@@ -280,6 +282,6 @@
     </footer>
 
     {{-- Шар нічної підсвітки (поверх усього, кліки проходять наскрізь) --}}
-    <div id="nightshade" aria-hidden="true"></div>
+    <div id="nightshade" style="--night-opacity: {{ $nightOpacity }}" aria-hidden="true"></div>
 </body>
 </html>

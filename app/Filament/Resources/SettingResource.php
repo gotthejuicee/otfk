@@ -29,6 +29,7 @@ class SettingResource extends Resource
                 ->options([
                     'text' => 'Текст',
                     'textarea' => 'Багаторядковий',
+                    'number' => 'Число',
                     'url' => 'Посилання',
                     'html' => 'HTML',
                     'image' => 'Зображення',
@@ -38,7 +39,10 @@ class SettingResource extends Resource
                 ->visible(fn (Forms\Get $get) => $get('type') === 'image')
                 ->helperText('Напр. логотип сайту. Рекомендований формат - PNG з прозорим тлом.'),
             Forms\Components\Textarea::make('value')->label('Значення')->rows(3)->columnSpanFull()
-                ->visible(fn (Forms\Get $get) => $get('type') !== 'image'),
+                ->visible(fn (Forms\Get $get) => $get('type') !== 'image')
+                ->helperText(fn (Forms\Get $get) => $get('key') === 'night_opacity'
+                    ? 'Яскравість нічної підсвітки у відсотках. 0 = вимкнено, 10–15 — рекомендовано, максимум 30.'
+                    : null),
             Forms\Components\TextInput::make('group')->label('Група')->default('general')->maxLength(255),
         ]);
     }
