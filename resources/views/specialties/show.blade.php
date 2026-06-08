@@ -36,7 +36,7 @@
                 <p class="mb-6 text-lg font-medium leading-relaxed text-slate-600">{{ $specialty->short_description }}</p>
             @endif
             @if (filled($specialty->description))
-                <div class="prose prose-slate max-w-none prose-headings:font-display prose-a:text-brand-700 dark:prose-invert dark:prose-a:text-brand-300">{!! $specialty->description !!}</div>
+                <div class="prose prose-slate max-w-none prose-headings:font-display prose-a:text-brand-700">{!! $specialty->description !!}</div>
             @endif
 
             {{-- Освітні програми --}}

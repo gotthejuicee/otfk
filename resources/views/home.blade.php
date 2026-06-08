@@ -66,9 +66,9 @@
                         <span class="grid h-12 w-12 place-items-center rounded-xl bg-{{ $tile->color }}-50 text-{{ $tile->color }}-600 transition group-hover:bg-{{ $tile->color }}-600 group-hover:text-white">
                             <x-ico :name="$tile->icon ?: 'academic-cap'" class="h-6 w-6" />
                         </span>
-                        <h3 class="mt-4 font-bold text-ink">{{ $tile->title }}</h3>
+                        <h3 class="mt-4 font-bold text-slate-900">{{ $tile->title }}</h3>
                         @if ($tile->description)
-                            <p class="mt-1 text-sm text-muted">{{ $tile->description }}</p>
+                            <p class="mt-1 text-sm text-slate-500">{{ $tile->description }}</p>
                         @endif
                     </a>
                 @endforeach
@@ -81,7 +81,7 @@
         <section class="container-site py-16">
             <div class="flex items-end justify-between gap-4">
                 <div>
-                    <h2 class="text-3xl font-extrabold text-ink">Останні новини</h2>
+                    <h2 class="text-3xl font-extrabold text-slate-900">Останні новини</h2>
                     <div class="accent-rule"></div>
                 </div>
                 <a href="{{ route('news.index') }}" class="btn-outline shrink-0">Усі новини <x-ico name="arrow-right" class="h-4 w-4" /></a>
@@ -96,11 +96,11 @@
 
     {{-- ===================== ВІДЕО ===================== --}}
     @if ($videos->isNotEmpty())
-        <section class="bg-surface-soft py-16">
+        <section class="bg-slate-50 py-16">
             <div class="container-site">
                 <div class="flex items-end justify-between gap-4">
                     <div>
-                        <h2 class="text-3xl font-extrabold text-ink">Останні відео</h2>
+                        <h2 class="text-3xl font-extrabold text-slate-900">Останні відео</h2>
                         <div class="accent-rule"></div>
                     </div>
                     <a href="{{ route('video.index') }}" class="btn-outline shrink-0">Усі відео <x-ico name="arrow-right" class="h-4 w-4" /></a>
@@ -117,7 +117,7 @@
                                 </span>
                             </div>
                             <div class="p-4">
-                                <h3 class="line-clamp-2 font-semibold text-ink group-hover:text-brand-700 dark:group-hover:text-brand-300">{{ $video->title }}</h3>
+                                <h3 class="line-clamp-2 font-semibold text-slate-800 group-hover:text-brand-700">{{ $video->title }}</h3>
                             </div>
                         </a>
                     @endforeach

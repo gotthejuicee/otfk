@@ -1,9 +1,6 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
-/* Темна тема — через клас .dark на <html> (а не лише prefers-color-scheme) */
-@custom-variant dark (&:where(.dark, .dark *));
-
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
@@ -45,53 +42,20 @@
 }
 
 @layer base {
-    /* Семантичні поверхні/текст — значення самі перемикаються під .dark */
-    :root {
-        --surface: #ffffff;          /* фон сторінки */
-        --surface-soft: #f8fafc;     /* приглушені секції (було slate-50) */
-        --card: #ffffff;             /* картки/панелі */
-        --ink: #0f172a;              /* заголовки (було slate-900) */
-        --ink-soft: #334155;         /* основний текст (було slate-700) */
-        --ink-muted: #64748b;        /* приглушений текст (було slate-500) */
-        --hairline: rgb(226 232 240 / 0.8); /* тонкі лінії/обведення */
-    }
-    .dark {
-        --surface: #0b1426;
-        --surface-soft: #111d38;
-        --card: #16223f;             /* brand-950 як піднята поверхня */
-        --ink: #eef2f9;
-        --ink-soft: #c6d2e6;
-        --ink-muted: #8ba1c1;
-        --hairline: rgb(255 255 255 / 0.09);
-    }
-
     html {
         scroll-behavior: smooth;
     }
     body {
-        @apply antialiased;
-        background-color: var(--surface);
-        color: var(--ink-soft);
+        @apply bg-white text-slate-700 antialiased;
     }
     h1, h2, h3, h4, h5 {
         font-family: var(--font-display);
-        @apply font-bold tracking-tight;
-        color: var(--ink);
+        @apply font-bold tracking-tight text-slate-900;
     }
     ::selection {
         @apply bg-brand-700 text-white;
     }
 }
-
-/* Семантичні утиліти, що самі перемикаються між світлою/темною темою */
-@utility bg-surface { background-color: var(--surface); }
-@utility bg-surface-soft { background-color: var(--surface-soft); }
-@utility bg-card { background-color: var(--card); }
-@utility text-ink { color: var(--ink); }
-@utility text-ink-soft { color: var(--ink-soft); }
-@utility text-muted { color: var(--ink-muted); }
-@utility border-hairline { border-color: var(--hairline); }
-@utility ring-hairline { --tw-ring-color: var(--hairline); }
 
 @layer components {
     .container-site {
@@ -114,19 +78,15 @@
         @apply bg-gold-500 text-white shadow-sm shadow-gold-700/20 hover:bg-gold-600 focus-visible:ring-gold-400;
     }
     .btn-outline {
-        @apply bg-white text-brand-800 ring-1 ring-brand-200 hover:bg-brand-50 focus-visible:ring-brand-400
-               dark:bg-white/5 dark:text-brand-100 dark:ring-white/15 dark:hover:bg-white/10;
+        @apply bg-white text-brand-800 ring-1 ring-brand-200 hover:bg-brand-50 focus-visible:ring-brand-400;
     }
     .btn-ghost {
-        @apply text-slate-700 hover:bg-slate-100 focus-visible:ring-slate-300
-               dark:text-slate-200 dark:hover:bg-white/10 dark:focus-visible:ring-white/20;
+        @apply text-slate-700 hover:bg-slate-100 focus-visible:ring-slate-300;
     }
 
     /* Картки */
     .card {
-        @apply rounded-2xl ring-1 shadow-sm;
-        background-color: var(--card);
-        --tw-ring-color: var(--hairline);
+        @apply rounded-2xl bg-white ring-1 ring-slate-200/80 shadow-sm;
     }
 
     /* Значки */
@@ -136,13 +96,12 @@
 
     /* Поля форм */
     .label {
-        @apply mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200;
+        @apply mb-1.5 block text-sm font-medium text-slate-700;
     }
     .input {
         @apply block w-full rounded-lg border-0 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm
                ring-1 ring-inset ring-slate-300 placeholder:text-slate-400
-               focus:ring-2 focus:ring-inset focus:ring-brand-500
-               dark:bg-white/5 dark:text-slate-100 dark:ring-white/15 dark:placeholder:text-slate-500;
+               focus:ring-2 focus:ring-inset focus:ring-brand-500;
     }
 
     /* Декоративна золота лінія під заголовками секцій */

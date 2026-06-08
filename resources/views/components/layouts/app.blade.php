@@ -21,8 +21,6 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    {{-- Тема: ставимо .dark ДО першого рендеру, щоб не було спалаху світлого --}}
-    <script>(function(){try{if(localStorage.getItem('theme')==='dark')document.documentElement.classList.add('dark')}catch(e){}})();</script>
     <title>{{ $title ? $title . ' - ' . config('app.name') : config('app.name') }}</title>
     <link rel="icon" href="{{ $favicon }}"@if (\Illuminate\Support\Str::endsWith($favicon, '.svg')) type="image/svg+xml"@endif>
     <link rel="apple-touch-icon" href="{{ $favicon }}">
@@ -52,7 +50,7 @@
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700|manrope:600,700,800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="flex min-h-screen flex-col">
+<body class="flex min-h-screen flex-col bg-white text-slate-700">
 
     {{-- ============================ ШАПКА ============================ --}}
     <header x-data="{ mobile: false }">
@@ -86,7 +84,7 @@
         </div>
 
         {{-- Липка частина: бренд + навігація --}}
-        <div class="sticky top-0 z-40 bg-card shadow-sm dark:border-b dark:border-hairline dark:shadow-none">
+        <div class="sticky top-0 z-40 bg-white shadow-sm">
             {{-- Ряд бренду та дій --}}
             <div class="mx-auto flex h-20 w-full max-w-[1600px] items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
                 <a href="{{ route('home') }}" class="flex shrink-0 items-center gap-3">
@@ -98,8 +96,8 @@
                         </span>
                     @endif
                     <span class="leading-tight">
-                        <span class="block whitespace-nowrap text-lg font-extrabold tracking-tight text-brand-900 dark:text-white" style="font-family:var(--font-display)">{{ $s['brand_short'] ?? 'ОТФК ОНТУ' }}</span>
-                        <span class="hidden whitespace-nowrap text-xs text-slate-500 dark:text-slate-400 sm:block">{{ $s['brand_name'] ?? 'Одеський технічний фаховий коледж' }}</span>
+                        <span class="block whitespace-nowrap text-lg font-extrabold tracking-tight text-brand-900" style="font-family:var(--font-display)">{{ $s['brand_short'] ?? 'ОТФК ОНТУ' }}</span>
+                        <span class="hidden whitespace-nowrap text-xs text-slate-500 sm:block">{{ $s['brand_name'] ?? 'Одеський технічний фаховий коледж' }}</span>
                     </span>
                 </a>
 
@@ -108,16 +106,8 @@
                     <form action="{{ route('search') }}" method="GET" class="relative hidden lg:block">
                         <x-ico name="magnifying-glass" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                         <input type="search" name="q" placeholder="Пошук..."
-                               class="w-48 rounded-full border-0 bg-slate-100 py-2 pl-9 pr-4 text-sm text-slate-700 ring-1 ring-transparent transition focus:w-64 focus:bg-white focus:ring-2 focus:ring-brand-500 dark:bg-white/5 dark:text-slate-200 dark:ring-white/10 dark:focus:bg-white/10" />
+                               class="w-48 rounded-full border-0 bg-slate-100 py-2 pl-9 pr-4 text-sm text-slate-700 ring-1 ring-transparent transition focus:w-64 focus:bg-white focus:ring-2 focus:ring-brand-500" />
                     </form>
-                    {{-- Перемикач теми (світла/темна) --}}
-                    <button type="button"
-                            x-data="{ dark: document.documentElement.classList.contains('dark') }"
-                            @click="dark = !dark; document.documentElement.classList.toggle('dark', dark); try { localStorage.setItem('theme', dark ? 'dark' : 'light') } catch (e) {}"
-                            class="btn-ghost p-2" title="Перемкнути тему" :aria-label="dark ? 'Увімкнути світлу тему' : 'Увімкнути темну тему'">
-                        <span x-show="!dark" x-cloak><x-ico name="moon" class="h-5 w-5" /></span>
-                        <span x-show="dark" x-cloak><x-ico name="sun" class="h-5 w-5" /></span>
-                    </button>
                     {{-- CTA --}}
                     <a href="{{ url('/abituriyentu') }}" class="btn-accent hidden whitespace-nowrap sm:inline-flex">Вступнику</a>
                     {{-- Мобільні дії --}}
@@ -139,10 +129,10 @@
                                     <x-ico name="chevron-down" class="h-4 w-4 opacity-70 transition" x-bind:class="open && 'rotate-180'" />
                                 </button>
                                 <div x-show="open" x-cloak x-transition.opacity
-                                     class="absolute left-0 top-full z-50 max-h-[75vh] w-72 overflow-y-auto rounded-b-xl border border-slate-200 bg-white p-2 shadow-2xl dark:border-white/10 dark:bg-card">
+                                     class="absolute left-0 top-full z-50 max-h-[75vh] w-72 overflow-y-auto rounded-b-xl border border-slate-200 bg-white p-2 shadow-2xl">
                                     @foreach ($item->children as $child)
                                         <a href="{{ $child->href }}" @if ($child->open_new_tab) target="_blank" @endif
-                                           class="block rounded-lg px-3 py-2 text-sm text-slate-600 transition hover:bg-brand-50 hover:text-brand-800 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white">{{ $child->label }}</a>
+                                           class="block rounded-lg px-3 py-2 text-sm text-slate-600 transition hover:bg-brand-50 hover:text-brand-800">{{ $child->label }}</a>
                                     @endforeach
                                 </div>
                             </div>
@@ -158,13 +148,13 @@
         {{-- Мобільне меню (off-canvas) --}}
         <div x-show="mobile" x-cloak class="fixed inset-0 z-50 min-[1560px]:hidden">
             <div @click="mobile = false" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
-            <div class="absolute right-0 top-0 flex h-full w-80 max-w-[88%] flex-col bg-white shadow-2xl dark:bg-card"
+            <div class="absolute right-0 top-0 flex h-full w-80 max-w-[88%] flex-col bg-white shadow-2xl"
                  x-transition:enter="transition ease-out duration-200" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0">
-                <div class="flex h-16 items-center justify-between border-b border-slate-200 px-5 dark:border-white/10">
-                    <span class="font-extrabold text-brand-900 dark:text-white" style="font-family:var(--font-display)">Меню</span>
+                <div class="flex h-16 items-center justify-between border-b border-slate-200 px-5">
+                    <span class="font-extrabold text-brand-900" style="font-family:var(--font-display)">Меню</span>
                     <button @click="mobile = false" class="btn-ghost p-2"><x-ico name="x-mark" class="h-6 w-6" /></button>
                 </div>
-                <div class="border-b border-slate-100 p-4 dark:border-white/10">
+                <div class="border-b border-slate-100 p-4">
                     <form action="{{ route('search') }}" method="GET" class="relative">
                         <x-ico name="magnifying-glass" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                         <input type="search" name="q" placeholder="Пошук по сайту..." class="input w-full pl-9" />
@@ -174,21 +164,21 @@
                 <nav class="flex-1 overflow-y-auto p-3">
                     @foreach ($menu as $item)
                         @if ($item->children->isNotEmpty())
-                            <div x-data="{ sub: false }" class="border-b border-slate-100 dark:border-white/10">
-                                <button @click="sub = !sub" class="flex w-full items-center justify-between px-3 py-3 text-sm font-semibold text-slate-800 dark:text-slate-100">
+                            <div x-data="{ sub: false }" class="border-b border-slate-100">
+                                <button @click="sub = !sub" class="flex w-full items-center justify-between px-3 py-3 text-sm font-semibold text-slate-800">
                                     {{ $item->label }}
                                     <x-ico name="chevron-down" class="h-4 w-4 transition" ::class="sub && 'rotate-180'" />
                                 </button>
                                 <div x-show="sub" x-cloak class="pb-2">
                                     @foreach ($item->children as $child)
                                         <a href="{{ $child->href }}" @if ($child->open_new_tab) target="_blank" @endif
-                                           class="block rounded-lg px-5 py-2 text-sm text-slate-600 hover:bg-brand-50 hover:text-brand-800 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white">{{ $child->label }}</a>
+                                           class="block rounded-lg px-5 py-2 text-sm text-slate-600 hover:bg-brand-50 hover:text-brand-800">{{ $child->label }}</a>
                                     @endforeach
                                 </div>
                             </div>
                         @else
                             <a href="{{ $item->href }}" @if ($item->open_new_tab) target="_blank" @endif
-                               class="block border-b border-slate-100 px-3 py-3 text-sm font-semibold text-slate-800 hover:text-brand-800 dark:border-white/10 dark:text-slate-100 dark:hover:text-white">{{ $item->label }}</a>
+                               class="block border-b border-slate-100 px-3 py-3 text-sm font-semibold text-slate-800 hover:text-brand-800">{{ $item->label }}</a>
                         @endif
                     @endforeach
                 </nav>
