@@ -21,6 +21,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    {{-- Нічна підсвітка: вмикаємо ДО першого рендеру, щоб не блимало --}}
+    <script>(function(){try{if(localStorage.getItem('night')==='1')document.documentElement.classList.add('night')}catch(e){}})();</script>
     <title>{{ $title ? $title . ' - ' . config('app.name') : config('app.name') }}</title>
     <link rel="icon" href="{{ $favicon }}"@if (\Illuminate\Support\Str::endsWith($favicon, '.svg')) type="image/svg+xml"@endif>
     <link rel="apple-touch-icon" href="{{ $favicon }}">
@@ -108,6 +110,14 @@
                         <input type="search" name="q" placeholder="Пошук..."
                                class="w-48 rounded-full border-0 bg-slate-100 py-2 pl-9 pr-4 text-sm text-slate-700 ring-1 ring-transparent transition focus:w-64 focus:bg-white focus:ring-2 focus:ring-brand-500" />
                     </form>
+                    {{-- Нічна підсвітка (тепле приглушення) --}}
+                    <button type="button"
+                            x-data="{ night: document.documentElement.classList.contains('night') }"
+                            @click="night = !night; document.documentElement.classList.toggle('night', night); try { localStorage.setItem('night', night ? '1' : '0') } catch (e) {}"
+                            class="btn-ghost p-2" title="Нічна підсвітка" :aria-label="night ? 'Вимкнути нічну підсвітку' : 'Увімкнути нічну підсвітку'">
+                        <span x-show="!night" x-cloak><x-ico name="moon" class="h-5 w-5" /></span>
+                        <span x-show="night" x-cloak><x-ico name="sun" class="h-5 w-5" /></span>
+                    </button>
                     {{-- CTA --}}
                     <a href="{{ url('/abituriyentu') }}" class="btn-accent hidden whitespace-nowrap sm:inline-flex">Вступнику</a>
                     {{-- Мобільні дії --}}
@@ -268,5 +278,8 @@
             </div>
         </div>
     </footer>
+
+    {{-- Шар нічної підсвітки (поверх усього, кліки проходять наскрізь) --}}
+    <div id="nightshade" aria-hidden="true"></div>
 </body>
 </html>

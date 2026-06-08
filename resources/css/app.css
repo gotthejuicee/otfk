@@ -111,3 +111,21 @@
 }
 
 [x-cloak] { display: none !important; }
+
+/* Нічна підсвітка — тепле приглушення поверх усієї сторінки (це НЕ темна тема:
+   дизайн лишається світлим, просто менше різкого білого ввечері) */
+#nightshade {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;        /* кліки проходять наскрізь */
+    background: #2a1e05;          /* теплий бурштин */
+    mix-blend-mode: multiply;     /* мʼяко притемнює + теплить */
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+html.night #nightshade { opacity: 0.13; }
+
+@media (prefers-reduced-motion: reduce) {
+    #nightshade { transition: none; }
+}
