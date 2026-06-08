@@ -8,9 +8,9 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// Щоденна резервна копія бази о 03:30. Зберігаємо 14 останніх копій.
-// Працює лише якщо на хостингу налаштовано cron «php artisan schedule:run» щохвилини.
+// Щотижнева резервна копія бази (щонеділі о 03:30). Зберігаємо 14 останніх копій.
+// Потрібно лише якщо на хостингу cron викликає «php artisan schedule:run» щохвилини.
+// Якщо ж налаштовано прямий cron на «artisan otfk:backup» — періодичність задає сам cron.
 Schedule::command('otfk:backup')
-    ->dailyAt('03:30')
-    ->withoutOverlapping()
-    ->runInBackground();
+    ->weeklyOn(0, '03:30')
+    ->withoutOverlapping();
