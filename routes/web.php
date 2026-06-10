@@ -53,6 +53,8 @@ Route::get('/halereya/{gallery:slug}', [GalleryController::class, 'show'])->name
 
 // Пошук
 Route::get('/poshuk', [SearchController::class, 'index'])->name('search');
+Route::get('/poshuk/pidkazky', [SearchController::class, 'suggest'])
+    ->middleware('throttle:60,1')->name('search.suggest');
 
 Route::get('/kontakty', [ContactController::class, 'index'])->name('contacts');
 Route::post('/kontakty', [ContactController::class, 'store'])->middleware('throttle:5,1')->name('contacts.store');

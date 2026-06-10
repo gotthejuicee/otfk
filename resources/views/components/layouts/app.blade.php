@@ -154,12 +154,31 @@
                 </a>
 
                 <div class="flex items-center gap-2 sm:gap-3">
-                    {{-- Пошук (десктоп) --}}
-                    <form action="{{ route('search') }}" method="GET" class="relative hidden lg:block">
-                        <x-ico name="magnifying-glass" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                        <input type="search" name="q" placeholder="Пошук..."
-                               class="w-48 rounded-full border-0 bg-slate-100 py-2 pl-9 pr-4 text-sm text-slate-700 ring-1 ring-transparent transition focus:w-64 focus:bg-white focus:ring-2 focus:ring-brand-500" />
-                    </form>
+                    {{-- Пошук з миттєвими підказками (десктоп) --}}
+                    <div x-data="liveSearch(@js(route('search.suggest')), @js(route('search')))"
+                         @click.outside="open = false" @keydown.escape.window="open = false"
+                         class="relative hidden lg:block">
+                        <form action="{{ route('search') }}" method="GET" class="relative">
+                            <x-ico name="magnifying-glass" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                            <input type="search" name="q" placeholder="Пошук..." autocomplete="off"
+                                   x-model="q" @input.debounce.250ms="suggest()" @focus="items.length && (open = true)"
+                                   class="w-48 rounded-full border-0 bg-slate-100 py-2 pl-9 pr-4 text-sm text-slate-700 ring-1 ring-transparent transition focus:w-64 focus:bg-white focus:ring-2 focus:ring-brand-500" />
+                        </form>
+                        <div x-show="open" x-cloak
+                             class="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl">
+                            <template x-for="it in items" :key="it.url + it.title">
+                                <a :href="it.url" class="flex items-center gap-2.5 px-3.5 py-2.5 transition hover:bg-brand-50">
+                                    <span class="shrink-0 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500" x-text="it.group"></span>
+                                    <span class="min-w-0 truncate text-sm text-slate-700" x-text="it.title"></span>
+                                </a>
+                            </template>
+                            <p x-show="!items.length && !busy" class="px-3.5 py-3 text-sm text-slate-400">Нічого не знайдено.</p>
+                            <a x-show="items.length" :href="allUrl()"
+                               class="block border-t border-slate-100 px-3.5 py-2.5 text-sm font-semibold text-brand-700 transition hover:bg-brand-50">
+                                Усі результати →
+                            </a>
+                        </div>
+                    </div>
                     {{-- Нічна підсвітка (тепле приглушення) --}}
                     <button type="button"
                             x-data="{ night: document.documentElement.classList.contains('night') }"
@@ -215,10 +234,23 @@
                     <button @click="mobile = false" class="btn-ghost p-2"><x-ico name="x-mark" class="h-6 w-6" /></button>
                 </div>
                 <div class="border-b border-slate-100 p-4">
-                    <form action="{{ route('search') }}" method="GET" class="relative">
-                        <x-ico name="magnifying-glass" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                        <input type="search" name="q" placeholder="Пошук по сайту..." class="input w-full pl-9" />
-                    </form>
+                    <div x-data="liveSearch(@js(route('search.suggest')), @js(route('search')))" class="relative">
+                        <form action="{{ route('search') }}" method="GET" class="relative">
+                            <x-ico name="magnifying-glass" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                            <input type="search" name="q" placeholder="Пошук по сайту..." autocomplete="off"
+                                   x-model="q" @input.debounce.250ms="suggest()" class="input w-full pl-9" />
+                        </form>
+                        <div x-show="open && items.length" x-cloak
+                             class="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl">
+                            <template x-for="it in items" :key="it.url + it.title">
+                                <a :href="it.url" class="flex items-center gap-2.5 px-3.5 py-2.5 transition hover:bg-brand-50">
+                                    <span class="shrink-0 rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500" x-text="it.group"></span>
+                                    <span class="min-w-0 truncate text-sm text-slate-700" x-text="it.title"></span>
+                                </a>
+                            </template>
+                            <a :href="allUrl()" class="block border-t border-slate-100 px-3.5 py-2.5 text-sm font-semibold text-brand-700">Усі результати →</a>
+                        </div>
+                    </div>
                     <a href="{{ url('/abituriyentu') }}" class="btn-accent mt-3 w-full">Вступнику</a>
                 </div>
                 <nav class="flex-1 overflow-y-auto p-3">
@@ -387,6 +419,22 @@
                 current: null,
                 status: '',
                 tick() { const st = window.bellState(periods); this.current = st.current; this.status = st.status; },
+            });
+
+            // Миттєві підказки пошуку (шапка + мобільне меню)
+            window.liveSearch = (suggestUrl, searchUrl) => ({
+                q: '', items: [], open: false, busy: false,
+                suggest() {
+                    const q = this.q.trim();
+                    if (q.length < 2) { this.items = []; this.open = false; return; }
+                    this.busy = true;
+                    fetch(suggestUrl + '?q=' + encodeURIComponent(q), { headers: { Accept: 'application/json' } })
+                        .then(r => r.json())
+                        .then(d => { this.items = d.results || []; this.open = true; })
+                        .catch(() => {})
+                        .finally(() => this.busy = false);
+                },
+                allUrl() { return searchUrl + '?q=' + encodeURIComponent(this.q.trim()); },
             });
         })();
     </script>
