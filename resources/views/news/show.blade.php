@@ -37,9 +37,28 @@
     </section>
 
     <section class="container-site grid gap-10 py-12 lg:grid-cols-12">
-        <article class="lg:col-span-8">
+        <article class="lg:col-span-8"
+                 x-data="{
+                     imgs: [], idx: null,
+                     init() {
+                         this.imgs = [...this.$el.querySelectorAll('img.lightboxable, .prose img')];
+                         this.imgs.forEach((im, i) => {
+                             im.classList.add('cursor-zoom-in');
+                             im.addEventListener('click', () => this.idx = i);
+                         });
+                         window.addEventListener('keydown', e => {
+                             if (this.idx === null) return;
+                             if (e.key === 'Escape') this.idx = null;
+                             if (e.key === 'ArrowRight') this.next();
+                             if (e.key === 'ArrowLeft') this.prev();
+                         });
+                     },
+                     next() { this.idx = (this.idx + 1) % this.imgs.length },
+                     prev() { this.idx = (this.idx - 1 + this.imgs.length) % this.imgs.length },
+                 }"
+                 x-effect="document.body.style.overflow = idx === null ? '' : 'hidden'">
             @if ($news->cover_image)
-                <img src="{{ asset('storage/' . $news->cover_image) }}" alt="{{ $news->title }}" loading="lazy" decoding="async" class="mb-8 w-full rounded-2xl object-cover">
+                <img src="{{ asset('storage/' . $news->cover_image) }}" alt="{{ $news->title }}" loading="lazy" decoding="async" class="lightboxable mb-8 w-full rounded-2xl object-cover">
             @endif
             @if ($news->excerpt)
                 <p class="mb-6 text-lg font-medium leading-relaxed text-slate-600">{{ $news->excerpt }}</p>
@@ -111,6 +130,33 @@
             <a href="{{ route('news.index') }}" class="btn-outline mt-8">
                 <x-ico name="arrow-left" class="h-4 w-4" /> До всіх новин
             </a>
+
+            {{-- Лайтбокс для фото статті --}}
+            <div x-show="idx !== null" x-cloak @click.self="idx = null"
+                 class="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/90 p-4 backdrop-blur-sm">
+                <button type="button" @click="idx = null" aria-label="Закрити"
+                        class="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20">
+                    <x-ico name="x-mark" class="h-6 w-6" />
+                </button>
+
+                <template x-if="imgs.length > 1">
+                    <div>
+                        <button type="button" @click="prev()" aria-label="Попереднє фото"
+                                class="absolute left-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20">
+                            <x-ico name="chevron-left" class="h-6 w-6" />
+                        </button>
+                        <button type="button" @click="next()" aria-label="Наступне фото"
+                                class="absolute right-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20">
+                            <x-ico name="chevron-right" class="h-6 w-6" />
+                        </button>
+                        <span class="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-white/10 px-3 py-1 text-sm text-white"
+                              x-text="(idx + 1) + ' / ' + imgs.length"></span>
+                    </div>
+                </template>
+
+                <img :src="idx !== null ? imgs[idx].src : ''" alt=""
+                     class="max-h-[85vh] max-w-full rounded-lg shadow-2xl" @click.stop>
+            </div>
         </article>
 
         <aside class="lg:col-span-4">

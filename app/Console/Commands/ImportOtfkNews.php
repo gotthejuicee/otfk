@@ -110,6 +110,8 @@ class ImportOtfkNews extends Command
                 'cover_image' => $article['cover'],
                 'published_at' => $article['published_at'],
                 'is_published' => true,
+                // Імпортовані новини НЕ постимо в Telegram (їх сотні — позначаємо як уже опубліковані)
+                'telegram_posted_at' => now(),
             ]);
 
             $done++;

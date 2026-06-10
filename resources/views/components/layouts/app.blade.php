@@ -74,6 +74,20 @@
                             <x-ico name="envelope" class="h-3.5 w-3.5" /> {{ $s['contact_email'] }}
                         </a>
                     @endif
+                    {{-- Жива позначка «зараз йде пара» (з розкладу дзвінків) --}}
+                    @php $bellPeriods = \App\Models\BellPeriod::active(); @endphp
+                    @if ($bellPeriods->isNotEmpty())
+                        <a href="{{ route('bells') }}"
+                           x-data="bellChip(@js($bellPeriods->map(fn ($b) => ['n' => $b->number, 's' => substr($b->starts, 0, 5), 'e' => substr($b->ends, 0, 5)])->values()))"
+                           x-init="tick(); setInterval(() => tick(), 30000)" x-show="label" x-cloak
+                           class="inline-flex items-center gap-1.5 rounded-full bg-gold-400/15 px-2.5 py-0.5 font-medium text-gold-200 ring-1 ring-gold-400/30 transition hover:bg-gold-400/25">
+                            <span class="relative flex h-1.5 w-1.5">
+                                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-gold-300 opacity-75"></span>
+                                <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-gold-400"></span>
+                            </span>
+                            <span x-text="label"></span>
+                        </a>
+                    @endif
                 </div>
                 <div class="flex items-center gap-4">
                     @if (! empty($s['social_facebook']))
@@ -300,5 +314,48 @@
 
     {{-- Шар нічної підсвітки (поверх усього, кліки проходять наскрізь) --}}
     <div id="nightshade" style="--night-opacity: {{ $nightOpacity }}" aria-hidden="true"></div>
+
+    {{-- Логіка «зараз йде пара» (розклад дзвінків): спільна для плашки в шапці та сторінки розкладу --}}
+    <script>
+        (function () {
+            const ORD = { 1: '1-ша', 2: '2-га', 3: '3-тя', 4: '4-та', 5: '5-та', 6: '6-та', 7: '7-ма', 8: '8-ма' };
+            const toMin = t => +t.slice(0, 2) * 60 + +t.slice(3, 5);
+
+            // Повертає {current, status}: current — номер пари (або null), status — текст
+            window.bellState = function (periods) {
+                const d = new Date();
+                if (d.getDay() === 0 || !periods.length) return { current: null, status: '' }; // неділя
+                const cur = d.getHours() * 60 + d.getMinutes();
+
+                for (const p of periods) {
+                    const s = toMin(p.s), e = toMin(p.e);
+                    if (cur >= s && cur < e) {
+                        return { current: p.n, status: (ORD[p.n] ?? p.n) + ' пара · до кінця ' + (e - cur) + ' хв' };
+                    }
+                }
+
+                const next = periods.find(p => toMin(p.s) > cur);
+                if (next) {
+                    // зранку показуємо за годину до першої пари; між парами — завжди
+                    const isBreak = cur >= toMin(periods[0].s);
+                    if (isBreak) return { current: null, status: 'Перерва · ' + (ORD[next.n] ?? next.n) + ' пара о ' + next.s };
+                    if (toMin(next.s) - cur <= 60) return { current: null, status: (ORD[next.n] ?? next.n) + ' пара о ' + next.s };
+                }
+
+                return { current: null, status: '' };
+            };
+
+            window.bellChip = periods => ({
+                label: '',
+                tick() { this.label = window.bellState(periods).status; },
+            });
+
+            window.bellSchedule = periods => ({
+                current: null,
+                status: '',
+                tick() { const st = window.bellState(periods); this.current = st.current; this.status = st.status; },
+            });
+        })();
+    </script>
 </body>
 </html>

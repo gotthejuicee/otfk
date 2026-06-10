@@ -56,6 +56,10 @@ class NewsResource extends Resource
                 Tables\Columns\IconColumn::make('is_featured')->label('Реком.')->boolean()->toggleable(),
                 Tables\Columns\TextColumn::make('views')->label('Перегляди')->numeric()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('likes')->label('Вподобайки')->numeric()->sortable()->toggleable(),
+                Tables\Columns\IconColumn::make('telegram_posted_at')->label('TG')->toggleable(isToggledHiddenByDefault: true)
+                    ->icon(fn ($state) => $state ? 'heroicon-s-paper-airplane' : 'heroicon-o-minus')
+                    ->color(fn ($state) => $state ? 'info' : 'gray')
+                    ->tooltip(fn ($state) => $state ? 'Опубліковано в Telegram' : 'Не публікувалось у Telegram'),
             ])
             ->defaultSort('published_at', 'desc')
             ->actions([Tables\Actions\EditAction::make()])

@@ -13,6 +13,7 @@ class News extends Model
     protected $fillable = [
         'category_id', 'title', 'slug', 'excerpt', 'body', 'cover_image',
         'published_at', 'is_published', 'is_featured', 'views', 'likes',
+        'telegram_posted_at',
     ];
 
     protected function casts(): array
@@ -21,6 +22,7 @@ class News extends Model
             'published_at' => 'datetime',
             'is_published' => 'boolean',
             'is_featured' => 'boolean',
+            'telegram_posted_at' => 'datetime',
         ];
     }
 
@@ -55,6 +57,18 @@ class News extends Model
         static::saving(function (News $news) {
             if (blank($news->slug) && filled($news->title)) {
                 $news->slug = Str::slug($news->title);
+            }
+        });
+
+        // Автопостинг у Telegram: один раз, коли новина стає опублікованою.
+        static::saved(function (News $news) {
+            $isLive = $news->is_published
+                && ($news->published_at === null || $news->published_at->lte(now()));
+
+            if ($isLive && $news->telegram_posted_at === null) {
+                if (\App\Services\TelegramPoster::post($news)) {
+                    $news->forceFill(['telegram_posted_at' => now()])->saveQuietly();
+                }
             }
         });
     }
