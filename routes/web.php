@@ -26,6 +26,8 @@ Route::get('/video', [VideoController::class, 'index'])->name('video.index');
 Route::get('/rozklad-dzvinkiv', [App\Http\Controllers\BellScheduleController::class, 'index'])->name('bells');
 Route::get('/podiyi', [App\Http\Controllers\EventController::class, 'index'])->name('events');
 
+Route::get('/faq', [App\Http\Controllers\FaqController::class, 'index'])->name('faq');
+
 // Заявка абітурієнта
 Route::get('/zayavka', [App\Http\Controllers\ApplicantRequestController::class, 'create'])->name('applicants.create');
 Route::post('/zayavka', [App\Http\Controllers\ApplicantRequestController::class, 'store'])

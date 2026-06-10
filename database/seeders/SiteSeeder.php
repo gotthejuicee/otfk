@@ -266,8 +266,9 @@ class SiteSeeder extends Seeder
                 'Взаємодія з роботодавцями' => 'vzayemodiya-z-robotodavtsyamy',
             ]],
             'abituriyentu' => ['title' => 'Абітурієнту', 'children' => [
-                // Сторінка-плитка: слаг перехоплюється маршрутом форми заявки
+                // Сторінки-плитки: слаги перехоплюються маршрутами заявки та FAQ
                 'Залишити заявку' => 'zayavka',
+                'Питання та відповіді' => 'faq',
                 'Правила прийому' => 'pravyla-pryyomu', 'Вартість навчання' => 'vartist-navchannya',
                 'Наші спеціальності' => ['url', '/spetsialnosti'],
                 'Освітньо-професійні програми' => ['url', '/spetsialnosti'],
