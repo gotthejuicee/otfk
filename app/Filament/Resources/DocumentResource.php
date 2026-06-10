@@ -28,7 +28,16 @@ class DocumentResource extends Resource
                 ->relationship('category', 'title')->searchable()->preload()->required(),
             Forms\Components\TextInput::make('title')->label('Назва документа')->required()->maxLength(255)->columnSpanFull(),
             Forms\Components\FileUpload::make('file_path')->label('Файл')->directory('documents')
-                ->downloadable()->openable()->helperText('PDF, DOC тощо. Або вкажіть зовнішнє посилання нижче.'),
+                ->downloadable()->openable()
+                ->acceptedFileTypes([
+                    'application/pdf',
+                    'application/msword',
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'application/vnd.ms-excel',
+                    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                ])
+                ->maxSize(20480)
+                ->helperText('PDF, DOC(X), XLS(X), до 20 МБ. Або вкажіть зовнішнє посилання нижче.'),
             Forms\Components\TextInput::make('external_url')->label('Зовнішнє посилання')->url()->maxLength(255),
             Forms\Components\Textarea::make('description')->label('Опис')->rows(2)->columnSpanFull(),
             Forms\Components\DatePicker::make('published_at')->label('Дата документа')->default(now()),
