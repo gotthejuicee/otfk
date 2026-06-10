@@ -39,4 +39,30 @@ class Event extends Model
             ->where(fn ($q) => $q->whereNull('ends_at')->orWhere('ends_at', '<', now()))
             ->orderByDesc('starts_at');
     }
+
+    /** Початок/кінець в UTC для календарів (час у БД — київський настінний). */
+    public function utcStart(): \Carbon\Carbon
+    {
+        return $this->starts_at->copy()->shiftTimezone('Europe/Kyiv')->utc();
+    }
+
+    public function utcEnd(): \Carbon\Carbon
+    {
+        return ($this->ends_at ?? $this->starts_at->copy()->addHour())
+            ->copy()->shiftTimezone('Europe/Kyiv')->utc();
+    }
+
+    /** Посилання «Додати в Google Календар». */
+    public function getGoogleCalendarUrlAttribute(): string
+    {
+        $fmt = fn ($c) => $c->format('Ymd\THis\Z');
+
+        return 'https://calendar.google.com/calendar/render?' . http_build_query([
+            'action' => 'TEMPLATE',
+            'text' => $this->title,
+            'dates' => $fmt($this->utcStart()) . '/' . $fmt($this->utcEnd()),
+            'details' => (string) $this->description,
+            'location' => (string) $this->location,
+        ]);
+    }
 }

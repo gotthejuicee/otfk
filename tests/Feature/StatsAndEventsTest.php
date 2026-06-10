@@ -39,6 +39,36 @@ class StatsAndEventsTest extends TestCase
         $this->get('/podiyi')->assertSee('День відкритих дверей')->assertSee('Актова зала');
     }
 
+    public function test_event_ics_download_and_calendar_buttons(): void
+    {
+        $event = Event::create([
+            'title' => 'День відкритих дверей; запрошуємо',
+            'description' => 'Знайомство, екскурсія',
+            'location' => 'Актова зала',
+            'starts_at' => now()->addDays(5)->setTime(11, 0),
+            'is_published' => true,
+        ]);
+
+        // Кнопки на сторінці подій
+        $this->get('/podiyi')
+            ->assertSee('Google Календар')
+            ->assertSee('calendar.google.com/calendar/render', escape: false)
+            ->assertSee(route('events.ics', $event), escape: false);
+
+        // Файл .ics: заголовки + структура + екранування «;»
+        $resp = $this->get(route('events.ics', $event));
+        $resp->assertOk()->assertHeader('Content-Type', 'text/calendar; charset=utf-8');
+        $body = $resp->getContent();
+        $this->assertStringContainsString('BEGIN:VCALENDAR', $body);
+        $this->assertStringContainsString('SUMMARY:День відкритих дверей\; запрошуємо', $body);
+        $this->assertStringContainsString('LOCATION:Актова зала', $body);
+        $this->assertStringContainsString('DTSTART:', $body);
+
+        // Неопублікована подія — 404
+        $event->update(['is_published' => false]);
+        $this->get(route('events.ics', $event))->assertNotFound();
+    }
+
     public function test_past_event_listed_in_past_section(): void
     {
         Event::create([

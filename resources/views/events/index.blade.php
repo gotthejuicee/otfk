@@ -47,12 +47,25 @@
                             @if ($event->description)
                                 <p class="mt-2 text-sm leading-relaxed text-slate-600">{{ $event->description }}</p>
                             @endif
-                            @if ($event->url)
-                                <a href="{{ $event->url }}" @if (! str_starts_with($event->url, url('/'))) target="_blank" rel="noopener" @endif
-                                   class="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-700 hover:gap-2.5 transition">
-                                    Детальніше <x-ico name="arrow-right" class="h-4 w-4" />
+                            <div class="mt-3 flex flex-wrap items-center gap-2">
+                                @if ($event->url)
+                                    <a href="{{ $event->url }}" @if (! str_starts_with($event->url, url('/'))) target="_blank" rel="noopener" @endif
+                                       class="mr-2 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-700 hover:gap-2.5 transition">
+                                        Детальніше <x-ico name="arrow-right" class="h-4 w-4" />
+                                    </a>
+                                @endif
+                                {{-- Додати в календар --}}
+                                <a href="{{ $event->google_calendar_url }}" target="_blank" rel="noopener"
+                                   class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-200"
+                                   title="Додати в Google Календар">
+                                    <x-ico name="calendar-days" class="h-3.5 w-3.5" /> Google Календар
                                 </a>
-                            @endif
+                                <a href="{{ route('events.ics', $event) }}"
+                                   class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-200"
+                                   title="Завантажити .ics (Apple, Outlook)">
+                                    <x-ico name="arrow-down-tray" class="h-3.5 w-3.5" /> .ics
+                                </a>
+                            </div>
                         </div>
                     </div>
                 @endforeach
