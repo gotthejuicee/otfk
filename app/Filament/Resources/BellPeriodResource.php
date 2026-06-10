@@ -26,8 +26,10 @@ class BellPeriodResource extends Resource
         return $form->schema([
             Forms\Components\TextInput::make('number')->label('Номер пари')->numeric()->required()
                 ->minValue(1)->maxValue(10),
-            Forms\Components\TimePicker::make('starts')->label('Початок')->seconds(false)->required(),
-            Forms\Components\TimePicker::make('ends')->label('Кінець')->seconds(false)->required(),
+            Forms\Components\TimePicker::make('starts')->label('Початок пари')->seconds(false)->required()
+                ->helperText('Дзвінок на пару. Перерва — проміжок від кінця попередньої пари до цього часу.'),
+            Forms\Components\TimePicker::make('ends')->label('Кінець пари')->seconds(false)->required()
+                ->helperText('Дзвінок з пари — початок перерви. Змінюючи ці часи, ви керуєте і перервами.'),
             Forms\Components\Toggle::make('is_active')->label('Активна')->default(true)
                 ->helperText('Неактивні пари не показуються на сайті.'),
         ]);

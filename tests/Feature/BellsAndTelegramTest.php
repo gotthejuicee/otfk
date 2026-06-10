@@ -17,7 +17,15 @@ class BellsAndTelegramTest extends TestCase
         $this->get('/rozklad-dzvinkiv')
             ->assertOk()
             ->assertSee('Розклад дзвінків')
-            ->assertSee('1-ша пара');
+            ->assertSee('1-ша пара')
+            ->assertSee('Велика перерва');
+    }
+
+    public function test_studentu_section_has_bells_tile(): void
+    {
+        $this->get('/studentu')
+            ->assertOk()
+            ->assertSee('Розклад дзвінків');
     }
 
     public function test_news_autoposts_to_telegram_once(): void

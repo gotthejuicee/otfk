@@ -277,6 +277,8 @@ class SiteSeeder extends Seeder
                 'Навчально-виробнича робота' => 'navchalno-vyrobnycha-robota', 'Виховна робота' => 'vyhovna-robota',
                 'Соціально-психологічна служба' => 'sotsialno-psyholohichna-sluzhba', 'Спортивне життя' => 'sportyvne-zhyttya',
                 'Гуртожиток' => 'hurtozhytok', 'Академічна доброчесність' => 'akademichna-dobrochesnist',
+                // Сторінка-плитка: сам слаг перехоплюється маршрутом розкладу дзвінків
+                'Розклад дзвінків' => 'rozklad-dzvinkiv',
             ]],
         ];
 

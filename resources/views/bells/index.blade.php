@@ -41,7 +41,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
-                            @foreach ($periods as $p)
+                            @foreach ($periods->values() as $i => $p)
                                 <tr :class="current === {{ $p->number }} ? 'bg-gold-50/70' : ''">
                                     <td class="px-5 py-3.5 font-bold text-slate-900">{{ $p->number }}-{{ [1 => 'ша', 2 => 'га', 3 => 'тя', 4 => 'та', 5 => 'та', 6 => 'та', 7 => 'ма', 8 => 'ма'][$p->number] ?? 'та' }} пара</td>
                                     <td class="px-5 py-3.5 tabular-nums text-slate-600">{{ substr($p->starts, 0, 5) }}</td>
@@ -51,6 +51,17 @@
                                         <span x-show="current !== {{ $p->number }}" class="text-slate-300">—</span>
                                     </td>
                                 </tr>
+                                @php
+                                    $next = $periods->values()->get($i + 1);
+                                    $gap = $next ? \Carbon\Carbon::parse($p->ends)->diffInMinutes(\Carbon\Carbon::parse($next->starts)) : 0;
+                                @endphp
+                                @if ($next && $gap > 0)
+                                    <tr>
+                                        <td colspan="4" class="px-5 py-2 text-center text-xs {{ $gap >= 20 ? 'bg-gold-50 font-semibold text-gold-700' : 'bg-slate-50 text-slate-400' }}">
+                                            {{ $gap >= 20 ? 'Велика перерва' : 'Перерва' }} · {{ $gap }} хв
+                                        </td>
+                                    </tr>
+                                @endif
                             @endforeach
                         </tbody>
                     </table>
