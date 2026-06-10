@@ -421,6 +421,30 @@
                 tick() { const st = window.bellState(periods); this.current = st.current; this.status = st.status; },
             });
 
+            // Прелоад сторінок при наведенні: клік відчувається миттєвим.
+            // Пропускаємо зовнішні лінки, файли, адмінку та режим економії трафіку.
+            (function () {
+                const conn = navigator.connection;
+                if (conn && (conn.saveData || /2g/.test(conn.effectiveType || ''))) return;
+                const seen = new Set();
+                let timer = null;
+                document.addEventListener('mouseover', e => {
+                    const a = e.target.closest('a[href]');
+                    if (!a || a.origin !== location.origin || a.target === '_blank') return;
+                    const url = a.href.split('#')[0];
+                    if (seen.has(url) || url === location.href.split('#')[0]) return;
+                    if (/^\/(admin|storage|build|livewire)\b/.test(a.pathname) || /\/ics$/.test(a.pathname)) return;
+                    clearTimeout(timer);
+                    timer = setTimeout(() => {
+                        seen.add(url);
+                        const l = document.createElement('link');
+                        l.rel = 'prefetch'; l.href = url; l.as = 'document';
+                        document.head.appendChild(l);
+                    }, 65); // невелика затримка — реагуємо лише на «намір», а не на проліт курсора
+                }, { passive: true });
+                document.addEventListener('mouseout', () => clearTimeout(timer), { passive: true });
+            })();
+
             // Миттєві підказки пошуку (шапка + мобільне меню)
             window.liveSearch = (suggestUrl, searchUrl) => ({
                 q: '', items: [], open: false, busy: false,
