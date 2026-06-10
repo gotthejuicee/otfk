@@ -12,7 +12,7 @@ class News extends Model
 
     protected $fillable = [
         'category_id', 'title', 'slug', 'excerpt', 'body', 'cover_image',
-        'published_at', 'is_published', 'is_featured', 'views',
+        'published_at', 'is_published', 'is_featured', 'views', 'likes',
     ];
 
     protected function casts(): array
@@ -32,6 +32,11 @@ class News extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(NewsCategory::class, 'category_id');
+    }
+
+    public function likeRecords()
+    {
+        return $this->hasMany(NewsLike::class);
     }
 
     public function scopePublished($query)

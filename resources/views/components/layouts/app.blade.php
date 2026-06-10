@@ -23,6 +23,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     {{-- Нічна підсвітка: вмикаємо ДО першого рендеру, щоб не блимало --}}
     <script>(function(){try{if(localStorage.getItem('night')==='1')document.documentElement.classList.add('night')}catch(e){}})();</script>
     <title>{{ $title ? $title . ' - ' . config('app.name') : config('app.name') }}</title>
@@ -271,12 +272,27 @@
             </div>
         </div>
         <div class="border-t border-white/10 py-5">
+            @php
+                // Напис версії сайту: текст і колір редагуються в адмінці
+                // (Налаштування: site_version_label / site_version_color).
+                $versionLabel = trim($s['site_version_label'] ?? 'Альфа-версія');
+                $versionColors = [
+                    'gold' => ['badge' => 'bg-gold-400/15 text-gold-200 ring-gold-400/30', 'dot' => 'bg-gold-400'],
+                    'green' => ['badge' => 'bg-emerald-400/15 text-emerald-200 ring-emerald-400/30', 'dot' => 'bg-emerald-400'],
+                    'blue' => ['badge' => 'bg-sky-400/15 text-sky-200 ring-sky-400/30', 'dot' => 'bg-sky-400'],
+                    'red' => ['badge' => 'bg-red-400/15 text-red-200 ring-red-400/30', 'dot' => 'bg-red-400'],
+                    'gray' => ['badge' => 'bg-slate-400/15 text-slate-300 ring-slate-400/30', 'dot' => 'bg-slate-400'],
+                ];
+                $versionColor = $versionColors[$s['site_version_color'] ?? 'gold'] ?? $versionColors['gold'];
+            @endphp
             <div class="container-site flex flex-col items-center justify-center gap-2.5 text-center text-xs text-brand-300 sm:flex-row">
                 <span>© 2014-{{ $year }} ВСП «ОТФК ОНТУ». Усі права захищено.</span>
-                <span class="inline-flex items-center gap-1.5 rounded-full bg-gold-400/15 px-2.5 py-1 font-medium text-gold-200 ring-1 ring-gold-400/30"
-                      title="Сайт працює в режимі тестування (альфа-версія)">
-                    <span class="h-1.5 w-1.5 rounded-full bg-gold-400"></span> Альфа-версія
-                </span>
+                @if ($versionLabel !== '')
+                    <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 font-medium ring-1 {{ $versionColor['badge'] }}"
+                          title="Стадія роботи сайту">
+                        <span class="h-1.5 w-1.5 rounded-full {{ $versionColor['dot'] }}"></span> {{ $versionLabel }}
+                    </span>
+                @endif
             </div>
         </div>
     </footer>

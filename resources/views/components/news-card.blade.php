@@ -24,8 +24,14 @@
             <a href="{{ route('news.show', $item) }}" class="text-slate-900 transition hover:text-brand-700">{{ $item->title }}</a>
         </h3>
         <p class="mt-2 line-clamp-3 text-sm leading-relaxed text-slate-500">{{ $item->excerpt }}</p>
-        <a href="{{ route('news.show', $item) }}" class="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-700 transition hover:gap-2.5">
-            Читати далі <x-ico name="arrow-right" class="h-4 w-4" />
-        </a>
+        <div class="mt-4 flex items-center justify-between gap-3">
+            <a href="{{ route('news.show', $item) }}" class="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-700 transition hover:gap-2.5">
+                Читати далі <x-ico name="arrow-right" class="h-4 w-4" />
+            </a>
+            <span class="inline-flex items-center gap-3 text-xs text-slate-400">
+                <span class="inline-flex items-center gap-1" title="Переглядів"><x-ico name="eye" class="h-3.5 w-3.5" /> {{ $item->views }}</span>
+                <span class="inline-flex items-center gap-1" title="Вподобайок"><x-ico name="heart" class="h-3.5 w-3.5" /> {{ (int) $item->likes }}</span>
+            </span>
+        </div>
     </div>
 </article>

@@ -55,6 +55,7 @@ class NewsResource extends Resource
                 Tables\Columns\IconColumn::make('is_published')->label('Опубл.')->boolean(),
                 Tables\Columns\IconColumn::make('is_featured')->label('Реком.')->boolean()->toggleable(),
                 Tables\Columns\TextColumn::make('views')->label('Перегляди')->numeric()->sortable()->toggleable(),
+                Tables\Columns\TextColumn::make('likes')->label('Вподобайки')->numeric()->sortable()->toggleable(),
             ])
             ->defaultSort('published_at', 'desc')
             ->actions([Tables\Actions\EditAction::make()])

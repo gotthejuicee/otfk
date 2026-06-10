@@ -15,7 +15,22 @@
                 @if ($news->published_at)
                     <span class="inline-flex items-center gap-1.5"><x-ico name="calendar-days" class="h-4 w-4" /> {{ $news->published_at->translatedFormat('j F Y') }}</span>
                 @endif
-                <span class="inline-flex items-center gap-1.5"><x-ico name="eye" class="h-4 w-4" /> {{ $news->views }}</span>
+                <span class="inline-flex items-center gap-1.5" title="Переглядів"><x-ico name="eye" class="h-4 w-4" /> {{ $news->views }}</span>
+
+                {{-- Вподобайка (без реєстрації) --}}
+                <button type="button"
+                        x-data="{ likes: {{ (int) $news->likes }}, liked: {{ $liked ? 'true' : 'false' }}, busy: false }"
+                        @click="if (busy) return; busy = true;
+                                fetch('{{ route('news.like', $news) }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content, 'Accept': 'application/json' } })
+                                  .then(r => r.json()).then(d => { likes = d.likes; liked = d.liked; })
+                                  .finally(() => busy = false)"
+                        :class="liked ? 'bg-red-500/25 text-red-100 ring-red-400/50' : 'bg-white/10 text-brand-100 ring-white/15 hover:bg-white/15'"
+                        class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 ring-1 transition active:scale-95"
+                        :title="liked ? 'Не подобається' : 'Подобається'">
+                    <span x-show="!liked"><x-ico name="heart" class="h-4 w-4" /></span>
+                    <span x-show="liked" x-cloak><x-ico name="heart" variant="solid" class="h-4 w-4 text-red-300" /></span>
+                    <span x-text="likes">{{ (int) $news->likes }}</span>
+                </button>
             </div>
         </div>
     </section>

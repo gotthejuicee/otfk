@@ -27,17 +27,56 @@ class NewsController extends Controller
         return view('news.index', compact('news', 'categories', 'activeCategory'));
     }
 
-    public function show(News $news)
+    public function show(Request $request, News $news)
     {
         abort_unless($news->is_published, 404);
 
-        $news->increment('views');
+        // Чесний лічильник: +1 лише раз за сесію відвідувача (не накручується F5).
+        if (! $request->session()->has("viewed_news.{$news->id}")) {
+            $news->increment('views');
+            $request->session()->put("viewed_news.{$news->id}", true);
+        }
+
+        $liked = $news->likeRecords()
+            ->where('fingerprint', $this->fingerprint($request))
+            ->exists();
 
         $related = News::published()->recent()
             ->whereKeyNot($news->id)
             ->limit(3)
             ->get();
 
-        return view('news.show', compact('news', 'related'));
+        return view('news.show', compact('news', 'related', 'liked'));
+    }
+
+    /** Вподобайка без реєстрації: один лайк на відвідувача, повторний клік знімає. */
+    public function like(Request $request, News $news)
+    {
+        abort_unless($news->is_published, 404);
+
+        $fp = $this->fingerprint($request);
+
+        $existing = $news->likeRecords()->where('fingerprint', $fp)->first();
+
+        if ($existing) {
+            $existing->delete();
+            $news->where('id', $news->id)->where('likes', '>', 0)->decrement('likes');
+            $liked = false;
+        } else {
+            $news->likeRecords()->create(['fingerprint' => $fp]);
+            $news->increment('likes');
+            $liked = true;
+        }
+
+        return response()->json([
+            'likes' => (int) $news->fresh()->likes,
+            'liked' => $liked,
+        ]);
+    }
+
+    /** Анонімний відбиток відвідувача (IP + браузер) — без реєстрації та кук. */
+    private function fingerprint(Request $request): string
+    {
+        return sha1($request->ip() . '|' . (string) $request->userAgent());
     }
 }

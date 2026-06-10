@@ -18,6 +18,8 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/novyny', [NewsController::class, 'index'])->name('news.index');
 Route::get('/novyny/{news:slug}', [NewsController::class, 'show'])->name('news.show');
+Route::post('/novyny/{news:slug}/vpodobayka', [NewsController::class, 'like'])
+    ->middleware('throttle:30,1')->name('news.like');
 
 Route::get('/video', [VideoController::class, 'index'])->name('video.index');
 

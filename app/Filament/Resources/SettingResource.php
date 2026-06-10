@@ -40,9 +40,12 @@ class SettingResource extends Resource
                 ->helperText('Напр. логотип сайту. Рекомендований формат - PNG з прозорим тлом.'),
             Forms\Components\Textarea::make('value')->label('Значення')->rows(3)->columnSpanFull()
                 ->visible(fn (Forms\Get $get) => $get('type') !== 'image')
-                ->helperText(fn (Forms\Get $get) => $get('key') === 'night_opacity'
-                    ? 'Яскравість нічної підсвітки у відсотках. 0 = вимкнено, 10–15 — рекомендовано, максимум 30.'
-                    : null),
+                ->helperText(fn (Forms\Get $get) => match ($get('key')) {
+                    'night_opacity' => 'Яскравість нічної підсвітки у відсотках. 0 = вимкнено, 10–15 — рекомендовано, максимум 30.',
+                    'site_version_label' => 'Напис у підвалі сайту (напр., «Бета-версія»). Порожнє значення — приховати позначку.',
+                    'site_version_color' => 'Колір позначки версії: gold (золотий), green (зелений), blue (синій), red (червоний) або gray (сірий).',
+                    default => null,
+                }),
             Forms\Components\TextInput::make('group')->label('Група')->default('general')->maxLength(255),
         ]);
     }
