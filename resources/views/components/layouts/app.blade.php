@@ -245,6 +245,7 @@
                 <ul class="mt-4 space-y-2 text-sm text-brand-200">
                     <li><a href="{{ route('home') }}" class="hover:text-white">Головна</a></li>
                     <li><a href="{{ route('news.index') }}" class="hover:text-white">Новини</a></li>
+                    <li><a href="{{ route('events') }}" class="hover:text-white">Події</a></li>
                     <li><a href="{{ route('specialties.index') }}" class="hover:text-white">Спеціальності</a></li>
                     <li><a href="{{ route('galleries.index') }}" class="hover:text-white">Галерея</a></li>
                     <li><a href="{{ route('contacts') }}" class="hover:text-white">Контакти</a></li>

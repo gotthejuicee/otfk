@@ -24,6 +24,7 @@ Route::post('/novyny/{news:slug}/vpodobayka', [NewsController::class, 'like'])
 Route::get('/video', [VideoController::class, 'index'])->name('video.index');
 
 Route::get('/rozklad-dzvinkiv', [App\Http\Controllers\BellScheduleController::class, 'index'])->name('bells');
+Route::get('/podiyi', [App\Http\Controllers\EventController::class, 'index'])->name('events');
 
 // Публічна інформація (документи)
 Route::get('/dokumenty', [DocumentController::class, 'index'])->name('documents.index');

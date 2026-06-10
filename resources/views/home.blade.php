@@ -76,6 +76,88 @@
         </section>
     @endif
 
+    {{-- ===================== КОЛЕДЖ У ЦИФРАХ ===================== --}}
+    @if ($stats->isNotEmpty())
+        <section class="mt-16 bg-brand-950"
+                 x-data="{ shown: false }"
+                 x-init="if ('IntersectionObserver' in window) new IntersectionObserver((entries, obs) => {
+                     if (!entries[0].isIntersecting) return;
+                     obs.disconnect(); shown = true;
+                     $el.querySelectorAll('[data-count]').forEach(el => {
+                         const target = parseInt(el.dataset.count, 10);
+                         if (isNaN(target)) return;
+                         const t0 = performance.now(), dur = 1400;
+                         const step = now => {
+                             const p = Math.min((now - t0) / dur, 1);
+                             el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))).toLocaleString('uk-UA');
+                             if (p < 1) requestAnimationFrame(step);
+                         };
+                         requestAnimationFrame(step);
+                     });
+                 }, { threshold: 0.35 }).observe($el)">
+            <div class="container-site grid grid-cols-2 gap-x-6 gap-y-10 py-14 text-center lg:grid-cols-4 lg:py-16">
+                @foreach ($stats as $stat)
+                    @php
+                        // «1000+» → число 1000 і суфікс «+»; нечислові значення показуються як є
+                        preg_match('/^([^\d]*)(\d[\d\s]*)(.*)$/u', $stat->value, $m);
+                        $num = isset($m[2]) ? (int) str_replace(' ', '', $m[2]) : null;
+                    @endphp
+                    <div>
+                        @if ($stat->icon)
+                            <x-ico :name="$stat->icon" class="mx-auto mb-3 h-8 w-8 text-gold-400/80" />
+                        @endif
+                        <div class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl" style="font-family:var(--font-display)">
+                            @if ($num !== null)
+                                {{-- Початково — фінальне число (працює і без JS); анімація обнуляє його сама --}}
+                                {{ $m[1] }}<span data-count="{{ $num }}">{{ number_format($num, 0, ',', ' ') }}</span>{{ $m[3] }}
+                            @else
+                                {{ $stat->value }}
+                            @endif
+                        </div>
+                        <div class="mt-2 text-sm font-medium uppercase tracking-wide text-brand-200">{{ $stat->label }}</div>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+    @endif
+
+    {{-- ===================== НАЙБЛИЖЧІ ПОДІЇ ===================== --}}
+    @if ($events->isNotEmpty())
+        <section class="container-site py-16">
+            <div class="flex items-end justify-between gap-4">
+                <div>
+                    <h2 class="text-3xl font-extrabold text-slate-900">Найближчі події</h2>
+                    <div class="accent-rule"></div>
+                </div>
+                <a href="{{ route('events') }}" class="btn-outline shrink-0">Усі події <x-ico name="arrow-right" class="h-4 w-4" /></a>
+            </div>
+            <div class="mt-9 grid gap-5 md:grid-cols-3">
+                @foreach ($events as $event)
+                    <div class="card flex gap-4 p-5">
+                        <div class="grid h-16 w-16 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-800">
+                            <div class="text-center leading-none">
+                                <div class="text-2xl font-extrabold">{{ $event->starts_at->format('d') }}</div>
+                                <div class="mt-0.5 text-[11px] font-semibold uppercase">{{ $event->starts_at->translatedFormat('M') }}</div>
+                            </div>
+                        </div>
+                        <div class="min-w-0">
+                            <h3 class="font-bold leading-snug text-slate-900">{{ $event->title }}</h3>
+                            <p class="mt-1 text-xs text-slate-500">
+                                <x-ico name="clock" class="-mt-0.5 inline h-3.5 w-3.5" /> {{ $event->starts_at->format('H:i') }}
+                                @if ($event->location)
+                                    · <x-ico name="map-pin" class="-mt-0.5 inline h-3.5 w-3.5" /> {{ $event->location }}
+                                @endif
+                            </p>
+                            @if ($event->description)
+                                <p class="mt-1.5 line-clamp-2 text-sm text-slate-500">{{ $event->description }}</p>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+    @endif
+
     {{-- ===================== НОВИНИ ===================== --}}
     @if ($news->isNotEmpty())
         <section class="container-site py-16">

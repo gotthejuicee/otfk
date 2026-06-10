@@ -1,0 +1,75 @@
+<x-layouts.app title="Події" description="Календар подій Одеського технічного фахового коледжу ОНТУ: дні відкритих дверей, конференції, важливі дати вступної кампанії.">
+
+    <section class="bg-brand-950">
+        <div class="container-site py-12 lg:py-14">
+            <nav class="flex items-center gap-2 text-sm text-brand-300">
+                <a href="{{ route('home') }}" class="hover:text-white">Головна</a>
+                <x-ico name="chevron-right" class="h-4 w-4" />
+                <span class="text-white">Події</span>
+            </nav>
+            <h1 class="mt-3 text-3xl font-extrabold text-white sm:text-4xl">Події коледжу</h1>
+            <div class="accent-rule"></div>
+        </div>
+    </section>
+
+    <section class="container-site py-12">
+        @if ($upcoming->isEmpty() && $past->isEmpty())
+            <div class="card p-12 text-center text-slate-500">
+                <x-ico name="calendar-days" class="mx-auto h-10 w-10 text-slate-300" />
+                <p class="mt-3">Запланованих подій поки немає. Слідкуйте за оновленнями!</p>
+            </div>
+        @endif
+
+        @if ($upcoming->isNotEmpty())
+            <h2 class="text-2xl font-extrabold text-slate-900">Найближчі події</h2>
+            <div class="accent-rule"></div>
+            <div class="mt-7 space-y-4">
+                @foreach ($upcoming as $event)
+                    <div class="card flex flex-col gap-4 p-5 sm:flex-row sm:items-start">
+                        <div class="grid h-20 w-20 shrink-0 place-items-center rounded-2xl bg-brand-700 text-white shadow-sm">
+                            <div class="text-center leading-none">
+                                <div class="text-3xl font-extrabold">{{ $event->starts_at->format('d') }}</div>
+                                <div class="mt-1 text-xs font-semibold uppercase">{{ $event->starts_at->translatedFormat('M Y') }}</div>
+                            </div>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h3 class="text-lg font-bold text-slate-900">{{ $event->title }}</h3>
+                            <p class="mt-1 text-sm text-slate-500">
+                                <x-ico name="clock" class="-mt-0.5 inline h-4 w-4" />
+                                {{ $event->starts_at->translatedFormat('l, j F') }} о {{ $event->starts_at->format('H:i') }}
+                                @if ($event->ends_at)
+                                    – {{ $event->ends_at->isSameDay($event->starts_at) ? $event->ends_at->format('H:i') : $event->ends_at->translatedFormat('j F, H:i') }}
+                                @endif
+                                @if ($event->location)
+                                    <span class="ml-1">· <x-ico name="map-pin" class="-mt-0.5 inline h-4 w-4" /> {{ $event->location }}</span>
+                                @endif
+                            </p>
+                            @if ($event->description)
+                                <p class="mt-2 text-sm leading-relaxed text-slate-600">{{ $event->description }}</p>
+                            @endif
+                            @if ($event->url)
+                                <a href="{{ $event->url }}" @if (! str_starts_with($event->url, url('/'))) target="_blank" rel="noopener" @endif
+                                   class="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-700 hover:gap-2.5 transition">
+                                    Детальніше <x-ico name="arrow-right" class="h-4 w-4" />
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
+        @if ($past->isNotEmpty())
+            <h2 class="mt-14 text-xl font-bold text-slate-400">Минулі події</h2>
+            <div class="mt-5 space-y-2.5">
+                @foreach ($past as $event)
+                    <div class="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-500">
+                        <span class="shrink-0 tabular-nums font-medium">{{ $event->starts_at->format('d.m.Y') }}</span>
+                        <span class="min-w-0 truncate">{{ $event->title }}</span>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    </section>
+
+</x-layouts.app>
