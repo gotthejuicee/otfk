@@ -1,5 +1,29 @@
 <x-layouts.app title="Події" description="Календар подій Одеського технічного фахового коледжу ОНТУ: дні відкритих дверей, конференції, важливі дати вступної кампанії.">
 
+    {{-- Розмітка Event: Google може показувати події у видачі з датою та місцем --}}
+    @if ($upcoming->isNotEmpty())
+        @php
+            $eventsLd = $upcoming->map(fn ($e) => array_filter([
+                '@context' => 'https://schema.org',
+                '@type' => 'Event',
+                'name' => $e->title,
+                'startDate' => $e->starts_at->copy()->shiftTimezone('Europe/Kyiv')->toIso8601String(),
+                'endDate' => $e->ends_at?->copy()->shiftTimezone('Europe/Kyiv')->toIso8601String(),
+                'description' => $e->description,
+                'eventStatus' => 'https://schema.org/EventScheduled',
+                'eventAttendanceMode' => 'https://schema.org/OfflineEventAttendanceMode',
+                'location' => [
+                    '@type' => 'Place',
+                    'name' => $e->location ?: config('app.name'),
+                    'address' => \App\Models\Setting::get('contact_address') ?: 'м. Одеса',
+                ],
+                'organizer' => ['@type' => 'Organization', 'name' => config('app.name'), 'url' => url('/')],
+                'url' => route('events'),
+            ]))->values()->all();
+        @endphp
+        <script type="application/ld+json">{!! json_encode($eventsLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+    @endif
+
     <section class="bg-brand-950">
         <div class="container-site py-12 lg:py-14">
             <nav class="flex items-center gap-2 text-sm text-brand-300">

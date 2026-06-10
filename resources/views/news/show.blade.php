@@ -1,6 +1,22 @@
 <x-layouts.app :title="$news->title" :description="$news->excerpt"
                :og-image="$news->cover_image ? asset('storage/' . $news->cover_image) : null">
 
+    {{-- Розмітка NewsArticle для пошукових систем --}}
+    @php
+        $articleLd = array_filter([
+            '@context' => 'https://schema.org',
+            '@type' => 'NewsArticle',
+            'headline' => \Illuminate\Support\Str::limit($news->title, 110),
+            'datePublished' => $news->published_at?->copy()->shiftTimezone('Europe/Kyiv')->toIso8601String(),
+            'dateModified' => $news->updated_at?->copy()->shiftTimezone('Europe/Kyiv')->toIso8601String(),
+            'image' => $news->cover_image ? [asset('storage/' . $news->cover_image)] : null,
+            'mainEntityOfPage' => route('news.show', $news),
+            'author' => ['@type' => 'Organization', 'name' => config('app.name')],
+            'publisher' => ['@type' => 'Organization', 'name' => config('app.name'), 'url' => url('/')],
+        ]);
+    @endphp
+    <script type="application/ld+json">{!! json_encode($articleLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
+
     <section class="bg-brand-950">
         <div class="container-site py-12 lg:py-14">
             <nav class="flex flex-wrap items-center gap-2 text-sm text-brand-300">

@@ -1,4 +1,18 @@
-<x-layouts.app :title="$specialty->title">
+<x-layouts.app :title="$specialty->title" :description="$specialty->short_description">
+
+    {{-- Розмітка Course для пошукових систем --}}
+    @php
+        $courseLd = array_filter([
+            '@context' => 'https://schema.org',
+            '@type' => 'Course',
+            'name' => $specialty->title,
+            'description' => $specialty->short_description ?: ('Спеціальність «' . $specialty->title . '» — ' . config('app.name')),
+            'courseCode' => $specialty->code,
+            'url' => route('specialties.show', $specialty),
+            'provider' => ['@type' => 'CollegeOrUniversity', 'name' => config('app.name'), 'url' => url('/')],
+        ]);
+    @endphp
+    <script type="application/ld+json">{!! json_encode($courseLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 
     <section class="bg-brand-950">
         <div class="container-site py-12 lg:py-14">

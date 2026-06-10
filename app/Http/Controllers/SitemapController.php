@@ -22,6 +22,10 @@ class SitemapController extends Controller
             route('galleries.index'),
             route('video.index'),
             route('contacts'),
+            route('events'),
+            route('faq'),
+            route('bells'),
+            route('applicants.create'),
         ];
 
         foreach (News::published()->get() as $n) {
