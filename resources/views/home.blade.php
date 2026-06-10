@@ -162,7 +162,7 @@
     @if ($onThisDay)
         <section class="container-site mt-16">
             <a href="{{ route('news.show', $onThisDay) }}"
-               class="card group flex items-center gap-4 overflow-hidden p-4 transition hover:-translate-y-0.5 hover:shadow-lg sm:gap-5">
+               class="card group mx-auto flex max-w-3xl items-center gap-4 overflow-hidden p-4 transition hover:-translate-y-0.5 hover:shadow-lg sm:gap-5">
                 @if ($onThisDay->cover_image)
                     <img src="{{ asset('storage/' . $onThisDay->cover_image) }}" alt="" loading="lazy" decoding="async"
                          class="hidden h-20 w-28 shrink-0 rounded-xl object-cover sm:block">
