@@ -1,4 +1,4 @@
-@props(['title' => null, 'description' => null])
+@props(['title' => null, 'description' => null, 'ogImage' => null])
 
 @php
     use App\Models\MenuItem;
@@ -35,7 +35,8 @@
     <meta property="og:title" content="{{ $title ?: config('app.name') }}">
     <meta property="og:description" content="{{ $metaDesc }}">
     <meta property="og:url" content="{{ url()->current() }}">
-    @if ($logo)<meta property="og:image" content="{{ $logo }}">@endif
+    @php $shareImage = $ogImage ?: $logo; @endphp
+    @if ($shareImage)<meta property="og:image" content="{{ $shareImage }}">@endif
     <meta property="og:locale" content="uk_UA">
     <meta name="twitter:card" content="summary">
     <link rel="alternate" type="application/xml" title="Sitemap" href="{{ url('/sitemap.xml') }}">
