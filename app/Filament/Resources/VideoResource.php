@@ -25,13 +25,31 @@ class VideoResource extends Resource
     {
         return $form->schema([
             Forms\Components\TextInput::make('title')->label('Назва')->required()->maxLength(255)->columnSpanFull(),
-            Forms\Components\TextInput::make('youtube_id')->label('ID відео YouTube')->required()->maxLength(255)
-                ->helperText('Напр., для youtube.com/watch?v=dQw4w9WgXcQ це «dQw4w9WgXcQ».'),
+            Forms\Components\TextInput::make('youtube_id')->label('Посилання на YouTube або ID')->required()->maxLength(255)
+                ->helperText('Просто вставте посилання (youtube.com/watch?v=…, youtu.be/…, shorts) — ID збережеться сам.')
+                ->dehydrateStateUsing(fn (?string $state) => static::extractYoutubeId((string) $state)),
             Forms\Components\DatePicker::make('published_at')->label('Дата')->default(now()),
             Forms\Components\Textarea::make('description')->label('Опис')->rows(3)->columnSpanFull(),
             Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0),
             Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true),
         ]);
+    }
+
+    /** Дістає ID відео з будь-якого формату посилання YouTube (або повертає введений ID як є). */
+    public static function extractYoutubeId(string $input): string
+    {
+        $input = trim($input);
+
+        foreach ([
+            '#(?:youtube\.com|youtube-nocookie\.com)/(?:watch\?(?:[^"]*&)?v=|embed/|shorts/|live/)([A-Za-z0-9_-]{6,})#u',
+            '#youtu\.be/([A-Za-z0-9_-]{6,})#u',
+        ] as $pattern) {
+            if (preg_match($pattern, $input, $m)) {
+                return $m[1];
+            }
+        }
+
+        return $input;
     }
 
     public static function table(Table $table): Table
