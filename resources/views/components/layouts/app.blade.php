@@ -58,6 +58,38 @@
 </head>
 <body class="flex min-h-screen flex-col bg-white text-slate-700">
 
+    {{-- ============================ БАНЕР ОГОЛОШЕНЬ ============================ --}}
+    @php
+        $annText = trim($s['announcement_text'] ?? '');
+        $annType = $s['announcement_type'] ?? 'info';
+        $annUrl = trim($s['announcement_url'] ?? '');
+        $annStyles = [
+            'info' => 'bg-brand-700 text-white',
+            'warning' => 'bg-gold-500 text-white',
+            'danger' => 'bg-red-600 text-white',
+        ];
+    @endphp
+    @if ($annText !== '')
+        <div x-data="{ hidden: false }"
+             x-init="hidden = localStorage.getItem('ann-closed') === @js(md5($annText))"
+             x-show="!hidden" x-cloak
+             class="relative {{ $annStyles[$annType] ?? $annStyles['info'] }}">
+            <div class="container-site flex items-center justify-center gap-3 py-2.5 pr-10 text-center text-sm font-medium">
+                <x-ico name="megaphone" class="h-4 w-4 shrink-0" />
+                @if ($annUrl !== '')
+                    <a href="{{ $annUrl }}" class="underline decoration-white/50 underline-offset-2 hover:decoration-white">{{ $annText }}</a>
+                @else
+                    <span>{{ $annText }}</span>
+                @endif
+            </div>
+            <button type="button" aria-label="Закрити оголошення"
+                    @click="hidden = true; try { localStorage.setItem('ann-closed', @js(md5($annText))) } catch (e) {}"
+                    class="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full transition hover:bg-white/15">
+                <x-ico name="x-mark" class="h-4 w-4" />
+            </button>
+        </div>
+    @endif
+
     {{-- ============================ ШАПКА ============================ --}}
     <header x-data="{ mobile: false }">
         {{-- Утилітарна стрічка --}}

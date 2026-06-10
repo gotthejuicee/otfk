@@ -33,9 +33,9 @@
             </div>
         @endif
 
-        {{-- Підрозділи (якщо це сторінка-розділ) --}}
+        {{-- Підрозділи (якщо це сторінка-розділ); відступ зверху — лише коли вище є контент --}}
         @if ($children->isNotEmpty())
-            <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div @class(['grid gap-4 sm:grid-cols-2 lg:grid-cols-3', 'mt-10' => $page->cover_image || filled($page->excerpt) || filled($page->body)])>
                 @foreach ($children as $child)
                     <a href="{{ url('/' . $child->slug) }}" class="card group flex items-center justify-between gap-3 p-5 transition hover:-translate-y-0.5 hover:shadow-lg">
                         <span class="font-semibold text-slate-800 group-hover:text-brand-700">{{ $child->title }}</span>

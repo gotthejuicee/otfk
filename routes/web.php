@@ -26,6 +26,11 @@ Route::get('/video', [VideoController::class, 'index'])->name('video.index');
 Route::get('/rozklad-dzvinkiv', [App\Http\Controllers\BellScheduleController::class, 'index'])->name('bells');
 Route::get('/podiyi', [App\Http\Controllers\EventController::class, 'index'])->name('events');
 
+// Заявка абітурієнта
+Route::get('/zayavka', [App\Http\Controllers\ApplicantRequestController::class, 'create'])->name('applicants.create');
+Route::post('/zayavka', [App\Http\Controllers\ApplicantRequestController::class, 'store'])
+    ->middleware('throttle:5,1')->name('applicants.store');
+
 // Публічна інформація (документи)
 Route::get('/dokumenty', [DocumentController::class, 'index'])->name('documents.index');
 Route::get('/dokumenty/{documentCategory:slug}', [DocumentController::class, 'category'])->name('documents.category');
