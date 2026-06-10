@@ -57,7 +57,7 @@
                         <select id="specialty_id" name="specialty_id" class="input">
                             <option value="">— Ще не визначився / не визначилась —</option>
                             @foreach ($specialties as $sp)
-                                <option value="{{ $sp->id }}" @selected(old('specialty_id') == $sp->id)>{{ $sp->title }}</option>
+                                <option value="{{ $sp->id }}" @selected(old('specialty_id', request('specialty_id')) == $sp->id)>{{ $sp->title }}</option>
                             @endforeach
                         </select>
                     </div>

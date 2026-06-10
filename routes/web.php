@@ -28,6 +28,7 @@ Route::get('/podiyi', [App\Http\Controllers\EventController::class, 'index'])->n
 Route::get('/podiyi/{event}/ics', [App\Http\Controllers\EventController::class, 'ics'])->name('events.ics');
 
 Route::get('/faq', [App\Http\Controllers\FaqController::class, 'index'])->name('faq');
+Route::get('/kviz', [App\Http\Controllers\QuizController::class, 'index'])->name('quiz');
 
 // Заявка абітурієнта
 Route::get('/zayavka', [App\Http\Controllers\ApplicantRequestController::class, 'create'])->name('applicants.create');

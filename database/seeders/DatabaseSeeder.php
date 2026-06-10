@@ -20,6 +20,6 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $this->call([SiteSeeder::class]);
+        $this->call([SiteSeeder::class, QuizSeeder::class]);
     }
 }
