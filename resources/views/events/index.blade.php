@@ -40,7 +40,7 @@
         @if ($upcoming->isEmpty() && $past->isEmpty())
             <div class="card p-12 text-center text-slate-500">
                 <x-ico name="calendar-days" class="mx-auto h-10 w-10 text-slate-300" />
-                <p class="mt-3">Запланованих подій поки немає. Слідкуйте за оновленнями!</p>
+                <p class="mt-3">Запланованих подій поки немає.</p>
             </div>
         @endif
 

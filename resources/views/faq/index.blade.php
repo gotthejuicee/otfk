@@ -60,7 +60,7 @@
 
                 <div class="mt-10 rounded-2xl bg-brand-50 p-6 text-center ring-1 ring-brand-100">
                     <p class="font-semibold text-brand-900">Не знайшли відповідь?</p>
-                    <p class="mt-1 text-sm text-brand-700">Залиште заявку — приймальна комісія зателефонує та все розповість.</p>
+                    <p class="mt-1 text-sm text-brand-700">Залиште заявку, і приймальна комісія зателефонує вам.</p>
                     <a href="{{ route('applicants.create') }}" class="btn-primary mt-4">Залишити заявку</a>
                 </div>
             @endif
