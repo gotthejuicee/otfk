@@ -22,9 +22,20 @@ class NewsController extends Controller
             }
         }
 
+        // Фільтр за роком (архів з 2014-го)
+        $activeYear = (int) $request->query('year') ?: null;
+        if ($activeYear) {
+            $query->whereYear('published_at', $activeYear);
+        }
+
+        $years = News::published()->whereNotNull('published_at')
+            ->get(['published_at'])
+            ->map(fn ($n) => $n->published_at->year)
+            ->unique()->sortDesc()->values();
+
         $news = $query->paginate(9)->withQueryString();
 
-        return view('news.index', compact('news', 'categories', 'activeCategory'));
+        return view('news.index', compact('news', 'categories', 'activeCategory', 'years', 'activeYear'));
     }
 
     public function show(Request $request, News $news)

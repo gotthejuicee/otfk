@@ -13,9 +13,9 @@
     </section>
 
     <section class="container-site py-12">
-        {{-- Фільтр за категоріями --}}
+        {{-- Фільтр за категоріями та роком --}}
         @if ($categories->isNotEmpty())
-            <div class="mb-8 flex flex-wrap gap-2">
+            <div class="mb-8 flex flex-wrap items-center gap-2">
                 <a href="{{ route('news.index') }}"
                    @class(['rounded-full px-4 py-1.5 text-sm font-medium transition', 'bg-brand-700 text-white' => ! $activeCategory, 'bg-slate-100 text-slate-600 hover:bg-slate-200' => $activeCategory])>
                     Усі
@@ -26,6 +26,22 @@
                         {{ $cat->title }}
                     </a>
                 @endforeach
+
+                {{-- Рік (архів) --}}
+                @if ($years->count() > 1)
+                    <form method="GET" action="{{ route('news.index') }}" class="ml-auto">
+                        @if ($activeCategory)
+                            <input type="hidden" name="category" value="{{ $activeCategory->slug }}">
+                        @endif
+                        <select name="year" onchange="this.form.submit()" aria-label="Рік"
+                                class="rounded-full border-0 bg-slate-100 py-1.5 pl-4 pr-9 text-sm font-medium text-slate-600 ring-0 transition hover:bg-slate-200 focus:ring-2 focus:ring-brand-500">
+                            <option value="">Усі роки</option>
+                            @foreach ($years as $y)
+                                <option value="{{ $y }}" @selected($activeYear === $y)>{{ $y }}</option>
+                            @endforeach
+                        </select>
+                    </form>
+                @endif
             </div>
         @endif
 

@@ -20,7 +20,37 @@ class HomeController extends Controller
         $news = News::published()->recent()->with('category')->limit(6)->get();
         $videos = Video::published()->ordered()->limit(6)->get();
         $testimonials = \App\Models\Testimonial::active()->limit(3)->get();
+        $onThisDay = $this->onThisDay();
 
-        return view('home', compact('banners', 'tiles', 'stats', 'events', 'news', 'videos', 'testimonials'));
+        return view('home', compact('banners', 'tiles', 'stats', 'events', 'news', 'videos', 'testimonials', 'onThisDay'));
+    }
+
+    /**
+     * «Цього дня в коледжі»: новина цього самого дня в минулі роки
+     * (а якщо точного збігу немає — в межах ±3 днів). Архів — з 2014 року.
+     */
+    private function onThisDay(): ?News
+    {
+        $base = fn () => News::published()
+            ->whereNotNull('published_at')
+            ->whereYear('published_at', '<', now()->year)
+            ->orderByDesc('published_at');
+
+        $exact = $base()
+            ->whereMonth('published_at', now()->month)
+            ->whereDay('published_at', now()->day)
+            ->first();
+
+        if ($exact) {
+            return $exact;
+        }
+
+        // ±3 дні: порівнюємо «день у році» незалежно від року
+        $window = collect(range(-3, 3))
+            ->map(fn ($d) => now()->copy()->addDays($d)->format('m-d'));
+
+        return $base()
+            ->get(['id', 'title', 'slug', 'published_at', 'cover_image'])
+            ->first(fn ($n) => $window->contains($n->published_at->format('m-d')));
     }
 }
