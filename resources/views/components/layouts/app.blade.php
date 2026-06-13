@@ -286,7 +286,7 @@
     </main>
 
     {{-- Підвал --}}
-    <footer class="mt-20 bg-brand-950 text-brand-100">
+    <footer class="border-t border-white/15 bg-brand-950 text-brand-100">
         <div class="container-site grid gap-10 py-14 md:grid-cols-2 lg:grid-cols-4">
             <div class="lg:col-span-1">
                 <div class="flex items-center gap-3">
