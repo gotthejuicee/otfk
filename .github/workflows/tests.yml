@@ -1,0 +1,43 @@
+name: Тести
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    name: PHP 8.3 · php artisan test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Клонування коду
+        uses: actions/checkout@v4
+
+      - name: Налаштування PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo_sqlite, sqlite3, bcmath, gd, zip, intl, fileinfo
+          coverage: none
+
+      - name: Шлях кешу Composer
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Кешування залежностей
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: composer-
+
+      - name: Встановлення залежностей
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Підготовка середовища
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Запуск тестів
+        run: php artisan test

@@ -10,12 +10,13 @@ class StatsAndEventsTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_home_shows_animated_stats(): void
+    public function test_home_shows_stats(): void
     {
+        // Лічильники показуються фінальними значеннями, без анімації відліку
         $this->get('/')
             ->assertOk()
             ->assertSee('Студентів')
-            ->assertSee('data-count', escape: false);
+            ->assertSee('Спеціальностей');
     }
 
     public function test_events_page_renders_empty_state(): void
