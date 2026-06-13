@@ -76,51 +76,6 @@
         </section>
     @endif
 
-    {{-- ===================== КОЛЕДЖ У ЦИФРАХ ===================== --}}
-    @if ($stats->isNotEmpty())
-        <section data-reveal class="mt-16 bg-brand-950"
-                 x-data="{ shown: false }"
-                 x-init="if ('IntersectionObserver' in window) new IntersectionObserver((entries, obs) => {
-                     if (!entries[0].isIntersecting) return;
-                     obs.disconnect(); shown = true;
-                     $el.querySelectorAll('[data-count]').forEach(el => {
-                         const target = parseInt(el.dataset.count, 10);
-                         if (isNaN(target)) return;
-                         const t0 = performance.now(), dur = 1400;
-                         const step = now => {
-                             const p = Math.min((now - t0) / dur, 1);
-                             el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))).toLocaleString('uk-UA');
-                             if (p < 1) requestAnimationFrame(step);
-                         };
-                         requestAnimationFrame(step);
-                     });
-                 }, { threshold: 0.35 }).observe($el)">
-            <div class="container-site grid grid-cols-2 gap-x-6 gap-y-10 py-14 text-center lg:grid-cols-4 lg:py-16">
-                @foreach ($stats as $stat)
-                    @php
-                        // «1000+» → число 1000 і суфікс «+»; нечислові значення показуються як є
-                        preg_match('/^([^\d]*)(\d[\d\s]*)(.*)$/u', $stat->value, $m);
-                        $num = isset($m[2]) ? (int) str_replace(' ', '', $m[2]) : null;
-                    @endphp
-                    <div>
-                        @if ($stat->icon)
-                            <x-ico :name="$stat->icon" class="mx-auto mb-3 h-8 w-8 text-gold-400/80" />
-                        @endif
-                        <div class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl" style="font-family:var(--font-display)">
-                            @if ($num !== null)
-                                {{-- Початково — фінальне число (працює і без JS); анімація обнуляє його сама --}}
-                                {{ $m[1] }}<span data-count="{{ $num }}">{{ number_format($num, 0, ',', ' ') }}</span>{{ $m[3] }}
-                            @else
-                                {{ $stat->value }}
-                            @endif
-                        </div>
-                        <div class="mt-2 text-sm font-medium uppercase tracking-wide text-brand-200">{{ $stat->label }}</div>
-                    </div>
-                @endforeach
-            </div>
-        </section>
-    @endif
-
     {{-- ===================== НАЙБЛИЖЧІ ПОДІЇ ===================== --}}
     @if ($events->isNotEmpty())
         <section data-reveal class="container-site py-16">
@@ -155,32 +110,6 @@
                     </div>
                 @endforeach
             </div>
-        </section>
-    @endif
-
-    {{-- ===================== ЦЬОГО ДНЯ В КОЛЕДЖІ ===================== --}}
-    @if ($onThisDay)
-        <section data-reveal class="container-site mt-16">
-            <a href="{{ route('news.show', $onThisDay) }}"
-               class="card group mx-auto flex max-w-3xl items-center gap-4 overflow-hidden p-4 transition hover:-translate-y-0.5 hover:shadow-lg sm:gap-5">
-                @if ($onThisDay->cover_image)
-                    <img src="{{ asset('storage/' . $onThisDay->cover_image) }}" alt="" loading="lazy" decoding="async"
-                         class="hidden h-20 w-28 shrink-0 rounded-xl object-cover sm:block">
-                @else
-                    <span class="hidden h-20 w-28 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-700 to-brand-900 text-white/30 sm:grid">
-                        <x-ico name="clock" class="h-8 w-8" />
-                    </span>
-                @endif
-                <div class="min-w-0 flex-1">
-                    <p class="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-gold-600">
-                        <x-ico name="sparkles" class="h-3.5 w-3.5" />
-                        Цього дня у {{ $onThisDay->published_at->year }} році
-                    </p>
-                    <h3 class="mt-1 line-clamp-2 font-bold text-slate-900 transition group-hover:text-brand-700">{{ $onThisDay->title }}</h3>
-                    <p class="mt-0.5 text-xs text-slate-400">{{ $onThisDay->published_at->translatedFormat('j F Y') }} · з архіву коледжу</p>
-                </div>
-                <x-ico name="arrow-right" class="h-5 w-5 shrink-0 text-slate-300 transition group-hover:translate-x-1 group-hover:text-brand-600" />
-            </a>
         </section>
     @endif
 
@@ -263,6 +192,60 @@
                     </figure>
                 @endforeach
             </div>
+        </section>
+    @endif
+
+    {{-- ===================== КОЛЕДЖ У ЦИФРАХ ===================== --}}
+    @if ($stats->isNotEmpty())
+        <section data-reveal class="mt-16 bg-brand-950">
+            <div class="container-site grid grid-cols-2 gap-x-6 gap-y-10 py-14 text-center lg:grid-cols-4 lg:py-16">
+                @foreach ($stats as $stat)
+                    @php
+                        // «1000+» → «1 000+» (розряди), решта значень — як є; без анімації
+                        preg_match('/^([^\d]*)(\d[\d\s]*)(.*)$/u', $stat->value, $m);
+                        $num = isset($m[2]) ? (int) str_replace(' ', '', $m[2]) : null;
+                    @endphp
+                    <div>
+                        @if ($stat->icon)
+                            <x-ico :name="$stat->icon" class="mx-auto mb-3 h-8 w-8 text-gold-400/80" />
+                        @endif
+                        <div class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl" style="font-family:var(--font-display)">
+                            @if ($num !== null)
+                                {{ $m[1] }}{{ number_format($num, 0, ',', ' ') }}{{ $m[3] }}
+                            @else
+                                {{ $stat->value }}
+                            @endif
+                        </div>
+                        <div class="mt-2 text-sm font-medium uppercase tracking-wide text-brand-200">{{ $stat->label }}</div>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+    @endif
+
+    {{-- ===================== ЦЬОГО ДНЯ В КОЛЕДЖІ ===================== --}}
+    @if ($onThisDay)
+        <section data-reveal class="container-site mt-16">
+            <a href="{{ route('news.show', $onThisDay) }}"
+               class="card group mx-auto flex max-w-3xl items-center gap-4 overflow-hidden p-4 transition hover:-translate-y-0.5 hover:shadow-lg sm:gap-5">
+                @if ($onThisDay->cover_image)
+                    <img src="{{ asset('storage/' . $onThisDay->cover_image) }}" alt="" loading="lazy" decoding="async"
+                         class="hidden h-20 w-28 shrink-0 rounded-xl object-cover sm:block">
+                @else
+                    <span class="hidden h-20 w-28 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-700 to-brand-900 text-white/30 sm:grid">
+                        <x-ico name="clock" class="h-8 w-8" />
+                    </span>
+                @endif
+                <div class="min-w-0 flex-1">
+                    <p class="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-gold-600">
+                        <x-ico name="sparkles" class="h-3.5 w-3.5" />
+                        Цього дня у {{ $onThisDay->published_at->year }} році
+                    </p>
+                    <h3 class="mt-1 line-clamp-2 font-bold text-slate-900 transition group-hover:text-brand-700">{{ $onThisDay->title }}</h3>
+                    <p class="mt-0.5 text-xs text-slate-400">{{ $onThisDay->published_at->translatedFormat('j F Y') }} · з архіву коледжу</p>
+                </div>
+                <x-ico name="arrow-right" class="h-5 w-5 shrink-0 text-slate-300 transition group-hover:translate-x-1 group-hover:text-brand-600" />
+            </a>
         </section>
     @endif
 
