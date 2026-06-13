@@ -69,7 +69,8 @@
     .btn-outline,
     .btn-ghost {
         @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold
-               transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-60;
+               transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-60
+               active:scale-[.97];
     }
     .btn-primary {
         @apply bg-brand-700 text-white shadow-sm shadow-brand-900/20 hover:bg-brand-800 focus-visible:ring-brand-500;
@@ -111,6 +112,22 @@
 }
 
 [x-cloak] { display: none !important; }
+
+/* Поява секцій при прокручуванні (scroll-reveal).
+   Анімація вмикається ЛИШЕ коли є JS і користувач не просив зменшити рух —
+   інакше весь контент показується одразу (доступність + надійність). */
+@media (prefers-reduced-motion: no-preference) {
+    html.js [data-reveal] {
+        opacity: 0;
+        transform: translateY(18px);
+        transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.7, 0.3, 1);
+        will-change: opacity, transform;
+    }
+    html.js [data-reveal].is-visible {
+        opacity: 1;
+        transform: none;
+    }
+}
 
 /* Нічна підсвітка — тепле приглушення поверх усієї сторінки (це НЕ темна тема:
    дизайн лишається світлим, просто менше різкого білого ввечері) */

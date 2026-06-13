@@ -78,7 +78,7 @@
 
     {{-- ===================== КОЛЕДЖ У ЦИФРАХ ===================== --}}
     @if ($stats->isNotEmpty())
-        <section class="mt-16 bg-brand-950"
+        <section data-reveal class="mt-16 bg-brand-950"
                  x-data="{ shown: false }"
                  x-init="if ('IntersectionObserver' in window) new IntersectionObserver((entries, obs) => {
                      if (!entries[0].isIntersecting) return;
@@ -123,7 +123,7 @@
 
     {{-- ===================== НАЙБЛИЖЧІ ПОДІЇ ===================== --}}
     @if ($events->isNotEmpty())
-        <section class="container-site py-16">
+        <section data-reveal class="container-site py-16">
             <div class="flex items-end justify-between gap-4">
                 <div>
                     <h2 class="text-3xl font-extrabold text-slate-900">Найближчі події</h2>
@@ -160,7 +160,7 @@
 
     {{-- ===================== ЦЬОГО ДНЯ В КОЛЕДЖІ ===================== --}}
     @if ($onThisDay)
-        <section class="container-site mt-16">
+        <section data-reveal class="container-site mt-16">
             <a href="{{ route('news.show', $onThisDay) }}"
                class="card group mx-auto flex max-w-3xl items-center gap-4 overflow-hidden p-4 transition hover:-translate-y-0.5 hover:shadow-lg sm:gap-5">
                 @if ($onThisDay->cover_image)
@@ -186,7 +186,7 @@
 
     {{-- ===================== НОВИНИ ===================== --}}
     @if ($news->isNotEmpty())
-        <section class="container-site py-16">
+        <section data-reveal class="container-site py-16">
             <div class="flex items-end justify-between gap-4">
                 <div>
                     <h2 class="text-3xl font-extrabold text-slate-900">Останні новини</h2>
@@ -204,7 +204,7 @@
 
     {{-- ===================== ВІДЕО ===================== --}}
     @if ($videos->isNotEmpty())
-        <section class="bg-slate-50 py-16">
+        <section data-reveal class="bg-slate-50 py-16">
             <div class="container-site">
                 <div class="flex items-end justify-between gap-4">
                     <div>
@@ -236,7 +236,7 @@
 
     {{-- ===================== ВІДГУКИ ===================== --}}
     @if ($testimonials->isNotEmpty())
-        <section class="container-site py-16">
+        <section data-reveal class="container-site py-16">
             <div class="text-center">
                 <h2 class="text-3xl font-extrabold text-slate-900">Відгуки студентів та випускників</h2>
                 <div class="accent-rule mx-auto"></div>

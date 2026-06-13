@@ -26,6 +26,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     {{-- Нічна підсвітка: вмикаємо ДО першого рендеру, щоб не блимало --}}
     <script>(function(){try{if(localStorage.getItem('night')==='1')document.documentElement.classList.add('night')}catch(e){}})();</script>
+    {{-- Позначка, що JS активний — лише тоді вмикається scroll-reveal (без FOUC) --}}
+    <script>document.documentElement.classList.add('js')</script>
     <title>{{ $title ? $title . ' - ' . config('app.name') : config('app.name') }}</title>
     <link rel="icon" href="{{ $favicon }}"@if (\Illuminate\Support\Str::endsWith($favicon, '.svg')) type="image/svg+xml"@endif>
     <link rel="apple-touch-icon" href="{{ $favicon }}">
@@ -460,6 +462,22 @@
                 },
                 allUrl() { return searchUrl + '?q=' + encodeURIComponent(this.q.trim()); },
             });
+
+            // Поява секцій при прокручуванні. Вимикається, якщо немає підтримки
+            // або користувач у системі обрав «зменшити рух» — тоді все видно одразу.
+            (function () {
+                const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+                if (reduce || !('IntersectionObserver' in window)) {
+                    document.querySelectorAll('[data-reveal]').forEach(el => el.classList.add('is-visible'));
+                    return;
+                }
+                const io = new IntersectionObserver((entries) => {
+                    entries.forEach(e => {
+                        if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); }
+                    });
+                }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+                document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
+            })();
         })();
     </script>
 </body>
