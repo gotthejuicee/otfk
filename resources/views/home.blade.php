@@ -195,6 +195,33 @@
         </section>
     @endif
 
+    {{-- ===================== ЦЬОГО ДНЯ В КОЛЕДЖІ ===================== --}}
+    @if ($onThisDay)
+        <section data-reveal class="container-site mt-16">
+            <a href="{{ route('news.show', $onThisDay) }}"
+               class="card group mx-auto flex max-w-3xl items-center gap-4 overflow-hidden p-4 transition hover:-translate-y-0.5 hover:shadow-lg sm:gap-5">
+                @if ($onThisDay->cover_image)
+                    <img src="{{ asset('storage/' . $onThisDay->cover_image) }}" alt="" loading="lazy" decoding="async"
+                         class="h-16 w-24 shrink-0 rounded-xl object-cover sm:h-20 sm:w-28">
+                @else
+                    <span class="grid h-16 w-24 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-700 to-brand-900 text-white/30 sm:h-20 sm:w-28">
+                        <x-ico name="clock" class="h-8 w-8" />
+                    </span>
+                @endif
+                <div class="min-w-0 flex-1">
+                    @php $sameDay = $onThisDay->published_at->format('m-d') === now()->format('m-d'); @endphp
+                    <p class="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-gold-600">
+                        <x-ico name="sparkles" class="h-3.5 w-3.5" />
+                        {{ $sameDay ? 'Цього дня' : 'Цими днями' }} у {{ $onThisDay->published_at->year }} році
+                    </p>
+                    <h3 class="mt-1 line-clamp-2 font-bold text-slate-900 transition group-hover:text-brand-700">{{ $onThisDay->title }}</h3>
+                    <p class="mt-0.5 text-xs text-slate-400">{{ $onThisDay->published_at->translatedFormat('j F Y') }} · з архіву коледжу</p>
+                </div>
+                <x-ico name="arrow-right" class="h-5 w-5 shrink-0 text-slate-300 transition group-hover:translate-x-1 group-hover:text-brand-600" />
+            </a>
+        </section>
+    @endif
+
     {{-- ===================== КОЛЕДЖ У ЦИФРАХ ===================== --}}
     @if ($stats->isNotEmpty())
         <section data-reveal class="mt-16 bg-brand-950">
@@ -220,33 +247,6 @@
                     </div>
                 @endforeach
             </div>
-        </section>
-    @endif
-
-    {{-- ===================== ЦЬОГО ДНЯ В КОЛЕДЖІ ===================== --}}
-    @if ($onThisDay)
-        <section data-reveal class="container-site mt-16">
-            <a href="{{ route('news.show', $onThisDay) }}"
-               class="card group mx-auto flex max-w-3xl items-center gap-4 overflow-hidden p-4 transition hover:-translate-y-0.5 hover:shadow-lg sm:gap-5">
-                @if ($onThisDay->cover_image)
-                    <img src="{{ asset('storage/' . $onThisDay->cover_image) }}" alt="" loading="lazy" decoding="async"
-                         class="hidden h-20 w-28 shrink-0 rounded-xl object-cover sm:block">
-                @else
-                    <span class="hidden h-20 w-28 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-700 to-brand-900 text-white/30 sm:grid">
-                        <x-ico name="clock" class="h-8 w-8" />
-                    </span>
-                @endif
-                <div class="min-w-0 flex-1">
-                    @php $sameDay = $onThisDay->published_at->format('m-d') === now()->format('m-d'); @endphp
-                    <p class="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-gold-600">
-                        <x-ico name="sparkles" class="h-3.5 w-3.5" />
-                        {{ $sameDay ? 'Цього дня' : 'Цими днями' }} у {{ $onThisDay->published_at->year }} році
-                    </p>
-                    <h3 class="mt-1 line-clamp-2 font-bold text-slate-900 transition group-hover:text-brand-700">{{ $onThisDay->title }}</h3>
-                    <p class="mt-0.5 text-xs text-slate-400">{{ $onThisDay->published_at->translatedFormat('j F Y') }} · з архіву коледжу</p>
-                </div>
-                <x-ico name="arrow-right" class="h-5 w-5 shrink-0 text-slate-300 transition group-hover:translate-x-1 group-hover:text-brand-600" />
-            </a>
         </section>
     @endif
 
