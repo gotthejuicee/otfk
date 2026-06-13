@@ -237,9 +237,10 @@
                     </span>
                 @endif
                 <div class="min-w-0 flex-1">
+                    @php $sameDay = $onThisDay->published_at->format('m-d') === now()->format('m-d'); @endphp
                     <p class="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-gold-600">
                         <x-ico name="sparkles" class="h-3.5 w-3.5" />
-                        Цього дня у {{ $onThisDay->published_at->year }} році
+                        {{ $sameDay ? 'Цього дня' : 'Цими днями' }} у {{ $onThisDay->published_at->year }} році
                     </p>
                     <h3 class="mt-1 line-clamp-2 font-bold text-slate-900 transition group-hover:text-brand-700">{{ $onThisDay->title }}</h3>
                     <p class="mt-0.5 text-xs text-slate-400">{{ $onThisDay->published_at->translatedFormat('j F Y') }} · з архіву коледжу</p>
