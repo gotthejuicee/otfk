@@ -16,6 +16,17 @@
     $year = date('Y');
     // Яскравість нічної підсвітки з адмінки (відсотки → 0..0.4), із захистом від зайвого затемнення
     $nightOpacity = max(0, min(40, (float) ($s['night_opacity'] ?? 13))) / 100;
+
+    // Чи веде пункт меню на поточну сторінку (порівнюємо шлях без домену й слешів) — для aria-current
+    $currentPath = rtrim(request()->getPathInfo(), '/') ?: '/';
+    $navCurrent = function (?string $href) use ($currentPath) {
+        if (! $href || $href === '#') {
+            return false;
+        }
+        $path = rtrim(parse_url($href, PHP_URL_PATH) ?: '/', '/') ?: '/';
+
+        return $path === $currentPath;
+    };
 @endphp
 
 <!DOCTYPE html>
@@ -38,9 +49,13 @@
     <meta property="og:description" content="{{ $metaDesc }}">
     <meta property="og:url" content="{{ url()->current() }}">
     @php $shareImage = $ogImage ?: $logo; @endphp
-    @if ($shareImage)<meta property="og:image" content="{{ $shareImage }}">@endif
+    @if ($shareImage)
+        <meta property="og:image" content="{{ $shareImage }}">
+        <meta property="og:image:alt" content="{{ $title ?: config('app.name') }}">
+    @endif
     <meta property="og:locale" content="uk_UA">
-    <meta name="twitter:card" content="summary">
+    {{-- Велика картка лише коли є справжня обкладинка сторінки (не логотип-фолбек) --}}
+    <meta name="twitter:card" content="{{ $ogImage ? 'summary_large_image' : 'summary' }}">
     <link rel="alternate" type="application/xml" title="Sitemap" href="{{ url('/sitemap.xml') }}">
     <link rel="canonical" href="{{ url()->current() }}">
     @php $jsonld = array_filter([
@@ -60,6 +75,12 @@
 </head>
 <body class="flex min-h-screen flex-col bg-white text-slate-700">
 
+    {{-- Пропустити навігацію (зʼявляється лише при фокусі з клавіатури) --}}
+    <a href="#main-content"
+       class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-brand-700 focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-white">
+        Перейти до основного вмісту
+    </a>
+
     {{-- ============================ БАНЕР ОГОЛОШЕНЬ ============================ --}}
     @php
         $annText = trim($s['announcement_text'] ?? '');
@@ -74,7 +95,7 @@
     @if ($annText !== '')
         <div x-data="{ hidden: false }"
              x-init="hidden = localStorage.getItem('ann-closed') === @js(md5($annText))"
-             x-show="!hidden" x-cloak
+             x-show="!hidden" x-cloak role="status" aria-live="polite"
              class="relative {{ $annStyles[$annType] ?? $annStyles['info'] }}">
             <div class="container-site flex items-center justify-center gap-3 py-2.5 pr-10 text-center text-sm font-medium">
                 <x-ico name="megaphone" class="h-4 w-4 shrink-0" />
@@ -150,7 +171,7 @@
                         </span>
                     @endif
                     <span class="leading-tight">
-                        <span class="block whitespace-nowrap text-lg font-extrabold tracking-tight text-brand-900" style="font-family:var(--font-display)">{{ $s['brand_short'] ?? 'ОТФК ОНТУ' }}</span>
+                        <span class="font-display block whitespace-nowrap text-lg font-extrabold tracking-tight text-brand-900">{{ $s['brand_short'] ?? 'ОТФК ОНТУ' }}</span>
                         <span class="hidden whitespace-nowrap text-xs text-slate-500 sm:block">{{ $s['brand_name'] ?? 'Одеський технічний фаховий коледж' }}</span>
                     </span>
                 </a>
@@ -213,13 +234,23 @@
                                      class="absolute left-0 top-full z-50 max-h-[75vh] w-72 overflow-y-auto rounded-b-xl border border-slate-200 bg-white p-2 shadow-2xl">
                                     @foreach ($item->children as $child)
                                         <a href="{{ $child->href }}" @if ($child->open_new_tab) target="_blank" @endif
-                                           class="block rounded-lg px-3 py-2 text-sm text-slate-600 transition hover:bg-brand-50 hover:text-brand-800">{{ $child->label }}</a>
+                                           @if ($navCurrent($child->href)) aria-current="page" @endif
+                                           @class([
+                                               'block rounded-lg px-3 py-2 text-sm transition hover:bg-brand-50 hover:text-brand-800',
+                                               'text-slate-600' => ! $navCurrent($child->href),
+                                               'bg-brand-50 font-semibold text-brand-800' => $navCurrent($child->href),
+                                           ])>{{ $child->label }}</a>
                                     @endforeach
                                 </div>
                             </div>
                         @else
                             <a href="{{ $item->href }}" @if ($item->open_new_tab) target="_blank" @endif
-                               class="flex shrink-0 items-center whitespace-nowrap border-b-2 border-transparent px-2 py-3 text-[13px] font-medium text-white/90 transition hover:border-gold-400 hover:bg-white/5 hover:text-white">{{ $item->label }}</a>
+                               @if ($navCurrent($item->href)) aria-current="page" @endif
+                               @class([
+                                   'flex shrink-0 items-center whitespace-nowrap border-b-2 px-2 py-3 text-[13px] font-medium transition hover:bg-white/5',
+                                   'border-transparent text-white/90 hover:border-gold-400 hover:text-white' => ! $navCurrent($item->href),
+                                   'border-gold-400 text-white' => $navCurrent($item->href),
+                               ])>{{ $item->label }}</a>
                         @endif
                     @endforeach
                 </div>
@@ -232,7 +263,7 @@
             <div class="absolute right-0 top-0 flex h-full w-80 max-w-[88%] flex-col bg-white shadow-2xl"
                  x-transition:enter="transition ease-out duration-200" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0">
                 <div class="flex h-16 items-center justify-between border-b border-slate-200 px-5">
-                    <span class="font-extrabold text-brand-900" style="font-family:var(--font-display)">Меню</span>
+                    <span class="font-display font-extrabold text-brand-900">Меню</span>
                     <button @click="mobile = false" class="btn-ghost p-2"><x-ico name="x-mark" class="h-6 w-6" /></button>
                 </div>
                 <div class="border-b border-slate-100 p-4">
@@ -266,13 +297,23 @@
                                 <div x-show="sub" x-cloak class="pb-2">
                                     @foreach ($item->children as $child)
                                         <a href="{{ $child->href }}" @if ($child->open_new_tab) target="_blank" @endif
-                                           class="block rounded-lg px-5 py-2 text-sm text-slate-600 hover:bg-brand-50 hover:text-brand-800">{{ $child->label }}</a>
+                                           @if ($navCurrent($child->href)) aria-current="page" @endif
+                                           @class([
+                                               'block rounded-lg px-5 py-2 text-sm hover:bg-brand-50 hover:text-brand-800',
+                                               'text-slate-600' => ! $navCurrent($child->href),
+                                               'bg-brand-50 font-semibold text-brand-800' => $navCurrent($child->href),
+                                           ])>{{ $child->label }}</a>
                                     @endforeach
                                 </div>
                             </div>
                         @else
                             <a href="{{ $item->href }}" @if ($item->open_new_tab) target="_blank" @endif
-                               class="block border-b border-slate-100 px-3 py-3 text-sm font-semibold text-slate-800 hover:text-brand-800">{{ $item->label }}</a>
+                               @if ($navCurrent($item->href)) aria-current="page" @endif
+                               @class([
+                                   'block border-b border-slate-100 px-3 py-3 text-sm font-semibold hover:text-brand-800',
+                                   'text-slate-800' => ! $navCurrent($item->href),
+                                   'text-brand-700' => $navCurrent($item->href),
+                               ])>{{ $item->label }}</a>
                         @endif
                     @endforeach
                 </nav>
@@ -281,7 +322,7 @@
     </header>
 
     {{-- Вміст --}}
-    <main class="flex-1">
+    <main id="main-content" class="flex-1">
         {{ $slot }}
     </main>
 
@@ -299,7 +340,7 @@
                             <x-ico name="academic-cap" class="h-6 w-6" />
                         </span>
                     @endif
-                    <span class="font-extrabold text-white" style="font-family:var(--font-display)">{{ $s['brand_short'] ?? 'ОТФК ОНТУ' }}</span>
+                    <span class="font-display font-extrabold text-white">{{ $s['brand_short'] ?? 'ОТФК ОНТУ' }}</span>
                 </div>
                 <p class="mt-4 text-sm leading-relaxed text-brand-200">
                     {{ $s['footer_about'] ?? 'Одеський технічний фаховий коледж Одеського національного технологічного університету.' }}
