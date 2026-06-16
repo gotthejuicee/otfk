@@ -59,6 +59,7 @@
     {{-- ===================== ШВИДКІ РОЗДІЛИ ===================== --}}
     @if ($tiles->isNotEmpty())
         <section class="container-site mt-12">
+            <h2 class="sr-only">Швидкі розділи</h2>
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 @foreach ($tiles as $tile)
                     <a href="{{ $tile->url }}" @if ($tile->open_new_tab) target="_blank" rel="noopener" @endif

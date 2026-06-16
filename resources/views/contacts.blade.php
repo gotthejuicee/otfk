@@ -55,7 +55,8 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('contacts.store') }}" class="mt-6 space-y-5">
+            <form method="POST" action="{{ route('contacts.store') }}" class="mt-6 space-y-5"
+                  x-data="{ sending: false }" @submit="sending = true">
                 @csrf
                 {{-- Honeypot (антиспам): приховане поле, яке заповнюють лише боти --}}
                 <div class="hidden" aria-hidden="true">
@@ -89,8 +90,13 @@
                     <textarea id="message" name="message" rows="5" required class="input @error('message') ring-rose-400 @enderror">{{ old('message') }}</textarea>
                     @error('message') <p class="mt-1.5 text-sm text-rose-600">{{ $message }}</p> @enderror
                 </div>
-                <button type="submit" class="btn-primary w-full sm:w-auto">
-                    <x-ico name="paper-airplane" class="h-4 w-4" /> Надіслати звернення
+                <button type="submit" class="btn-primary w-full sm:w-auto" :disabled="sending">
+                    <span x-show="!sending" class="inline-flex items-center gap-2">
+                        <x-ico name="paper-airplane" class="h-4 w-4" /> Надіслати звернення
+                    </span>
+                    <span x-show="sending" x-cloak class="inline-flex items-center gap-2">
+                        <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z" /></svg> Надсилаємо…
+                    </span>
                 </button>
             </form>
         </div>

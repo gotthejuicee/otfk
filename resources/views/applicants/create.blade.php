@@ -25,7 +25,8 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('applicants.store') }}" class="space-y-5">
+                <form method="POST" action="{{ route('applicants.store') }}" class="space-y-5"
+                      x-data="{ sending: false }" @submit="sending = true">
                     @csrf
                     {{-- Honeypot (антиспам) --}}
                     <div class="hidden" aria-hidden="true">
@@ -67,8 +68,13 @@
                         <textarea id="message" name="message" rows="4" class="input" placeholder="Напр.: чи є місця на бюджет після 9 класу?">{{ old('message') }}</textarea>
                     </div>
 
-                    <button type="submit" class="btn-primary w-full sm:w-auto">
-                        <x-ico name="paper-airplane" class="h-4 w-4" /> Надіслати заявку
+                    <button type="submit" class="btn-primary w-full sm:w-auto" :disabled="sending">
+                        <span x-show="!sending" class="inline-flex items-center gap-2">
+                            <x-ico name="paper-airplane" class="h-4 w-4" /> Надіслати заявку
+                        </span>
+                        <span x-show="sending" x-cloak class="inline-flex items-center gap-2">
+                            <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z" /></svg> Надсилаємо…
+                        </span>
                     </button>
                     <p class="text-xs text-slate-400">Надсилаючи форму, ви даєте згоду на обробку вказаних контактних даних для звʼязку з вами.</p>
                 </form>
