@@ -14,9 +14,6 @@
     $favicon = ! empty($s['favicon']) ? asset('storage/' . $s['favicon']) : asset('favicon.svg');
     $metaDesc = $description ?: ($s['site_description'] ?? 'Офіційний сайт Одеського технічного фахового коледжу ОНТУ.');
     $year = date('Y');
-    // Яскравість нічної підсвітки з адмінки (відсотки → 0..0.4), із захистом від зайвого затемнення
-    $nightOpacity = max(0, min(40, (float) ($s['night_opacity'] ?? 13))) / 100;
-
     // Чи веде пункт меню на поточну сторінку (порівнюємо шлях без домену й слешів) — для aria-current
     $currentPath = rtrim(request()->getPathInfo(), '/') ?: '/';
     $navCurrent = function (?string $href) use ($currentPath) {
@@ -35,8 +32,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    {{-- Нічна підсвітка: вмикаємо ДО першого рендеру, щоб не блимало --}}
-    <script>(function(){try{if(localStorage.getItem('night')==='1')document.documentElement.classList.add('night')}catch(e){}})();</script>
+    {{-- Темна тема: ставимо ДО першого рендеру (вибір користувача або системна) — щоб не блимало --}}
+    <script>(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark')}catch(e){}})();</script>
     {{-- Позначка, що JS активний — лише тоді вмикається scroll-reveal (без FOUC) --}}
     <script>document.documentElement.classList.add('js')</script>
     <title>{{ $title ? $title . ' - ' . config('app.name') : config('app.name') }}</title>
@@ -202,13 +199,13 @@
                             </a>
                         </div>
                     </div>
-                    {{-- Нічна підсвітка (тепле приглушення) --}}
+                    {{-- Перемикач теми: світла / темна (за замовчуванням — як у системі) --}}
                     <button type="button"
-                            x-data="{ night: document.documentElement.classList.contains('night') }"
-                            @click="night = !night; document.documentElement.classList.toggle('night', night); try { localStorage.setItem('night', night ? '1' : '0') } catch (e) {}"
-                            class="btn-ghost p-2" title="Нічна підсвітка" :aria-label="night ? 'Вимкнути нічну підсвітку' : 'Увімкнути нічну підсвітку'">
-                        <span x-show="!night" x-cloak><x-ico name="moon" class="h-5 w-5" /></span>
-                        <span x-show="night" x-cloak><x-ico name="sun" class="h-5 w-5" /></span>
+                            x-data="{ dark: document.documentElement.classList.contains('dark') }"
+                            @click="dark = !dark; document.documentElement.classList.toggle('dark', dark); try { localStorage.setItem('theme', dark ? 'dark' : 'light') } catch (e) {}"
+                            class="btn-ghost p-2" :title="dark ? 'Світла тема' : 'Темна тема'" :aria-label="dark ? 'Увімкнути світлу тему' : 'Увімкнути темну тему'">
+                        <span x-show="!dark" x-cloak><x-ico name="moon" class="h-5 w-5" /></span>
+                        <span x-show="dark" x-cloak><x-ico name="sun" class="h-5 w-5" /></span>
                     </button>
                     {{-- CTA --}}
                     <a href="{{ url('/abituriyentu') }}" class="btn-accent hidden whitespace-nowrap sm:inline-flex">Вступнику</a>
@@ -421,9 +418,6 @@
             </div>
         </div>
     </footer>
-
-    {{-- Шар нічної підсвітки (поверх усього, кліки проходять наскрізь) --}}
-    <div id="nightshade" style="--night-opacity: {{ $nightOpacity }}" aria-hidden="true"></div>
 
     {{-- Логіка «зараз йде пара» (розклад дзвінків): спільна для плашки в шапці та сторінки розкладу --}}
     <script>

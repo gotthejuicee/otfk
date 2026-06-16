@@ -1,6 +1,9 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
+/* Темна тема керується класом .dark на <html> (ставиться скриптом за системою або вибором користувача) */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
@@ -135,20 +138,82 @@
     }
 }
 
-/* Нічна підсвітка — тепле приглушення поверх усієї сторінки (це НЕ темна тема:
-   дизайн лишається світлим, просто менше різкого білого ввечері) */
-#nightshade {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    pointer-events: none;        /* кліки проходять наскрізь */
-    background: #2a1e05;          /* теплий бурштин */
-    mix-blend-mode: multiply;     /* мʼяко притемнює + теплить */
-    opacity: 0;
-    transition: opacity 0.4s ease;
+/* ===================== СПРАВЖНЯ ТЕМНА ТЕМА =====================
+   Замість колишнього тeплого оверлея — повноцінна темна палітра (navy-теплий
+   тон, що тримає айдентику бренду). Керується класом html.dark.
+
+   Підхід: широка кисть перекриває базові поверхні/текст/межі глобально, тож
+   уся сторінка стає темною узгоджено, без правок у кожному шаблоні. Точкові
+   винятки нижче — там, де базове відображення хибне. */
+
+:root { color-scheme: light; }
+
+html.dark {
+    color-scheme: dark;
+    --bg: #0d1424;          /* фон сторінки */
+    --surface: #16223f;     /* картки, шапка, дропдауни */
+    --surface-2: #111c33;   /* підкладка секцій (замість slate-50) */
+    --elevated: #1f2d4d;    /* трохи піднята поверхня */
 }
-html.night #nightshade { opacity: var(--night-opacity, 0.13); }
+
+html.dark body { background-color: var(--bg); color: #cdd8ea; }
+
+/* Поверхні */
+html.dark .bg-white { background-color: var(--surface); }
+html.dark .bg-slate-50 { background-color: var(--surface-2); }
+html.dark .bg-slate-100 { background-color: var(--elevated); }
+html.dark .bg-brand-50 { background-color: #1b2a4d; }
+
+/* Текст */
+html.dark .text-slate-900 { color: #f1f5f9; }
+html.dark .text-slate-800 { color: #e2e8f0; }
+html.dark .text-slate-700 { color: #cbd5e1; }
+html.dark .text-slate-600 { color: #aab8cc; }
+html.dark .text-slate-500 { color: #94a3b8; }
+html.dark .text-slate-400 { color: #7e8ca3; }
+html.dark .text-brand-900 { color: #dbe4f3; }
+html.dark .text-brand-800 { color: #9fb8e2; }
+html.dark .text-brand-700 { color: #6493db; }
+
+/* Межі та ring */
+html.dark .border-slate-100,
+html.dark .border-slate-200 { border-color: rgba(255, 255, 255, 0.10); }
+html.dark .ring-slate-100,
+html.dark .ring-slate-200,
+html.dark .ring-slate-300 { --tw-ring-color: rgba(255, 255, 255, 0.10); }
+
+/* Компоненти */
+html.dark .card {
+    background-color: var(--surface);
+    --tw-ring-color: rgba(255, 255, 255, 0.10);
+}
+html.dark .input {
+    background-color: var(--surface-2);
+    color: #e8edf6;
+    --tw-ring-color: rgba(255, 255, 255, 0.14);
+}
+html.dark .input::placeholder { color: #7e8ca3; }
+html.dark .btn-outline {
+    background-color: transparent;
+    color: #cbd5e1;
+    --tw-ring-color: rgba(255, 255, 255, 0.22);
+}
+html.dark .btn-outline:hover { background-color: rgba(255, 255, 255, 0.06); }
+html.dark .btn-ghost { color: #cbd5e1; }
+html.dark .btn-ghost:hover { background-color: rgba(255, 255, 255, 0.08); }
+
+/* Поле пошуку у шапці на фокусі не має «спалахувати» білим */
+html.dark .focus\:bg-white:focus { background-color: var(--elevated); }
+
+/* Часті hover-стани, що інакше лишаються «світлими» */
+html.dark .hover\:bg-slate-100:hover { background-color: rgba(255, 255, 255, 0.06); }
+html.dark .hover\:bg-brand-50:hover { background-color: rgba(100, 147, 219, 0.12); }
+html.dark .hover\:text-brand-700:hover,
+html.dark .hover\:text-brand-800:hover { color: #6493db; }
+
+/* Плавний перехід світла↔темна (не на першому рендері — клас стоїть ще до показу) */
+body, .card, .input { transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease; }
 
 @media (prefers-reduced-motion: reduce) {
-    #nightshade { transition: none; }
+    body, .card, .input { transition: none; }
 }
