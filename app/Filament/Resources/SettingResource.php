@@ -41,7 +41,6 @@ class SettingResource extends Resource
             Forms\Components\Textarea::make('value')->label('Значення')->rows(3)->columnSpanFull()
                 ->visible(fn (Forms\Get $get) => $get('type') !== 'image')
                 ->helperText(fn (Forms\Get $get) => match ($get('key')) {
-                    'night_opacity' => 'Яскравість нічної підсвітки у відсотках. 0 = вимкнено, 10–15 — рекомендовано, максимум 30.',
                     'site_version_label' => 'Напис у підвалі сайту (напр., «Бета-версія»). Порожнє значення — приховати позначку.',
                     'site_version_color' => 'Колір позначки версії: gold (золотий), green (зелений), blue (синій), red (червоний) або gray (сірий).',
                     'telegram_autopost' => 'Автопостинг новин у Telegram: 1 — увімкнено, 0 — вимкнено. Потрібні також telegram_bot_token і telegram_channel.',

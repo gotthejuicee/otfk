@@ -43,6 +43,19 @@ class FrontendPolishTest extends TestCase
             ->assertSee('storage/news/cover.jpg', escape: false);
     }
 
+    public function test_dark_theme_replaces_old_night_overlay(): void
+    {
+        $res = $this->get('/')->assertOk();
+
+        // Нова тема: анти-мигання за збереженим вибором/системою + перемикач .dark
+        $res->assertSee("localStorage.getItem('theme')", escape: false);
+        $res->assertSee("classList.toggle('dark'", escape: false);
+
+        // Старий тeплий оверлей повністю прибрано
+        $res->assertDontSee('nightshade', escape: false);
+        $res->assertDontSee("localStorage.getItem('night')", escape: false);
+    }
+
     public function test_sitemap_has_priority_changefreq_and_lastmod(): void
     {
         News::create([
