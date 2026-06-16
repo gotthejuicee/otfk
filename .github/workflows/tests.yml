@@ -34,6 +34,10 @@ jobs:
       - name: Встановлення залежностей
         run: composer install --no-interaction --prefer-dist --no-progress
 
+      - name: Перевірка вразливостей залежностей (попереджувальна)
+        run: composer audit --no-interaction
+        continue-on-error: true
+
       - name: Підготовка середовища
         run: |
           cp .env.example .env
@@ -41,3 +45,23 @@ jobs:
 
       - name: Запуск тестів
         run: php artisan test
+
+  assets:
+    name: Збірка фронтенду (Vite)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Клонування коду
+        uses: actions/checkout@v4
+
+      - name: Налаштування Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Встановлення npm-залежностей
+        run: npm ci
+
+      - name: Збірка
+        run: npm run build

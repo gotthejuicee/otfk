@@ -5,26 +5,33 @@ namespace App\Services;
 use App\Models\News;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class TelegramPoster
 {
+    /**
+     * Чи увімкнено автопостинг і чи заповнені токен та канал.
+     */
+    public static function enabled(): bool
+    {
+        return Setting::get('telegram_autopost') === '1'
+            && trim((string) Setting::get('telegram_bot_token')) !== ''
+            && trim((string) Setting::get('telegram_channel')) !== '';
+    }
+
     /**
      * Публікує новину в Telegram-канал коледжу (якщо автопостинг увімкнено).
      * Повертає true при успішній відправці.
      */
     public static function post(News $news): bool
     {
-        if (Setting::get('telegram_autopost') !== '1') {
+        if (! static::enabled()) {
             return false;
         }
 
         $token = trim((string) Setting::get('telegram_bot_token'));
         $channel = trim((string) Setting::get('telegram_channel'));
-
-        if ($token === '' || $channel === '') {
-            return false;
-        }
 
         $url = route('news.show', $news);
         $excerpt = filled($news->excerpt) ? Str::limit(strip_tags($news->excerpt), 200) : '';
@@ -50,7 +57,19 @@ class TelegramPoster
                 ]);
             }
 
-            return $resp->successful() && ($resp->json('ok') === true);
+            $ok = $resp->successful() && ($resp->json('ok') === true);
+
+            // Позначку telegram_posted_at вже виставлено до відправки (захист від дублів),
+            // тож тиху невдачу логуємо — інакше новина «вважається опублікованою» дарма.
+            if (! $ok) {
+                Log::warning('Не вдалося запостити новину в Telegram', [
+                    'news_id' => $news->id,
+                    'status' => $resp->status(),
+                    'response' => $resp->json(),
+                ]);
+            }
+
+            return $ok;
         } catch (\Throwable $e) {
             report($e);
 
