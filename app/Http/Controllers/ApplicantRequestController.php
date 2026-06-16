@@ -36,14 +36,17 @@ class ApplicantRequestController extends Controller
         $data['ip'] = $request->ip();
         $applicant = ApplicantRequest::create($data);
 
-        // Лист приймальній комісії (форму не ламаємо, якщо пошта не налаштована)
+        // Лист приймальній комісії — після віддачі відповіді: абітурієнт не чекає
+        // на SMTP, а збій пошти не ламає форму (заявка вже збережена в БД/CRM).
         $to = Setting::get('feedback_email') ?: Setting::get('contact_email');
         if ($to) {
-            try {
-                Mail::to($to)->send(new ApplicantRequestReceived($applicant));
-            } catch (\Throwable $e) {
-                report($e);
-            }
+            dispatch(function () use ($to, $applicant) {
+                try {
+                    Mail::to($to)->send(new ApplicantRequestReceived($applicant));
+                } catch (\Throwable $e) {
+                    report($e);
+                }
+            })->afterResponse();
         }
 
         return back()->with('status', 'Дякуємо! Вашу заявку прийнято — ми звʼяжемося з вами найближчим часом.');

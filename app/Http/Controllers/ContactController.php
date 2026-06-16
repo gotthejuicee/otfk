@@ -33,14 +33,17 @@ class ContactController extends Controller
         $data['ip'] = $request->ip();
         $feedback = FeedbackMessage::create($data);
 
-        // Сповіщення на пошту коледжу (не ламаємо форму, якщо пошта не налаштована).
+        // Сповіщення на пошту коледжу — після віддачі відповіді: відвідувач не
+        // чекає на SMTP, а збій пошти не ламає форму (звернення вже в БД/CRM).
         $to = Setting::get('feedback_email') ?: Setting::get('contact_email');
         if ($to) {
-            try {
-                Mail::to($to)->send(new FeedbackReceived($feedback));
-            } catch (\Throwable $e) {
-                report($e);
-            }
+            dispatch(function () use ($to, $feedback) {
+                try {
+                    Mail::to($to)->send(new FeedbackReceived($feedback));
+                } catch (\Throwable $e) {
+                    report($e);
+                }
+            })->afterResponse();
         }
 
         return back()->with('status', 'Дякуємо! Ваше звернення успішно надіслано.');

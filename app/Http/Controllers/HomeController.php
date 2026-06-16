@@ -45,12 +45,18 @@ class HomeController extends Controller
             return $exact;
         }
 
-        // ±3 дні: порівнюємо «день у році» незалежно від року
-        $window = collect(range(-3, 3))
-            ->map(fn ($d) => now()->copy()->addDays($d)->format('m-d'));
+        // ±3 дні: добу року (місяць+день) звіряємо на боці БД, не тягнучи
+        // весь архів у пам'ять. Беремо найсвіжішу новину з вікна.
+        $window = collect(range(-3, 3))->map(fn ($d) => now()->copy()->addDays($d));
 
         return $base()
-            ->get(['id', 'title', 'slug', 'published_at', 'cover_image'])
-            ->first(fn ($n) => $window->contains($n->published_at->format('m-d')));
+            ->where(function ($q) use ($window) {
+                foreach ($window as $day) {
+                    $q->orWhere(fn ($w) => $w
+                        ->whereMonth('published_at', $day->month)
+                        ->whereDay('published_at', $day->day));
+                }
+            })
+            ->first(['id', 'title', 'slug', 'published_at', 'cover_image']);
     }
 }

@@ -46,6 +46,39 @@ class ArchiveAndPolishTest extends TestCase
         $this->get('/')->assertOk()->assertDontSee('Цього дня у');
     }
 
+    public function test_on_this_day_ignores_current_year_news(): void
+    {
+        // Новина цього року в межах вікна ±3 днів НЕ має потрапляти в блок «з архіву»
+        // (стереже умову whereYear < поточного — інакше фолбек показав би свіжу новину).
+        News::create([
+            'title' => 'Цьогорічна новина',
+            'body' => '<p>т</p>',
+            'published_at' => now()->subDays(2),
+            'is_published' => true,
+        ]);
+
+        $this->get('/')->assertOk()->assertDontSee('з архіву коледжу');
+    }
+
+    public function test_on_this_day_falls_back_to_nearby_days(): void
+    {
+        // Новина не точно сьогоднішнього числа, але в межах ±3 днів — має показатись
+        // як «Цими днями» (перевіряє SQL-фолбек по вікну дат, а не точний збіг).
+        $nearby = now()->addDays(2)->subYears(2);
+
+        News::create([
+            'title' => 'Подія кількаденної давнини',
+            'body' => '<p>т</p>',
+            'published_at' => $nearby,
+            'is_published' => true,
+        ]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Цими днями у ' . $nearby->year . ' році')
+            ->assertSee('Подія кількаденної давнини');
+    }
+
     public function test_admin_dashboard_renders_quick_actions(): void
     {
         $admin = \App\Models\User::firstOrFail(); // створюється сидером

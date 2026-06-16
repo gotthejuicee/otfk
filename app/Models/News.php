@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Observers\NewsObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 
+#[ObservedBy(NewsObserver::class)]
 class News extends Model
 {
     protected $table = 'news';
@@ -60,16 +63,6 @@ class News extends Model
             }
         });
 
-        // Автопостинг у Telegram: один раз, коли новина стає опублікованою.
-        static::saved(function (News $news) {
-            $isLive = $news->is_published
-                && ($news->published_at === null || $news->published_at->lte(now()));
-
-            if ($isLive && $news->telegram_posted_at === null) {
-                if (\App\Services\TelegramPoster::post($news)) {
-                    $news->forceFill(['telegram_posted_at' => now()])->saveQuietly();
-                }
-            }
-        });
+        // Автопостинг у Telegram живе в NewsObserver (винесено з циклу збереження).
     }
 }
