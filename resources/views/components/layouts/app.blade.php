@@ -193,18 +193,18 @@
                     <a href="{{ url('/abituriyentu') }}" class="btn-accent hidden whitespace-nowrap sm:inline-flex">Вступнику</a>
                     {{-- Мобільні дії --}}
                     <a href="{{ route('search') }}" class="btn-ghost p-2 lg:hidden" aria-label="Пошук"><x-ico name="magnifying-glass" class="h-5 w-5" /></a>
-                    <button @click="mobile = true" class="btn-ghost p-2 min-[1560px]:hidden" aria-label="Меню"><x-ico name="bars-3" class="h-6 w-6" /></button>
+                    <button @click="mobile = true" class="btn-ghost p-2 xl:hidden" aria-label="Меню"><x-ico name="bars-3" class="h-6 w-6" /></button>
                 </div>
             </div>
 
             {{-- Навігаційна стрічка (десктоп) --}}
-            <nav class="hidden bg-brand-900 min-[1560px]:block">
+            <nav class="hidden bg-brand-900 xl:block">
                 <div class="mx-auto flex w-full max-w-[1600px] flex-wrap items-stretch px-4 sm:px-6 lg:px-8">
                     @foreach ($menu as $item)
                         @if ($item->children->isNotEmpty())
                             <div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false" class="relative shrink-0">
                                 <button type="button" @click="open = ! open"
-                                        class="flex items-center gap-1 whitespace-nowrap border-b-2 border-transparent px-2.5 py-3 text-[13px] font-medium text-white/90 transition hover:bg-white/5 hover:text-white"
+                                        class="flex items-center gap-1 whitespace-nowrap border-b-2 border-transparent px-2 py-3 text-[13px] font-medium text-white/90 transition hover:bg-white/5 hover:text-white"
                                         :class="open ? 'border-gold-400 bg-white/5 text-white' : ''">
                                     {{ $item->label }}
                                     <x-ico name="chevron-down" class="h-4 w-4 opacity-70 transition" x-bind:class="open && 'rotate-180'" />
@@ -219,7 +219,7 @@
                             </div>
                         @else
                             <a href="{{ $item->href }}" @if ($item->open_new_tab) target="_blank" @endif
-                               class="flex shrink-0 items-center whitespace-nowrap border-b-2 border-transparent px-2.5 py-3 text-[13px] font-medium text-white/90 transition hover:border-gold-400 hover:bg-white/5 hover:text-white">{{ $item->label }}</a>
+                               class="flex shrink-0 items-center whitespace-nowrap border-b-2 border-transparent px-2 py-3 text-[13px] font-medium text-white/90 transition hover:border-gold-400 hover:bg-white/5 hover:text-white">{{ $item->label }}</a>
                         @endif
                     @endforeach
                 </div>
@@ -227,7 +227,7 @@
         </div>
 
         {{-- Мобільне меню (off-canvas) --}}
-        <div x-show="mobile" x-cloak class="fixed inset-0 z-50 min-[1560px]:hidden">
+        <div x-show="mobile" x-cloak class="fixed inset-0 z-50 xl:hidden">
             <div @click="mobile = false" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
             <div class="absolute right-0 top-0 flex h-full w-80 max-w-[88%] flex-col bg-white shadow-2xl"
                  x-transition:enter="transition ease-out duration-200" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0">
@@ -345,10 +345,12 @@
                 </ul>
                 <div class="mt-5 flex gap-3">
                     @if (! empty($s['social_facebook']))
-                        <a href="{{ $s['social_facebook'] }}" target="_blank" rel="noopener" class="grid h-9 w-9 place-items-center rounded-lg bg-white/10 hover:bg-white/20">f</a>
+                        <a href="{{ $s['social_facebook'] }}" target="_blank" rel="noopener" aria-label="Facebook коледжу"
+                           class="grid h-9 w-9 place-items-center rounded-lg bg-white/10 text-white transition hover:bg-white/20"><x-brand-ico name="facebook" class="h-4 w-4" /></a>
                     @endif
                     @if (! empty($s['social_instagram']))
-                        <a href="{{ $s['social_instagram'] }}" target="_blank" rel="noopener" class="grid h-9 w-9 place-items-center rounded-lg bg-white/10 hover:bg-white/20">ig</a>
+                        <a href="{{ $s['social_instagram'] }}" target="_blank" rel="noopener" aria-label="Instagram коледжу"
+                           class="grid h-9 w-9 place-items-center rounded-lg bg-white/10 text-white transition hover:bg-white/20"><x-brand-ico name="instagram" class="h-4 w-4" /></a>
                     @endif
                 </div>
             </div>

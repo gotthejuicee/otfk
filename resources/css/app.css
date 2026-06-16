@@ -76,10 +76,11 @@
         @apply bg-brand-700 text-white shadow-sm shadow-brand-900/20 hover:bg-brand-800 focus-visible:ring-brand-500;
     }
     .btn-accent {
-        @apply bg-gold-500 text-white shadow-sm shadow-gold-700/20 hover:bg-gold-600 focus-visible:ring-gold-400;
+        /* Темний текст на золоті: контраст 6.8:1 (білий давав 2.68:1 — провал WCAG AA) */
+        @apply bg-gold-500 text-slate-900 shadow-sm shadow-gold-700/20 hover:bg-gold-600 focus-visible:ring-gold-400;
     }
     .btn-outline {
-        @apply bg-white text-brand-800 ring-1 ring-brand-200 hover:bg-brand-50 focus-visible:ring-brand-400;
+        @apply bg-white text-brand-800 ring-1 ring-brand-300 hover:bg-brand-50 focus-visible:ring-brand-400;
     }
     .btn-ghost {
         @apply text-slate-700 hover:bg-slate-100 focus-visible:ring-slate-300;
@@ -101,7 +102,7 @@
     }
     .input {
         @apply block w-full rounded-lg border-0 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm
-               ring-1 ring-inset ring-slate-300 placeholder:text-slate-400
+               ring-1 ring-inset ring-slate-300 placeholder:text-slate-500
                focus:ring-2 focus:ring-inset focus:ring-brand-500;
     }
 
