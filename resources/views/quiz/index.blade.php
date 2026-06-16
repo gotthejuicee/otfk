@@ -46,7 +46,7 @@
                     </div>
 
                     {{-- Питання --}}
-                    <div x-show="typeof step === 'number'" x-cloak class="card p-6 sm:p-8">
+                    <div x-show="typeof step === 'number'" x-cloak aria-live="polite" aria-atomic="true" class="card p-6 sm:p-8">
                         <div class="flex items-center justify-between gap-4 text-sm text-slate-400">
                             <span>Питання <span x-text="step + 1"></span> з <span x-text="questions.length"></span></span>
                             <button type="button" x-show="step > 0" @click="back()" class="inline-flex items-center gap-1 font-medium text-slate-500 hover:text-brand-700">
@@ -74,7 +74,7 @@
                     </div>
 
                     {{-- Результат --}}
-                    <div x-show="step === 'result'" x-cloak class="card overflow-hidden">
+                    <div x-show="step === 'result'" x-cloak aria-live="polite" aria-atomic="true" class="card overflow-hidden">
                         <div class="bg-brand-950 px-8 pb-8 pt-9 text-center">
                             <p class="text-sm font-medium uppercase tracking-wide text-gold-300">Твій результат</p>
                             <h2 class="mt-2 text-2xl font-extrabold text-white sm:text-3xl" x-text="winner()?.title"></h2>

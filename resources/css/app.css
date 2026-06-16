@@ -110,6 +110,11 @@
     .accent-rule {
         @apply mt-3 h-1 w-14 rounded-full bg-gold-500;
     }
+
+    /* Заголовковий (display) шрифт — єдине джерело правди замість інлайн-стилів */
+    .font-display {
+        font-family: var(--font-display);
+    }
 }
 
 [x-cloak] { display: none !important; }

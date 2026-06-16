@@ -237,7 +237,7 @@
                         @if ($stat->icon)
                             <x-ico :name="$stat->icon" class="mx-auto mb-3 h-8 w-8 text-gold-400/80" />
                         @endif
-                        <div class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl" style="font-family:var(--font-display)">
+                        <div class="font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
                             @if ($num !== null)
                                 {{ $m[1] }}{{ number_format($num, 0, ',', ' ') }}{{ $m[3] }}
                             @else

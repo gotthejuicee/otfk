@@ -1,4 +1,5 @@
-<x-layouts.app :title="$specialty->title" :description="$specialty->short_description">
+<x-layouts.app :title="$specialty->title" :description="$specialty->short_description"
+               :og-image="$specialty->cover_image ? asset('storage/' . $specialty->cover_image) : null">
 
     {{-- Розмітка Course для пошукових систем --}}
     @php

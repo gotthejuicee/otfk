@@ -12,42 +12,52 @@ class SitemapController extends Controller
 {
     public function index()
     {
-        $urls = [
-            url('/'),
-            route('news.index'),
-            route('specialties.index'),
-            route('documents.index'),
-            route('structure.index'),
-            route('staff.administration'),
-            route('galleries.index'),
-            route('video.index'),
-            route('contacts'),
-            route('events'),
-            route('faq'),
-            route('bells'),
-            route('applicants.create'),
-        ];
+        $entries = [];
 
+        // Статичні розділи: пріоритет вручну, без точної дати зміни.
+        $sections = [
+            'news.index' => '0.9', 'specialties.index' => '0.9', 'applicants.create' => '0.9',
+            'events' => '0.8', 'documents.index' => '0.6', 'structure.index' => '0.6',
+            'galleries.index' => '0.6', 'contacts' => '0.6', 'faq' => '0.6',
+            'staff.administration' => '0.5', 'video.index' => '0.5', 'bells' => '0.5',
+        ];
+        $entries[] = ['loc' => url('/'), 'lastmod' => null, 'changefreq' => 'daily', 'priority' => '1.0'];
+        foreach ($sections as $name => $priority) {
+            $entries[] = ['loc' => route($name), 'lastmod' => null, 'changefreq' => 'weekly', 'priority' => $priority];
+        }
+
+        // Динамічні сторінки: lastmod з updated_at (Google так розумніше планує обхід).
         foreach (News::published()->get() as $n) {
-            $urls[] = route('news.show', $n);
+            $entries[] = ['loc' => route('news.show', $n), 'lastmod' => optional($n->updated_at)->toDateString(), 'changefreq' => 'monthly', 'priority' => '0.7'];
         }
         foreach (Page::published()->get() as $p) {
-            $urls[] = url('/' . $p->slug);
+            $entries[] = ['loc' => url('/' . $p->slug), 'lastmod' => optional($p->updated_at)->toDateString(), 'changefreq' => 'monthly', 'priority' => '0.6'];
         }
         foreach (Specialty::published()->get() as $s) {
-            $urls[] = route('specialties.show', $s);
+            $entries[] = ['loc' => route('specialties.show', $s), 'lastmod' => optional($s->updated_at)->toDateString(), 'changefreq' => 'monthly', 'priority' => '0.7'];
         }
         foreach (Gallery::published()->get() as $g) {
-            $urls[] = route('galleries.show', $g);
+            $entries[] = ['loc' => route('galleries.show', $g), 'lastmod' => optional($g->updated_at)->toDateString(), 'changefreq' => 'monthly', 'priority' => '0.5'];
         }
         foreach (DocumentCategory::all() as $c) {
-            $urls[] = route('documents.category', $c);
+            $entries[] = ['loc' => route('documents.category', $c), 'lastmod' => optional($c->updated_at)->toDateString(), 'changefreq' => 'monthly', 'priority' => '0.5'];
         }
 
         $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
         $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
-        foreach (array_unique($urls) as $url) {
-            $xml .= '  <url><loc>' . htmlspecialchars($url) . '</loc></url>' . "\n";
+        $seen = [];
+        foreach ($entries as $e) {
+            if (isset($seen[$e['loc']])) {
+                continue;
+            }
+            $seen[$e['loc']] = true;
+
+            $xml .= '  <url><loc>' . htmlspecialchars($e['loc']) . '</loc>';
+            if ($e['lastmod']) {
+                $xml .= '<lastmod>' . $e['lastmod'] . '</lastmod>';
+            }
+            $xml .= '<changefreq>' . $e['changefreq'] . '</changefreq>';
+            $xml .= '<priority>' . $e['priority'] . '</priority></url>' . "\n";
         }
         $xml .= '</urlset>';
 
