@@ -43,15 +43,15 @@ class FrontendPolishTest extends TestCase
             ->assertSee('storage/news/cover.jpg', escape: false);
     }
 
-    public function test_dark_theme_replaces_old_night_overlay(): void
+    public function test_site_is_light_only_without_theme_toggle(): void
     {
         $res = $this->get('/')->assertOk();
 
-        // Нова тема: анти-мигання за збереженим вибором/системою + перемикач .dark
-        $res->assertSee("localStorage.getItem('theme')", escape: false);
-        $res->assertSee("classList.toggle('dark'", escape: false);
+        // Перемикач теми й темну тему прибрано — лишається лише світла
+        $res->assertDontSee("classList.toggle('dark'", escape: false);
+        $res->assertDontSee("localStorage.getItem('theme')", escape: false);
 
-        // Старий тeплий оверлей повністю прибрано
+        // Старого тeплого оверлея теж немає
         $res->assertDontSee('nightshade', escape: false);
         $res->assertDontSee("localStorage.getItem('night')", escape: false);
     }
