@@ -19,11 +19,11 @@
 
     <section class="bg-brand-950">
         <div class="container-site py-12 lg:py-14">
-            <nav class="flex flex-wrap items-center gap-2 text-sm text-brand-300">
-                <a href="{{ route('home') }}" class="hover:text-white">Головна</a>
-                <x-ico name="chevron-right" class="h-4 w-4" />
-                <a href="{{ route('news.index') }}" class="hover:text-white">Новини</a>
-            </nav>
+            <x-breadcrumbs :items="[
+                ['label' => 'Головна', 'url' => route('home')],
+                ['label' => 'Новини', 'url' => route('news.index')],
+                ['label' => $news->title],
+            ]" />
             <h1 class="mt-3 max-w-4xl text-3xl font-extrabold leading-tight text-white sm:text-4xl">{{ $news->title }}</h1>
             <div class="mt-4 flex flex-wrap items-center gap-3 text-sm text-brand-200">
                 @if ($news->category)

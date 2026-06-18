@@ -24,17 +24,10 @@
         <script type="application/ld+json">{!! json_encode($eventsLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
     @endif
 
-    <section class="bg-brand-950">
-        <div class="container-site py-12 lg:py-14">
-            <nav class="flex items-center gap-2 text-sm text-brand-300">
-                <a href="{{ route('home') }}" class="hover:text-white">Головна</a>
-                <x-ico name="chevron-right" class="h-4 w-4" />
-                <span class="text-white">Події</span>
-            </nav>
-            <h1 class="mt-3 text-3xl font-extrabold text-white sm:text-4xl">Події коледжу</h1>
-            <div class="accent-rule"></div>
-        </div>
-    </section>
+    <x-page-hero title="Події коледжу" :breadcrumbs="[
+        ['label' => 'Головна', 'url' => route('home')],
+        ['label' => 'Події'],
+    ]" />
 
     <section class="container-site py-12">
         @if ($upcoming->isEmpty() && $past->isEmpty())

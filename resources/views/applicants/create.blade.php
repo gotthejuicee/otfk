@@ -1,19 +1,12 @@
 <x-layouts.app title="Залишити заявку" description="Онлайн-заявка для вступників до Одеського технічного фахового коледжу ОНТУ: залиште контакти — приймальна комісія звʼяжеться з вами.">
 
-    <section class="bg-brand-950">
-        <div class="container-site py-12 lg:py-14">
-            <nav class="flex flex-wrap items-center gap-2 text-sm text-brand-300">
-                <a href="{{ route('home') }}" class="hover:text-white">Головна</a>
-                <x-ico name="chevron-right" class="h-4 w-4" />
-                <a href="{{ url('/abituriyentu') }}" class="hover:text-white">Абітурієнту</a>
-                <x-ico name="chevron-right" class="h-4 w-4" />
-                <span class="text-white">Залишити заявку</span>
-            </nav>
-            <h1 class="mt-3 text-3xl font-extrabold text-white sm:text-4xl">Залишити заявку</h1>
-            <p class="mt-4 max-w-2xl text-brand-100">Заповніть форму — приймальна комісія зателефонує вам, відповість на питання та допоможе зі вступом.</p>
-            <div class="accent-rule"></div>
-        </div>
-    </section>
+    <x-page-hero title="Залишити заявку" :breadcrumbs="[
+        ['label' => 'Головна', 'url' => route('home')],
+        ['label' => 'Абітурієнту', 'url' => url('/abituriyentu')],
+        ['label' => 'Залишити заявку'],
+    ]">
+        <p class="mt-4 max-w-2xl text-brand-100">Заповніть форму — приймальна комісія зателефонує вам, відповість на питання та допоможе зі вступом.</p>
+    </x-page-hero>
 
     <section class="container-site py-12">
         <div class="mx-auto max-w-2xl">

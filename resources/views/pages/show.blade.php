@@ -2,21 +2,14 @@
 
 <x-layouts.app :title="$page->meta_title ?: $page->title" :description="$page->meta_description ?: $page->excerpt">
 
-    <section class="bg-brand-950">
-        <div class="container-site py-12 lg:py-14">
-            <nav class="flex flex-wrap items-center gap-2 text-sm text-brand-300">
-                <a href="{{ route('home') }}" class="hover:text-white">Головна</a>
-                <x-ico name="chevron-right" class="h-4 w-4" />
-                @if ($page->parent)
-                    <a href="{{ url('/' . $page->parent->slug) }}" class="hover:text-white">{{ $page->parent->title }}</a>
-                    <x-ico name="chevron-right" class="h-4 w-4" />
-                @endif
-                <span class="text-white">{{ $page->title }}</span>
-            </nav>
-            <h1 class="mt-3 max-w-4xl text-3xl font-extrabold leading-tight text-white sm:text-4xl">{{ $page->title }}</h1>
-            <div class="accent-rule"></div>
-        </div>
-    </section>
+    @php
+        $pageBreadcrumbs = [['label' => 'Головна', 'url' => route('home')]];
+        if ($page->parent) {
+            $pageBreadcrumbs[] = ['label' => $page->parent->title, 'url' => url('/' . $page->parent->slug)];
+        }
+        $pageBreadcrumbs[] = ['label' => $page->title];
+    @endphp
+    <x-page-hero :title="$page->title" :breadcrumbs="$pageBreadcrumbs" class="max-w-4xl leading-tight" />
 
     <section class="container-site py-12">
         @if ($page->cover_image)

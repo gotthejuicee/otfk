@@ -1,18 +1,10 @@
 <x-layouts.app :title="$category->title">
 
-    <section class="bg-brand-950">
-        <div class="container-site py-12 lg:py-14">
-            <nav class="flex flex-wrap items-center gap-2 text-sm text-brand-300">
-                <a href="{{ route('home') }}" class="hover:text-white">Головна</a>
-                <x-ico name="chevron-right" class="h-4 w-4" />
-                <a href="{{ route('documents.index') }}" class="hover:text-white">Публічна інформація</a>
-                <x-ico name="chevron-right" class="h-4 w-4" />
-                <span class="text-white">{{ $category->title }}</span>
-            </nav>
-            <h1 class="mt-3 text-3xl font-extrabold text-white sm:text-4xl">{{ $category->title }}</h1>
-            <div class="accent-rule"></div>
-        </div>
-    </section>
+    <x-page-hero :title="$category->title" :breadcrumbs="[
+        ['label' => 'Головна', 'url' => route('home')],
+        ['label' => 'Публічна інформація', 'url' => route('documents.index')],
+        ['label' => $category->title],
+    ]" />
 
     <section class="container-site grid gap-8 py-12 lg:grid-cols-12">
         <aside class="lg:col-span-3">
