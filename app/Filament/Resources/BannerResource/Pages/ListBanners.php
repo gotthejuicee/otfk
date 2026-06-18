@@ -5,7 +5,7 @@ namespace App\Filament\Resources\BannerResource\Pages;
 use App\Filament\Resources\BannerResource;
 use App\Models\Setting;
 use Filament\Actions;
-use Filament\Forms\Components\Slider;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
@@ -39,12 +39,10 @@ class ListBanners extends ListRecords implements HasForms
     {
         return $form
             ->schema([
-                Slider::make('opacity')
+                Select::make('opacity')
                     ->label('Сила затемнення')
-                    ->min(0)
-                    ->max(100)
-                    ->step(5)
-                    ->live(debounce: 400)
+                    ->options(collect(range(0, 100, 5))->mapWithKeys(fn (int $value) => [$value => "{$value}%"])->all())
+                    ->live()
                     ->afterStateUpdated(function (?int $state): void {
                         Setting::updateOrCreate(
                             ['key' => 'banner_overlay_opacity'],

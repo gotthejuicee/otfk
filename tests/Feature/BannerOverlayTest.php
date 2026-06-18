@@ -11,6 +11,17 @@ class BannerOverlayTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_admin_banners_page_renders_overlay_control(): void
+    {
+        $admin = \App\Models\User::firstOrFail();
+
+        $this->actingAs($admin)
+            ->get('/admin/banners')
+            ->assertOk()
+            ->assertSee('Затемнення фото')
+            ->assertSee('Сила затемнення');
+    }
+
     public function test_banner_overlay_strength_follows_setting(): void
     {
         Banner::query()->delete();
