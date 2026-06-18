@@ -25,7 +25,7 @@
         @endif
 
         @if (filled($page->body))
-            <x-prose.article :heritage="$page->is_heritage" :drop-cap="$page->section !== 'abituriyentu'">
+            <x-prose.article :heritage="$page->is_heritage" :drop-cap="$page->slug === 'istoriya'">
                 {!! $page->body !!}
             </x-prose.article>
         @endif
