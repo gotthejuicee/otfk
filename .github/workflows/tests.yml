@@ -66,5 +66,5 @@ jobs:
       - name: Збірка
         run: npm run build
 
-      - name: Перевірка, що build закомічений
-        run: git diff --exit-code public/build
+      - name: Перевірка, що build відповідає вихідникам
+        run: node scripts/frontend-source-hash.mjs --check
