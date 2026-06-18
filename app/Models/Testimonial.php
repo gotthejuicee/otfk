@@ -2,10 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\OptimizesUploadedImages;
 use Illuminate\Database\Eloquent\Model;
 
 class Testimonial extends Model
 {
+    use OptimizesUploadedImages;
+
+    /** @var list<string> */
+    protected static array $optimizedImages = ['photo'];
+
     protected $fillable = ['name', 'role', 'quote', 'photo', 'sort_order', 'is_active'];
 
     protected function casts(): array

@@ -27,7 +27,10 @@ class BannerResource extends Resource
             Forms\Components\TextInput::make('title')->label('Заголовок')->maxLength(255)->columnSpanFull(),
             Forms\Components\TextInput::make('subtitle')->label('Підзаголовок')->maxLength(255)->columnSpanFull(),
             Forms\Components\FileUpload::make('image')->label('Зображення')->image()->directory('banners')->imageEditor()->imageResizeMode('contain')->imageResizeTargetWidth('1920')->imageResizeTargetHeight('1080')
-                ->helperText('Якщо не завантажити - буде синій градієнт.')->columnSpanFull(),
+                ->helperText('Якщо не завантажити - буде синій градієнт. Після збереження створюється WebP-версія.')->columnSpanFull(),
+            Forms\Components\TextInput::make('image_alt')->label('Опис зображення (alt)')
+                ->maxLength(255)->columnSpanFull()
+                ->helperText('Для доступності та SEO. Якщо порожньо — використається заголовок банера.'),
             Forms\Components\TextInput::make('link_url')->label('Посилання')->maxLength(255)->placeholder('/abituriyentu'),
             Forms\Components\TextInput::make('link_label')->label('Текст кнопки')->maxLength(255)->placeholder('Детальніше'),
             Forms\Components\DatePicker::make('starts_at')->label('Показувати з'),

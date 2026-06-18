@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\OptimizesUploadedImages;
 use App\Observers\NewsObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
@@ -11,6 +12,11 @@ use Illuminate\Support\Str;
 #[ObservedBy(NewsObserver::class)]
 class News extends Model
 {
+    use OptimizesUploadedImages;
+
+    /** @var list<string> */
+    protected static array $optimizedImages = ['cover_image'];
+
     protected $table = 'news';
 
     protected $fillable = [

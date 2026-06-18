@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class MenuItem extends Model
 {
@@ -44,6 +46,24 @@ class MenuItem extends Model
     public function scopeRoots($query)
     {
         return $query->whereNull('parent_id')->orderBy('sort_order');
+    }
+
+    /** Кешоване дерево меню для шапки сайту. */
+    public static function navigation(): Collection
+    {
+        return Cache::remember('menu.navigation', 600, fn () => static::roots()->visible()
+            ->with([
+                'children' => fn ($q) => $q->visible()->orderBy('sort_order'),
+                'page',
+                'children.page',
+            ])
+            ->get());
+    }
+
+    protected static function booted(): void
+    {
+        static::saved(fn () => Cache::forget('menu.navigation'));
+        static::deleted(fn () => Cache::forget('menu.navigation'));
     }
 
     /**

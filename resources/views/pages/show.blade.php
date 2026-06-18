@@ -20,7 +20,7 @@
 
     <section class="container-site py-12">
         @if ($page->cover_image)
-            <img src="{{ asset('storage/' . $page->cover_image) }}" alt="{{ $page->title }}" loading="lazy" decoding="async" class="mb-8 w-full rounded-2xl object-cover">
+            <x-picture :path="$page->cover_image" :alt="$page->title" loading="lazy" decoding="async" class="mb-8 w-full rounded-2xl object-cover" />
         @endif
 
         @if ($page->excerpt)

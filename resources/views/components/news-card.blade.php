@@ -3,8 +3,8 @@
 <article class="card group flex flex-col overflow-hidden transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-300/40">
     <a href="{{ route('news.show', $item) }}" class="block aspect-[16/9] overflow-hidden">
         @if ($item->cover_image)
-            <img src="{{ asset('storage/' . $item->cover_image) }}" alt="{{ $item->title }}" loading="lazy" decoding="async"
-                 class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
+            <x-picture :path="$item->cover_image" :alt="$item->title" loading="lazy" decoding="async"
+                       class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
         @else
             <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-brand-700 to-brand-900 text-white/25">
                 <x-ico name="newspaper" class="h-12 w-12" />
