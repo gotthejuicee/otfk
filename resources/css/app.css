@@ -91,6 +91,28 @@
         @apply rounded-2xl bg-white ring-1 ring-slate-200/80 shadow-sm;
     }
 
+    /* Інтерактивні картки — єдиний hover по всьому сайту */
+    .card-interactive {
+        @apply transition duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-300/40;
+    }
+
+    /* Довгі тексти (новини, сторінки) — комфортна ширина рядка */
+    .prose-site {
+        @apply prose prose-slate prose-lg max-w-[65ch] leading-relaxed
+               prose-headings:font-display prose-a:text-brand-700 prose-a:no-underline hover:prose-a:underline;
+    }
+
+    /* Порожні стани розділів */
+    .empty-state {
+        @apply mx-auto max-w-lg rounded-2xl bg-white p-10 text-center shadow-sm ring-1 ring-slate-200/80 sm:p-12;
+    }
+    .empty-state-icon {
+        @apply mx-auto h-12 w-12 text-brand-200;
+    }
+    .empty-state-text {
+        @apply mt-4 text-base leading-relaxed text-slate-500;
+    }
+
     /* Значки */
     .badge {
         @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold;
@@ -122,7 +144,17 @@
 /* Поява секцій при прокручуванні (scroll-reveal).
    Анімація вмикається ЛИШЕ коли є JS і користувач не просив зменшити рух —
    інакше весь контент показується одразу (доступність + надійність). */
+/* Повільний Ken Burns на фото банера (вимкнено при reduced-motion) */
 @media (prefers-reduced-motion: no-preference) {
+    .hero-ken-burns {
+        animation: hero-ken-burns 14s ease-out both;
+        will-change: transform;
+    }
+    @keyframes hero-ken-burns {
+        from { transform: scale(1); }
+        to { transform: scale(1.06); }
+    }
+
     html.js [data-reveal] {
         opacity: 0;
         transform: translateY(18px);

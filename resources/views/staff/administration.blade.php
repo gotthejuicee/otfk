@@ -13,7 +13,7 @@
                 @endforeach
             </div>
         @else
-            <div class="card p-12 text-center text-slate-500">Інформацію про адміністрацію незабаром буде додано.</div>
+            <x-empty-state icon="users" title="Інформацію про адміністрацію незабаром буде додано." />
         @endif
     </section>
 

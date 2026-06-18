@@ -35,21 +35,21 @@
         @foreach ($slides as $i => $banner)
             <div @if ($count > 1)
                      x-show="index === {{ $i }}"
-                     x-transition:enter="transition ease-out duration-500"
+                     x-transition:enter="transition ease-in-out duration-700"
                      x-transition:enter-start="opacity-0"
                      x-transition:enter-end="opacity-100"
-                     x-transition:leave="transition ease-in duration-300"
+                     x-transition:leave="transition ease-in-out duration-700"
                      x-transition:leave-start="opacity-100"
                      x-transition:leave-end="opacity-0"
                      :aria-hidden="index !== {{ $i }}"
                  @endif
                  class="@if ($count > 1) absolute inset-0 @endif flex min-h-[460px] flex-col justify-center">
-                <div class="pointer-events-none absolute inset-0">
+                <div class="pointer-events-none absolute inset-0 overflow-hidden">
                     @if ($banner->image)
                         @if ($i === 0)
-                            <x-picture :path="$banner->image" :alt="$banner->imageAlt()" class="h-full w-full object-cover" fetchpriority="high" decoding="async" />
+                            <x-picture :path="$banner->image" :alt="$banner->imageAlt()" class="hero-ken-burns h-full w-full object-cover" fetchpriority="high" decoding="async" />
                         @else
-                            <x-picture :path="$banner->image" :alt="$banner->imageAlt()" class="h-full w-full object-cover" loading="lazy" decoding="async" />
+                            <x-picture :path="$banner->image" :alt="$banner->imageAlt()" class="hero-ken-burns h-full w-full object-cover" loading="lazy" decoding="async" />
                         @endif
                         <div class="absolute inset-0 bg-gradient-to-r from-brand-950/95 via-brand-950/80 to-brand-950/55"></div>
                         <div class="absolute inset-0 bg-brand-950/25"></div>

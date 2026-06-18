@@ -10,7 +10,7 @@
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 @foreach ($tiles as $tile)
                     <a href="{{ $tile->url }}" @if ($tile->open_new_tab) target="_blank" rel="noopener" @endif
-                       class="card group flex flex-col p-5 transition hover:-translate-y-1 hover:shadow-lg">
+                       class="card card-interactive group flex flex-col p-5">
                         <span class="grid h-12 w-12 place-items-center rounded-xl bg-{{ $tile->color }}-50 text-{{ $tile->color }}-600 transition group-hover:bg-{{ $tile->color }}-600 group-hover:text-white">
                             <x-ico :name="$tile->icon ?: 'academic-cap'" class="h-6 w-6" />
                         </span>
@@ -92,7 +92,7 @@
                 </div>
                 <div class="mt-9 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach ($videos as $video)
-                        <a href="{{ $video->watch_url }}" target="_blank" rel="noopener" class="card group overflow-hidden">
+                        <a href="{{ $video->watch_url }}" target="_blank" rel="noopener" class="card card-interactive group overflow-hidden">
                             <div class="relative aspect-video overflow-hidden bg-slate-900">
                                 <img src="{{ $video->thumbnail }}" alt="{{ $video->title }}" loading="lazy" decoding="async" class="h-full w-full object-cover opacity-90 transition group-hover:scale-105 group-hover:opacity-100">
                                 <span class="absolute inset-0 grid place-items-center">
@@ -147,7 +147,7 @@
     @if ($onThisDay)
         <section data-reveal class="container-site mt-16">
             <a href="{{ route('news.show', $onThisDay) }}"
-               class="card group mx-auto flex max-w-3xl items-center gap-4 overflow-hidden p-4 transition hover:-translate-y-0.5 hover:shadow-lg sm:gap-5">
+               class="card card-interactive group mx-auto flex max-w-3xl items-center gap-4 overflow-hidden p-4 sm:gap-5">
                 @if ($onThisDay->cover_image)
                     <x-picture :path="$onThisDay->cover_image" :alt="$onThisDay->title" loading="lazy" decoding="async"
                                class="h-16 w-24 shrink-0 rounded-xl object-cover sm:h-20 sm:w-28" />

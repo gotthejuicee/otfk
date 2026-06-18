@@ -10,7 +10,7 @@
              x-init="tick(); setInterval(() => tick(), 15000)">
 
         @if ($periods->isEmpty())
-            <div class="card p-12 text-center text-slate-500">Розклад дзвінків ще не налаштовано.</div>
+            <x-empty-state icon="clock" title="Розклад дзвінків ще не налаштовано." />
         @else
             {{-- Живий статус --}}
             <div class="mx-auto max-w-2xl">

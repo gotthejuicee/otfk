@@ -57,7 +57,7 @@
                  x-data="{
                      imgs: [], idx: null,
                      init() {
-                         this.imgs = [...this.$el.querySelectorAll('img.lightboxable, .prose img')];
+                         this.imgs = [...this.$el.querySelectorAll('img.lightboxable, .prose-site img')];
                          this.imgs.forEach((im, i) => {
                              im.classList.add('cursor-zoom-in');
                              im.addEventListener('click', () => this.idx = i);
@@ -79,7 +79,7 @@
             @if ($news->excerpt)
                 <p class="mb-6 text-lg font-medium leading-relaxed text-slate-600">{{ $news->excerpt }}</p>
             @endif
-            <div class="prose prose-slate max-w-none prose-headings:font-display prose-a:text-brand-700">
+            <div class="prose-site">
                 {!! $news->body !!}
             </div>
 

@@ -29,7 +29,7 @@
             </div>
             <div class="mt-10">{{ $videos->links() }}</div>
         @else
-            <div class="card p-12 text-center text-slate-500">Відео поки немає.</div>
+            <x-empty-state icon="play" title="Відео поки немає." />
         @endif
     </section>
 

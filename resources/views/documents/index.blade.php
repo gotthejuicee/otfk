@@ -9,7 +9,7 @@
         @if ($categories->isNotEmpty())
             <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($categories as $cat)
-                    <a href="{{ route('documents.category', $cat) }}" class="card group flex items-start gap-4 p-6 transition hover:-translate-y-1 hover:shadow-lg">
+                    <a href="{{ route('documents.category', $cat) }}" class="card card-interactive group flex items-start gap-4 p-6">
                         <span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-700 transition group-hover:bg-brand-700 group-hover:text-white">
                             <x-ico name="folder" class="h-6 w-6" />
                         </span>
@@ -22,7 +22,7 @@
                 @endforeach
             </div>
         @else
-            <div class="card p-12 text-center text-slate-500">Категорії документів незабаром буде додано.</div>
+            <x-empty-state icon="folder" title="Категорії документів незабаром буде додано." />
         @endif
     </section>
 

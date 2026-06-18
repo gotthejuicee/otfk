@@ -46,7 +46,7 @@
             </div>
             <div class="mt-10">{{ $news->links() }}</div>
         @else
-            <div class="card p-12 text-center text-slate-500">Новин поки немає.</div>
+            <x-empty-state icon="newspaper" title="Новин поки немає." />
         @endif
     </section>
 

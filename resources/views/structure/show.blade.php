@@ -33,10 +33,7 @@
         @endif
 
         @if (blank($department->description) && $department->staff->isEmpty())
-            <div class="card p-12 text-center text-slate-500">
-                <x-ico name="building-office-2" class="mx-auto h-10 w-10 text-slate-300" />
-                <p class="mt-3">Інформацію про цей підрозділ незабаром буде додано.</p>
-            </div>
+            <x-empty-state icon="building-office-2" title="Інформацію про цей підрозділ незабаром буде додано." />
         @endif
 
         <a href="{{ route('structure.index') }}" class="btn-outline mt-10"><x-ico name="arrow-left" class="h-4 w-4" /> До структури</a>

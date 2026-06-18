@@ -108,7 +108,7 @@
     @endif
 
     {{-- ============================ ШАПКА ============================ --}}
-    <header x-data="{ mobile: false }">
+    <header x-data="{ mobile: false, scrolled: false }" @scroll.window.throttle.50ms="scrolled = window.scrollY > 40">
         {{-- Утилітарна стрічка --}}
         <div class="hidden bg-brand-950 text-brand-100 lg:block">
             <div class="mx-auto flex h-9 w-full max-w-[1600px] items-center justify-between px-4 text-xs sm:px-6 lg:px-8">
@@ -153,7 +153,8 @@
         </div>
 
         {{-- Липка частина: бренд + навігація --}}
-        <div class="sticky top-0 z-40 bg-white shadow-sm">
+        <div class="sticky top-0 z-40 border-b border-transparent bg-white shadow-sm transition-[box-shadow,background-color,border-color] duration-300"
+             :class="scrolled ? 'border-slate-200/80 bg-white/90 shadow-md backdrop-blur-md' : ''">
             {{-- Ряд бренду та дій --}}
             <div class="mx-auto flex h-20 w-full max-w-[1600px] items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
                 <a href="{{ route('home') }}" class="flex shrink-0 items-center gap-3">

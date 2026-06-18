@@ -12,7 +12,7 @@
                 <div class="accent-rule"></div>
                 <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach ($group['items'] as $dep)
-                        <a href="{{ route('structure.show', $dep) }}" class="card group flex items-start gap-4 p-5 transition hover:-translate-y-1 hover:shadow-lg">
+                        <a href="{{ route('structure.show', $dep) }}" class="card card-interactive group flex items-start gap-4 p-5">
                             <span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-brand-50 text-brand-700 transition group-hover:bg-brand-700 group-hover:text-white">
                                 <x-ico name="building-office-2" class="h-6 w-6" />
                             </span>
@@ -27,7 +27,7 @@
                 </div>
             </div>
         @empty
-            <div class="card p-12 text-center text-slate-500">Інформацію про структурні підрозділи незабаром буде додано.</div>
+            <x-empty-state icon="building-office-2" title="Інформацію про структурні підрозділи незабаром буде додано." />
         @endforelse
     </section>
 

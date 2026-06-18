@@ -9,7 +9,7 @@
     <section class="container-site py-12">
         <div class="mx-auto max-w-2xl">
             @if ($questions->isEmpty() || $specialties->isEmpty())
-                <div class="card p-12 text-center text-slate-500">Тест ще готується — завітайте пізніше.</div>
+                <x-empty-state icon="puzzle-piece" title="Тест ще готується — завітайте пізніше." />
             @else
                 <div x-data="quiz(
                         @js($questions->map(fn ($q) => [

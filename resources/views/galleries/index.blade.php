@@ -9,7 +9,7 @@
         @if ($galleries->isNotEmpty())
             <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($galleries as $gallery)
-                    <a href="{{ route('galleries.show', $gallery) }}" class="card group overflow-hidden transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+                    <a href="{{ route('galleries.show', $gallery) }}" class="card card-interactive group overflow-hidden">
                         <div class="relative aspect-[16/10] overflow-hidden bg-brand-50">
                             @if ($gallery->cover_url)
                                 <img src="{{ $gallery->cover_url }}" alt="{{ $gallery->title }}" loading="lazy" decoding="async" class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
@@ -28,7 +28,7 @@
                 @endforeach
             </div>
         @else
-            <div class="card p-12 text-center text-slate-500">Фотоальбоми незабаром буде додано.</div>
+            <x-empty-state icon="photo" title="Фотоальбоми незабаром буде додано." />
         @endif
     </section>
 
