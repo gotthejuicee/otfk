@@ -17,7 +17,7 @@
     @endphp
     <script type="application/ld+json">{!! json_encode($articleLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 
-    <section class="bg-brand-950">
+    <section @class(['bg-brand-950', 'heritage-hero' => $news->is_heritage])>
         <div class="container-site py-12 lg:py-14">
             <x-breadcrumbs :items="[
                 ['label' => 'Головна', 'url' => route('home')],
@@ -26,6 +26,9 @@
             ]" />
             <h1 class="mt-3 max-w-4xl text-3xl font-extrabold leading-tight text-white sm:text-4xl">{{ $news->title }}</h1>
             <div class="mt-4 flex flex-wrap items-center gap-3 text-sm text-brand-200">
+                @if ($news->is_heritage)
+                    <span class="badge bg-gold-500/20 text-gold-200 ring-1 ring-gold-400/30">Особлива публікація</span>
+                @endif
                 @if ($news->category)
                     <span class="badge bg-white/10 text-brand-100">{{ $news->category->title }}</span>
                 @endif
@@ -77,11 +80,15 @@
                 <x-picture :path="$news->cover_image" :alt="$news->title" loading="lazy" decoding="async" class="lightboxable mb-8 w-full rounded-2xl object-cover" />
             @endif
             @if ($news->excerpt)
-                <p class="mb-6 text-lg font-medium leading-relaxed text-slate-600">{{ $news->excerpt }}</p>
+                <p @class([
+                    'mb-6 text-lg leading-relaxed',
+                    'font-heritage-display italic text-brand-800/90' => $news->is_heritage,
+                    'font-medium text-slate-600' => ! $news->is_heritage,
+                ])>{{ $news->excerpt }}</p>
             @endif
-            <div class="prose-site">
+            <x-prose.article :heritage="$news->is_heritage" :date="$news->published_at">
                 {!! $news->body !!}
-            </div>
+            </x-prose.article>
 
             {{-- Поділитися новиною --}}
             @php $shareUrl = route('news.show', $news); @endphp

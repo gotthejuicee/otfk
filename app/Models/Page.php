@@ -17,12 +17,15 @@ class Page extends Model
 
     protected $fillable = [
         'parent_id', 'title', 'slug', 'excerpt', 'body', 'cover_image',
-        'section', 'is_published', 'sort_order', 'meta_title', 'meta_description',
+        'section', 'is_published', 'is_heritage', 'sort_order', 'meta_title', 'meta_description',
     ];
 
     protected function casts(): array
     {
-        return ['is_published' => 'boolean'];
+        return [
+            'is_published' => 'boolean',
+            'is_heritage' => 'boolean',
+        ];
     }
 
     public function getRouteKeyName(): string

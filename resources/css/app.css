@@ -14,6 +14,10 @@
     /* Типографіка */
     --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
     --font-display: 'Manrope', 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-heritage-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+    --font-heritage-body: 'Lora', Georgia, 'Times New Roman', serif;
+    --color-parchment: #fdfbf7;
+    --color-parchment-deep: #f6f0e6;
 
     /* Брендовий синій (інституційний navy) */
     --color-brand-50: #f0f5fc;
@@ -96,10 +100,94 @@
         @apply transition duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-300/40;
     }
 
-    /* Довгі тексти (новини, сторінки) — комфортна ширина рядка */
+    /* Довгі тексти (новини, сторінки) — теплий «паперовий» блок + золоті акценти */
     .prose-site {
         @apply prose prose-slate prose-lg max-w-[65ch] leading-relaxed
-               prose-headings:font-display prose-a:text-brand-700 prose-a:no-underline hover:prose-a:underline;
+               rounded-2xl bg-[var(--color-parchment)] px-6 py-8 shadow-sm ring-1 ring-gold-200/50
+               sm:px-10 sm:py-10
+               prose-headings:font-display prose-headings:text-brand-900
+               prose-a:text-brand-700 prose-a:no-underline hover:prose-a:underline
+               prose-blockquote:border-l-gold-500 prose-blockquote:bg-gold-50/60 prose-blockquote:py-1 prose-blockquote:not-italic
+               prose-hr:border-gold-200/80;
+    }
+
+    /* Велика літера першого абзацу (drop cap) */
+    .prose-site > p:first-of-type::first-letter,
+    .prose-heritage > p:first-of-type::first-letter {
+        float: left;
+        margin: 0.06em 0.14em 0 0;
+        font-family: var(--font-display);
+        font-size: 3.25em;
+        font-weight: 800;
+        line-height: 0.78;
+        color: var(--color-gold-600);
+    }
+
+    /* Heritage — урочистий «лист» для ювілеїв і історії */
+    .prose-heritage {
+        font-family: var(--font-heritage-body);
+        @apply text-[1.05rem] leading-[1.85] text-slate-800
+               bg-[var(--color-parchment-deep)] ring-gold-300/70
+               prose-headings:font-semibold prose-headings:tracking-normal prose-headings:text-brand-950
+               prose-blockquote:text-lg prose-blockquote:italic prose-blockquote:text-brand-900/90;
+    }
+    .prose-heritage :where(h1, h2, h3, h4, blockquote) {
+        font-family: var(--font-heritage-display);
+    }
+
+    .font-heritage-display {
+        font-family: var(--font-heritage-display);
+    }
+    .font-heritage-body {
+        font-family: var(--font-heritage-body);
+    }
+
+    .heritage-frame {
+        @apply relative mx-auto max-w-[65ch] rounded-2xl bg-[var(--color-parchment-deep)] px-6 py-8 shadow-md ring-1 ring-gold-300/60 sm:px-10 sm:py-10;
+        background-image:
+            radial-gradient(ellipse at top, rgb(217 142 30 / 0.06), transparent 55%),
+            linear-gradient(180deg, var(--color-parchment) 0%, var(--color-parchment-deep) 100%);
+    }
+    .heritage-frame::before,
+    .heritage-frame::after {
+        content: '';
+        position: absolute;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-color: rgb(217 142 30 / 0.35);
+        pointer-events: none;
+    }
+    .heritage-frame::before {
+        top: 0.85rem;
+        left: 0.85rem;
+        border-top: 2px solid;
+        border-left: 2px solid;
+    }
+    .heritage-frame::after {
+        right: 0.85rem;
+        bottom: 0.85rem;
+        border-right: 2px solid;
+        border-bottom: 2px solid;
+    }
+    .heritage-dateline {
+        font-family: var(--font-heritage-display);
+        @apply text-center text-sm italic tracking-wide text-brand-800/80;
+    }
+    .heritage-rule {
+        @apply mx-auto my-5 h-px w-32 bg-gradient-to-r from-transparent via-gold-400 to-transparent;
+    }
+    .heritage-seal {
+        @apply mx-auto mt-6 grid h-14 w-14 place-items-center rounded-full bg-gold-100/80 text-gold-600 ring-2 ring-gold-300/60;
+    }
+    .heritage-signoff {
+        font-family: var(--font-heritage-display);
+        @apply mt-8 border-t border-gold-200/80 pt-6 text-center text-base italic text-brand-900/85;
+    }
+
+    /* Шапка новини в heritage-режимі */
+    .heritage-hero h1 {
+        font-family: var(--font-heritage-display);
+        @apply font-semibold tracking-normal;
     }
 
     /* Порожні стани розділів */

@@ -1,6 +1,6 @@
-@props(['title', 'breadcrumbs' => [], 'showRule' => true])
+@props(['title', 'breadcrumbs' => [], 'showRule' => true, 'heritage' => false])
 
-<section class="bg-brand-950">
+<section @class(['bg-brand-950', 'heritage-hero' => $heritage])>
     <div class="container-site py-12 lg:py-14">
         @if (count($breadcrumbs))
             <x-breadcrumbs :items="$breadcrumbs" />

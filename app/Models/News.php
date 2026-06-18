@@ -21,7 +21,7 @@ class News extends Model
 
     protected $fillable = [
         'category_id', 'title', 'slug', 'excerpt', 'body', 'cover_image',
-        'published_at', 'is_published', 'is_featured', 'views', 'likes',
+        'published_at', 'is_published', 'is_featured', 'is_heritage', 'views', 'likes',
         'telegram_posted_at',
     ];
 
@@ -31,6 +31,7 @@ class News extends Model
             'published_at' => 'datetime',
             'is_published' => 'boolean',
             'is_featured' => 'boolean',
+            'is_heritage' => 'boolean',
             'telegram_posted_at' => 'datetime',
         ];
     }
