@@ -49,6 +49,7 @@ class SettingResource extends Resource
                     'announcement_text' => 'Текст термінового оголошення у смузі над шапкою сайту. Порожнє — смуга прихована.',
                     'announcement_type' => 'Колір смуги: info (синій), warning (золотий) або danger (червоний).',
                     'announcement_url' => 'Необовʼязкове посилання, куди веде оголошення (напр., новина).',
+                    'banner_overlay_opacity' => 'Затемнення фото банера (0–100). Зручніше змінювати в розділі «Банери».',
                     default => null,
                 }),
             Forms\Components\TextInput::make('group')->label('Група')->default('general')->maxLength(255),

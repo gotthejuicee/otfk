@@ -1,6 +1,8 @@
 @props(['banners'])
 
 @php
+    use App\Support\BannerOverlay;
+
     $slides = $banners->values();
     $count = $slides->count();
 @endphp
@@ -51,8 +53,10 @@
                         @else
                             <x-picture :path="$banner->image" :alt="$banner->imageAlt()" class="hero-ken-burns h-full w-full object-cover" loading="lazy" decoding="async" />
                         @endif
-                        <div class="absolute inset-0 bg-gradient-to-r from-brand-950/95 via-brand-950/80 to-brand-950/55"></div>
-                        <div class="absolute inset-0 bg-brand-950/25"></div>
+                        @if (BannerOverlay::hasOverlay())
+                            <div class="absolute inset-0" style="{{ BannerOverlay::gradientStyle() }}"></div>
+                            <div class="absolute inset-0" style="{{ BannerOverlay::flatStyle() }}"></div>
+                        @endif
                     @else
                         <div class="h-full w-full bg-gradient-to-br from-brand-800 via-brand-900 to-brand-950"></div>
                         <div class="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-brand-600/30 blur-3xl"></div>
