@@ -1,16 +1,9 @@
 <x-layouts.app title="Адміністрація">
 
-    <section class="bg-brand-950">
-        <div class="container-site py-12 lg:py-14">
-            <nav class="flex flex-wrap items-center gap-2 text-sm text-brand-300">
-                <a href="{{ route('home') }}" class="hover:text-white">Головна</a>
-                <x-ico name="chevron-right" class="h-4 w-4" />
-                <span class="text-white">Адміністрація</span>
-            </nav>
-            <h1 class="mt-3 text-3xl font-extrabold text-white sm:text-4xl">Адміністрація коледжу</h1>
-            <div class="accent-rule"></div>
-        </div>
-    </section>
+    <x-page-hero title="Адміністрація коледжу" :breadcrumbs="[
+        ['label' => 'Головна', 'url' => route('home')],
+        ['label' => 'Адміністрація'],
+    ]" />
 
     <section class="container-site py-12">
         @if ($staff->isNotEmpty())

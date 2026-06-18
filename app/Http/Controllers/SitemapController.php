@@ -22,6 +22,7 @@ class SitemapController extends Controller
             'staff.administration' => '0.5', 'video.index' => '0.5', 'bells' => '0.5',
         ];
         $entries[] = ['loc' => url('/'), 'lastmod' => null, 'changefreq' => 'daily', 'priority' => '1.0'];
+        $entries[] = ['loc' => route('news.feed'), 'lastmod' => now()->toDateString(), 'changefreq' => 'daily', 'priority' => '0.5'];
         foreach ($sections as $name => $priority) {
             $entries[] = ['loc' => route($name), 'lastmod' => null, 'changefreq' => 'weekly', 'priority' => $priority];
         }

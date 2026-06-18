@@ -50,6 +50,7 @@
     {{-- Велика картка лише коли є справжня обкладинка сторінки (не логотип-фолбек) --}}
     <meta name="twitter:card" content="{{ $ogImage ? 'summary_large_image' : 'summary' }}">
     <link rel="alternate" type="application/xml" title="Sitemap" href="{{ url('/sitemap.xml') }}">
+    <link rel="alternate" type="application/rss+xml" title="RSS — Новини" href="{{ route('news.feed') }}">
     <link rel="canonical" href="{{ url()->current() }}">
     @php $jsonld = array_filter([
         '@context' => 'https://schema.org',

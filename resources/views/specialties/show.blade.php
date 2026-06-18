@@ -17,13 +17,11 @@
 
     <section class="bg-brand-950">
         <div class="container-site py-12 lg:py-14">
-            <nav class="flex flex-wrap items-center gap-2 text-sm text-brand-300">
-                <a href="{{ route('home') }}" class="hover:text-white">Головна</a>
-                <x-ico name="chevron-right" class="h-4 w-4" />
-                <a href="{{ route('specialties.index') }}" class="hover:text-white">Спеціальності</a>
-                <x-ico name="chevron-right" class="h-4 w-4" />
-                <span class="text-white">{{ $specialty->title }}</span>
-            </nav>
+            <x-breadcrumbs :items="[
+                ['label' => 'Головна', 'url' => route('home')],
+                ['label' => 'Спеціальності', 'url' => route('specialties.index')],
+                ['label' => $specialty->title],
+            ]" />
             @if ($specialty->code)
                 <span class="mt-4 inline-block badge bg-white/10 text-brand-100 ring-1 ring-white/15">Код спеціальності: {{ $specialty->code }}</span>
             @endif

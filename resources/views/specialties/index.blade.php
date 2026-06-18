@@ -1,17 +1,11 @@
 <x-layouts.app title="Спеціальності">
 
-    <section class="bg-brand-950">
-        <div class="container-site py-12 lg:py-14">
-            <nav class="flex items-center gap-2 text-sm text-brand-300">
-                <a href="{{ route('home') }}" class="hover:text-white">Головна</a>
-                <x-ico name="chevron-right" class="h-4 w-4" />
-                <span class="text-white">Спеціальності</span>
-            </nav>
-            <h1 class="mt-3 text-3xl font-extrabold text-white sm:text-4xl">Наші спеціальності</h1>
-            <p class="mt-3 max-w-2xl text-brand-100">Оберіть напрям підготовки - і дізнайтеся більше про навчання в коледжі.</p>
-            <div class="accent-rule"></div>
-        </div>
-    </section>
+    <x-page-hero title="Наші спеціальності" :breadcrumbs="[
+        ['label' => 'Головна', 'url' => route('home')],
+        ['label' => 'Спеціальності'],
+    ]">
+        <p class="mt-3 max-w-2xl text-brand-100">Оберіть напрям підготовки — і дізнайтеся більше про навчання в коледжі.</p>
+    </x-page-hero>
 
     <section class="container-site py-12">
         @if ($specialties->isNotEmpty())

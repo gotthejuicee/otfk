@@ -1,16 +1,9 @@
 <x-layouts.app title="Структура">
 
-    <section class="bg-brand-950">
-        <div class="container-site py-12 lg:py-14">
-            <nav class="flex items-center gap-2 text-sm text-brand-300">
-                <a href="{{ route('home') }}" class="hover:text-white">Головна</a>
-                <x-ico name="chevron-right" class="h-4 w-4" />
-                <span class="text-white">Структура</span>
-            </nav>
-            <h1 class="mt-3 text-3xl font-extrabold text-white sm:text-4xl">Структура коледжу</h1>
-            <div class="accent-rule"></div>
-        </div>
-    </section>
+    <x-page-hero title="Структура коледжу" :breadcrumbs="[
+        ['label' => 'Головна', 'url' => route('home')],
+        ['label' => 'Структура'],
+    ]" />
 
     <section class="container-site space-y-14 py-12">
         @forelse ($groups as $type => $group)

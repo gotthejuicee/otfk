@@ -1,21 +1,14 @@
 <x-layouts.app :title="$gallery->title">
 
-    <section class="bg-brand-950">
-        <div class="container-site py-12 lg:py-14">
-            <nav class="flex flex-wrap items-center gap-2 text-sm text-brand-300">
-                <a href="{{ route('home') }}" class="hover:text-white">Головна</a>
-                <x-ico name="chevron-right" class="h-4 w-4" />
-                <a href="{{ route('galleries.index') }}" class="hover:text-white">Галерея</a>
-                <x-ico name="chevron-right" class="h-4 w-4" />
-                <span class="text-white">{{ $gallery->title }}</span>
-            </nav>
-            <h1 class="mt-3 text-3xl font-extrabold text-white sm:text-4xl">{{ $gallery->title }}</h1>
-            @if ($gallery->description)
-                <p class="mt-3 max-w-2xl text-brand-100">{{ $gallery->description }}</p>
-            @endif
-            <div class="accent-rule"></div>
-        </div>
-    </section>
+    <x-page-hero :title="$gallery->title" :breadcrumbs="[
+        ['label' => 'Головна', 'url' => route('home')],
+        ['label' => 'Галерея', 'url' => route('galleries.index')],
+        ['label' => $gallery->title],
+    ]">
+        @if ($gallery->description)
+            <p class="mt-3 max-w-2xl text-brand-100">{{ $gallery->description }}</p>
+        @endif
+    </x-page-hero>
 
     <section class="container-site py-12" x-data="{ open: false, src: '', cap: '' }">
         @if ($gallery->photos->isNotEmpty())
