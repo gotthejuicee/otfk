@@ -33,11 +33,12 @@ class TierOneTest extends TestCase
             ->assertDontSee('hero-ken-burns', escape: false);
     }
 
-    public function test_home_header_uses_dark_brand_bar(): void
+    public function test_home_header_nav_sits_flush_above_hero(): void
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('bg-brand-950 shadow-none', escape: false);
+            ->assertSee('bg-brand-900 xl:block', escape: false)
+            ->assertSee('relative overflow-hidden bg-brand-950', escape: false);
     }
 
     public function test_single_banner_has_no_carousel_controls(): void
