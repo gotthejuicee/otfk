@@ -25,6 +25,7 @@ class HeritageProseTest extends TestCase
         $this->get(route('news.show', $news))
             ->assertOk()
             ->assertSee('prose-site', escape: false)
+            ->assertSee('prose-site--no-dropcap', escape: false)
             ->assertDontSee('heritage-frame', escape: false)
             ->assertDontSee('prose-heritage', escape: false);
     }
@@ -44,6 +45,7 @@ class HeritageProseTest extends TestCase
             ->assertOk()
             ->assertSee('heritage-frame', escape: false)
             ->assertSee('prose-heritage', escape: false)
+            ->assertSee('prose-site--no-dropcap', escape: false)
             ->assertSee('Особлива публікація')
             ->assertSee('З повагою', escape: false)
             ->assertSee('Одеса · 15 березня 2020');
@@ -62,6 +64,22 @@ class HeritageProseTest extends TestCase
         $this->get('/' . $page->slug)
             ->assertOk()
             ->assertSee('heritage-frame', escape: false)
-            ->assertSee('prose-heritage', escape: false);
+            ->assertSee('prose-heritage', escape: false)
+            ->assertSee('prose-site--no-dropcap', escape: false);
+    }
+
+    public function test_istoriya_page_keeps_drop_cap(): void
+    {
+        $this->get('/istoriya')
+            ->assertOk()
+            ->assertSee('prose-site', escape: false)
+            ->assertDontSee('prose-site--no-dropcap', escape: false);
+    }
+
+    public function test_other_pages_disable_drop_cap(): void
+    {
+        $this->get('/abituriyentu')
+            ->assertOk()
+            ->assertSee('prose-site--no-dropcap', escape: false);
     }
 }

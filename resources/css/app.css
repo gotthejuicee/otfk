@@ -111,7 +111,7 @@
                prose-hr:border-gold-200/80;
     }
 
-    /* Велика літера першого абзацу (drop cap); вимикається класом prose-site--no-dropcap */
+    /* Велика літера першого абзацу (drop cap) — лише де явно увімкнено (сторінка /istoriya) */
     .prose-site:not(.prose-site--no-dropcap) > p:first-of-type::first-letter,
     .prose-heritage:not(.prose-site--no-dropcap) > p:first-of-type::first-letter {
         float: left;
