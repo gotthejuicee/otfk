@@ -17,7 +17,8 @@
     @endphp
     <script type="application/ld+json">{!! json_encode($articleLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 
-    <section @class(['bg-brand-950', 'heritage-hero' => $news->is_heritage])>
+    @php $heritage = $news->usesHeritagePresentation(); @endphp
+    <section @class(['bg-brand-950', 'heritage-hero' => $heritage])>
         <div class="container-site py-12 lg:py-14">
             <x-breadcrumbs :items="[
                 ['label' => 'Головна', 'url' => route('home')],
@@ -26,7 +27,7 @@
             ]" />
             <h1 class="mt-3 max-w-4xl text-3xl font-extrabold leading-tight text-white sm:text-4xl">{{ $news->title }}</h1>
             <div class="mt-4 flex flex-wrap items-center gap-3 text-sm text-brand-200">
-                @if ($news->is_heritage)
+                @if ($heritage)
                     <span class="badge bg-gold-500/20 text-gold-200 ring-1 ring-gold-400/30">Особлива публікація</span>
                 @endif
                 @if ($news->category)
@@ -82,11 +83,11 @@
             @if ($news->excerpt)
                 <p @class([
                     'mb-6 text-lg leading-relaxed',
-                    'font-heritage-display italic text-brand-800/90' => $news->is_heritage,
-                    'font-medium text-slate-600' => ! $news->is_heritage,
+                    'font-heritage-display italic text-brand-800/90' => $heritage,
+                    'font-medium text-slate-600' => ! $heritage,
                 ])>{{ $news->excerpt }}</p>
             @endif
-            <x-prose.article :heritage="$news->is_heritage" :date="$news->published_at">
+            <x-prose.article :heritage="$heritage" :date="$news->published_at">
                 {!! $news->body !!}
             </x-prose.article>
 

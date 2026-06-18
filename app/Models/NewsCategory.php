@@ -8,7 +8,14 @@ use Illuminate\Support\Str;
 
 class NewsCategory extends Model
 {
-    protected $fillable = ['title', 'slug', 'sort_order'];
+    protected $fillable = ['title', 'slug', 'sort_order', 'is_heritage'];
+
+    protected function casts(): array
+    {
+        return [
+            'is_heritage' => 'boolean',
+        ];
+    }
 
     public function getRouteKeyName(): string
     {

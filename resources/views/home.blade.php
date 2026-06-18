@@ -145,30 +145,61 @@
 
     {{-- ===================== ЦЬОГО ДНЯ В КОЛЕДЖІ ===================== --}}
     @if ($onThisDay)
+        @php
+            $sameDay = $onThisDay->published_at->format('m-d') === now()->format('m-d');
+            $heritageTeaser = $onThisDay->usesHeritagePresentation();
+        @endphp
         <section data-reveal class="container-site mt-16">
             <a href="{{ route('news.show', $onThisDay) }}"
-               class="card card-interactive group mx-auto flex max-w-3xl items-center gap-4 overflow-hidden p-4 sm:gap-5">
+               @class([
+                   'group mx-auto flex max-w-3xl items-center gap-4 overflow-hidden p-4 sm:gap-5',
+                   'heritage-teaser' => $heritageTeaser,
+                   'card card-interactive' => ! $heritageTeaser,
+               ])>
                 @if ($onThisDay->cover_image)
                     <x-picture :path="$onThisDay->cover_image" :alt="$onThisDay->title" loading="lazy" decoding="async"
-                               class="h-16 w-24 shrink-0 rounded-xl object-cover sm:h-20 sm:w-28" />
+                               @class([
+                                   'h-16 w-24 shrink-0 object-cover sm:h-20 sm:w-28',
+                                   'rounded-lg ring-2 ring-gold-300/50 sepia-[0.12]' => $heritageTeaser,
+                                   'rounded-xl' => ! $heritageTeaser,
+                               ]) />
                 @else
-                    <span class="grid h-16 w-24 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-700 to-brand-900 text-white/30 sm:h-20 sm:w-28">
-                        <x-ico name="clock" class="h-8 w-8" />
+                    <span @class([
+                        'grid h-16 w-24 shrink-0 place-items-center sm:h-20 sm:w-28',
+                        'rounded-lg bg-gold-100/80 text-gold-600 ring-2 ring-gold-300/50' => $heritageTeaser,
+                        'rounded-xl bg-gradient-to-br from-brand-700 to-brand-900 text-white/30' => ! $heritageTeaser,
+                    ])>
+                        <x-ico :name="$heritageTeaser ? 'archive-box' : 'clock'" class="h-8 w-8" />
                     </span>
                 @endif
                 <div class="min-w-0 flex-1">
-                    @php $sameDay = $onThisDay->published_at->format('m-d') === now()->format('m-d'); @endphp
-                    <p class="inline-flex flex-wrap items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-gold-600">
+                    <p @class([
+                        'inline-flex flex-wrap items-center gap-1.5 text-xs font-semibold uppercase tracking-wide',
+                        'font-heritage-display normal-case tracking-normal text-brand-800/90' => $heritageTeaser,
+                        'text-gold-600' => ! $heritageTeaser,
+                    ])>
                         <x-ico name="sparkles" class="h-3.5 w-3.5" />
                         {{ $sameDay ? 'Цього дня' : 'Цими днями' }} у {{ $onThisDay->published_at->year }} році
-                        @if ($onThisDay->is_heritage)
-                            <span class="rounded-full bg-gold-100 px-2 py-0.5 text-[10px] normal-case tracking-normal text-gold-800 ring-1 ring-gold-300/60">з архіву</span>
+                        @if ($heritageTeaser)
+                            <span class="rounded-full bg-gold-200/60 px-2 py-0.5 text-[10px] normal-case tracking-normal text-gold-900 ring-1 ring-gold-400/50">з архіву</span>
                         @endif
                     </p>
-                    <h3 class="mt-1 line-clamp-2 font-bold text-slate-900 transition group-hover:text-brand-700">{{ $onThisDay->title }}</h3>
-                    <p class="mt-0.5 text-xs text-slate-400">{{ $onThisDay->published_at->translatedFormat('j F Y') }} · з архіву коледжу</p>
+                    <h3 @class([
+                        'mt-1 line-clamp-2 font-bold transition',
+                        'font-heritage-display text-lg font-semibold text-brand-950 group-hover:text-brand-800' => $heritageTeaser,
+                        'text-slate-900 group-hover:text-brand-700' => ! $heritageTeaser,
+                    ])>{{ $onThisDay->title }}</h3>
+                    <p @class([
+                        'mt-0.5 text-xs',
+                        'font-heritage-body italic text-brand-800/70' => $heritageTeaser,
+                        'text-slate-400' => ! $heritageTeaser,
+                    ])>{{ $onThisDay->published_at->translatedFormat('j F Y') }} · з архіву коледжу</p>
                 </div>
-                <x-ico name="arrow-right" class="h-5 w-5 shrink-0 text-slate-300 transition group-hover:translate-x-1 group-hover:text-brand-600" />
+                <x-ico name="arrow-right" @class([
+                    'h-5 w-5 shrink-0 transition group-hover:translate-x-1',
+                    'text-gold-500 group-hover:text-gold-700' => $heritageTeaser,
+                    'text-slate-300 group-hover:text-brand-600' => ! $heritageTeaser,
+                ]) />
             </a>
         </section>
     @endif

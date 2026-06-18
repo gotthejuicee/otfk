@@ -37,6 +37,7 @@ class HomeController extends Controller
             ->orderByDesc('published_at');
 
         $exact = $base()
+            ->with('category')
             ->whereMonth('published_at', now()->month)
             ->whereDay('published_at', now()->day)
             ->first();
@@ -50,6 +51,7 @@ class HomeController extends Controller
         $window = collect(range(-3, 3))->map(fn ($d) => now()->copy()->addDays($d));
 
         return $base()
+            ->with('category')
             ->where(function ($q) use ($window) {
                 foreach ($window as $day) {
                     $q->orWhere(fn ($w) => $w
@@ -57,6 +59,6 @@ class HomeController extends Controller
                         ->whereDay('published_at', $day->day));
                 }
             })
-            ->first(['id', 'title', 'slug', 'published_at', 'cover_image']);
+            ->first(['id', 'title', 'slug', 'published_at', 'cover_image', 'is_heritage', 'category_id']);
     }
 }
