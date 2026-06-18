@@ -5,9 +5,7 @@
     use App\Models\QuickLink;
     use App\Models\Setting;
 
-    $menu = MenuItem::roots()->visible()
-        ->with(['children' => fn ($q) => $q->visible()->orderBy('sort_order'), 'page', 'children.page'])
-        ->get();
+    $menu = MenuItem::navigation();
     $s = Setting::map();
     $partners = QuickLink::visible()->location('footer_partner')->ordered()->get();
     $logo = ! empty($s['logo']) ? asset('storage/' . $s['logo']) : null;

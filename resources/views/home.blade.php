@@ -1,60 +1,7 @@
 <x-layouts.app>
 
-    {{-- ===================== ГЕРОЙ / БАНЕР ===================== --}}
-    @php $b = $banners->first(); @endphp
-    @if ($b)
-        {{-- Один статичний банер (без слайдера) - стабільна висота. Фото/слайди додамо пізніше через адмінку. --}}
-        <section class="relative overflow-hidden bg-brand-950">
-            <div class="pointer-events-none absolute inset-0">
-                @if ($b->image)
-                    <img src="{{ asset('storage/' . $b->image) }}" alt="" fetchpriority="high" class="h-full w-full object-cover">
-                    {{-- Затемнення фото: зліва темніше (під текст) + рівномірне приглушення для контрасту --}}
-                    <div class="absolute inset-0 bg-gradient-to-r from-brand-950/95 via-brand-950/80 to-brand-950/55"></div>
-                    <div class="absolute inset-0 bg-brand-950/25"></div>
-                @else
-                    <div class="h-full w-full bg-gradient-to-br from-brand-800 via-brand-900 to-brand-950"></div>
-                    <div class="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-brand-600/30 blur-3xl"></div>
-                    <div class="absolute bottom-0 left-1/4 h-72 w-72 rounded-full bg-gold-500/10 blur-3xl"></div>
-                @endif
-            </div>
-            <div class="container-site relative flex min-h-[460px] flex-col justify-center py-20 lg:py-28">
-                <div class="max-w-2xl">
-                    @if ($b->title)
-                        <h1 class="text-4xl font-extrabold leading-[1.1] text-white sm:text-5xl lg:text-6xl">{{ $b->title }}</h1>
-                    @endif
-                    @if ($b->subtitle)
-                        <p class="mt-5 max-w-xl text-lg leading-relaxed text-brand-100">{{ $b->subtitle }}</p>
-                    @endif
-                    @if ($b->link_url)
-                        <a href="{{ $b->link_url }}" class="btn-accent mt-8">{{ $b->link_label ?: 'Детальніше' }} <x-ico name="arrow-right" class="h-4 w-4" /></a>
-                    @endif
-                </div>
-            </div>
-        </section>
-    @else
-        {{-- Запасний герой (поки немає банерів) --}}
-        <section class="relative overflow-hidden bg-brand-950">
-            <div class="pointer-events-none absolute inset-0">
-                <div class="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-brand-600/30 blur-3xl"></div>
-                <div class="absolute bottom-0 left-1/4 h-72 w-72 rounded-full bg-gold-500/10 blur-3xl"></div>
-            </div>
-            <div class="container-site relative py-20 lg:py-28">
-                <span class="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-medium text-brand-100 ring-1 ring-white/15">
-                    <span class="h-1.5 w-1.5 rounded-full bg-gold-400"></span> Структурний підрозділ ОНТУ
-                </span>
-                <h1 class="mt-6 max-w-3xl text-4xl font-extrabold leading-[1.1] text-white sm:text-5xl lg:text-6xl">
-                    Одеський технічний фаховий коледж
-                </h1>
-                <p class="mt-6 max-w-xl text-lg leading-relaxed text-brand-100">
-                    Сучасна фахова передвища освіта: технічні спеціальності, досвідчені викладачі та практична підготовка.
-                </p>
-                <div class="mt-9 flex flex-wrap gap-3">
-                    <a href="{{ url('/abituriyentu') }}" class="btn-accent">Абітурієнту <x-ico name="arrow-right" class="h-4 w-4" /></a>
-                    <a href="{{ route('news.index') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-white/10 px-5 py-2.5 text-sm font-semibold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-white/15">Новини коледжу</a>
-                </div>
-            </div>
-        </section>
-    @endif
+    {{-- ===================== ГЕРОЙ / БАНЕР (слайдер) ===================== --}}
+    <x-home.hero-slider :banners="$banners" />
 
     {{-- ===================== ШВИДКІ РОЗДІЛИ ===================== --}}
     @if ($tiles->isNotEmpty())
@@ -178,8 +125,8 @@
                         <blockquote class="mt-4 flex-1 text-sm leading-relaxed text-slate-600">«{{ $t->quote }}»</blockquote>
                         <figcaption class="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
                             @if ($t->photo)
-                                <img src="{{ asset('storage/' . $t->photo) }}" alt="{{ $t->name }}" loading="lazy" decoding="async"
-                                     class="h-11 w-11 rounded-full object-cover ring-2 ring-brand-100">
+                                <x-picture :path="$t->photo" :alt="$t->name" loading="lazy" decoding="async"
+                                           class="h-11 w-11 rounded-full object-cover ring-2 ring-brand-100" />
                             @else
                                 <span class="grid h-11 w-11 place-items-center rounded-full bg-brand-700 text-sm font-bold text-white">{{ $t->initials }}</span>
                             @endif
@@ -202,8 +149,8 @@
             <a href="{{ route('news.show', $onThisDay) }}"
                class="card group mx-auto flex max-w-3xl items-center gap-4 overflow-hidden p-4 transition hover:-translate-y-0.5 hover:shadow-lg sm:gap-5">
                 @if ($onThisDay->cover_image)
-                    <img src="{{ asset('storage/' . $onThisDay->cover_image) }}" alt="" loading="lazy" decoding="async"
-                         class="h-16 w-24 shrink-0 rounded-xl object-cover sm:h-20 sm:w-28">
+                    <x-picture :path="$onThisDay->cover_image" :alt="$onThisDay->title" loading="lazy" decoding="async"
+                               class="h-16 w-24 shrink-0 rounded-xl object-cover sm:h-20 sm:w-28" />
                 @else
                     <span class="grid h-16 w-24 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-700 to-brand-900 text-white/30 sm:h-20 sm:w-28">
                         <x-ico name="clock" class="h-8 w-8" />

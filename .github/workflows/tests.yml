@@ -65,3 +65,6 @@ jobs:
 
       - name: Збірка
         run: npm run build
+
+      - name: Перевірка, що build закомічений
+        run: git diff --exit-code public/build

@@ -2,11 +2,17 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\OptimizesUploadedImages;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Staff extends Model
 {
+    use OptimizesUploadedImages;
+
+    /** @var list<string> */
+    protected static array $optimizedImages = ['photo'];
+
     protected $table = 'staff';
 
     public const CATEGORIES = [

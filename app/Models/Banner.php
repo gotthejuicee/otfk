@@ -2,14 +2,27 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\OptimizesUploadedImages;
 use Illuminate\Database\Eloquent\Model;
 
 class Banner extends Model
 {
+    use OptimizesUploadedImages;
+
+    /** @var list<string> */
+    protected static array $optimizedImages = ['image'];
+
     protected $fillable = [
-        'title', 'subtitle', 'image', 'link_url', 'link_label',
+        'title', 'subtitle', 'image', 'image_alt', 'link_url', 'link_label',
         'starts_at', 'ends_at', 'sort_order', 'is_published',
     ];
+
+    public function imageAlt(): string
+    {
+        return filled($this->image_alt)
+            ? $this->image_alt
+            : (filled($this->title) ? $this->title : 'Банер');
+    }
 
     protected function casts(): array
     {

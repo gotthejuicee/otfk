@@ -74,7 +74,7 @@
                  }"
                  x-effect="document.body.style.overflow = idx === null ? '' : 'hidden'">
             @if ($news->cover_image)
-                <img src="{{ asset('storage/' . $news->cover_image) }}" alt="{{ $news->title }}" loading="lazy" decoding="async" class="lightboxable mb-8 w-full rounded-2xl object-cover">
+                <x-picture :path="$news->cover_image" :alt="$news->title" loading="lazy" decoding="async" class="lightboxable mb-8 w-full rounded-2xl object-cover" />
             @endif
             @if ($news->excerpt)
                 <p class="mb-6 text-lg font-medium leading-relaxed text-slate-600">{{ $news->excerpt }}</p>

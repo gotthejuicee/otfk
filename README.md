@@ -23,7 +23,7 @@ Laravel 12 · Filament 3 · Tailwind CSS · Alpine.js · MySQL · PHP 8.3
 
 ```bash
 composer install
-npm install && npm run build
+npm install && npm run build   # public/build комітиться в git — на хостингу npm не потрібен
 cp .env.example .env
 php artisan key:generate
 # вкажіть доступ до БД у .env, потім:

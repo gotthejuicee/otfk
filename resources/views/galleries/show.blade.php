@@ -23,7 +23,8 @@
                 @foreach ($gallery->photos as $photo)
                     <button type="button" @click="open = true; src = '{{ $photo->url }}'; cap = @js($photo->caption)"
                             class="group relative aspect-square overflow-hidden rounded-xl bg-slate-100">
-                        <img src="{{ $photo->url }}" alt="{{ $photo->caption }}" loading="lazy" class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
+                        <x-picture :path="$photo->image" :alt="$photo->caption ?: $gallery->title" loading="lazy"
+                                   class="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
                         <span class="absolute inset-0 bg-brand-950/0 transition group-hover:bg-brand-950/20"></span>
                     </button>
                 @endforeach

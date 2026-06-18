@@ -2,12 +2,18 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\OptimizesUploadedImages;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class Specialty extends Model
 {
+    use OptimizesUploadedImages;
+
+    /** @var list<string> */
+    protected static array $optimizedImages = ['cover_image'];
+
     protected $fillable = [
         'title', 'slug', 'code', 'short_description', 'description',
         'degree', 'study_form', 'duration', 'cover_image', 'sort_order', 'is_published',

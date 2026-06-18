@@ -61,7 +61,7 @@ php artisan filament:assets      # опубликовать CSS/JS админк�
 php artisan storage:link         # симлинк public/storage → storage/app/public (для загруженных фото)
 php artisan optimize             # кеш конфигов/роутов/вью (быстрее). При проблемах: php artisan optimize:clear
 ```
-`public/build` собран локально и в `.gitignore` — залейте папку `public/build` на сервер через файловый менеджер/SFTP.
+`public/build` **комітиться в git** (на хостингу немає npm) — після `git pull` збірка вже на місці. Якщо змінювали `resources/css` або `resources/js` — локально `npm run build` і закомітьте `public/build` перед push.
 
 ### 5. Корень сайта → public
 В панели: **Сайти → Налаштування → Кореневий каталог** → указать `public`
@@ -90,7 +90,7 @@ php artisan optimize             # кеш конфигов/роутов/вью (
 - [ ] `php artisan migrate --seed --force` (или импорт `otfk.sql`)
 - [ ] `php artisan storage:link` (фото из админки)
 - [ ] `php artisan filament:assets` (стили админки)
-- [ ] `public/build` загружен (собирается локально)
+- [ ] `public/build` у репозиторії (локально `npm run build` перед push)
 - [ ] права на запись: `chmod -R 775 storage bootstrap/cache` (если будут ошибки 500)
 
 ## Проверить после деплоя
@@ -124,5 +124,11 @@ git pull
 composer install --no-dev --optimize-autoloader
 php artisan migrate --force
 php artisan optimize:clear && php artisan optimize
-# + залить свежий public/build, если менялся фронтенд
+```
+
+Якщо в PR були нові міграції або зображення на сервері ще без WebP:
+
+```bash
+php artisan migrate --force
+php artisan images:webp
 ```
