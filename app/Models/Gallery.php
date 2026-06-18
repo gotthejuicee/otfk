@@ -17,7 +17,7 @@ class Gallery extends Model
     protected $table = 'galleries';
 
     protected $fillable = [
-        'title', 'slug', 'description', 'cover_image', 'published_at', 'sort_order', 'is_published',
+        'title', 'slug', 'description', 'cover_image', 'published_at', 'sort_order', 'is_published', 'is_archive',
     ];
 
     protected function casts(): array
@@ -25,6 +25,7 @@ class Gallery extends Model
         return [
             'published_at' => 'date',
             'is_published' => 'boolean',
+            'is_archive' => 'boolean',
         ];
     }
 

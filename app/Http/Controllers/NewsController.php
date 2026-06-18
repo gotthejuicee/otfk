@@ -42,6 +42,8 @@ class NewsController extends Controller
     {
         abort_unless($news->is_published, 404);
 
+        $news->loadMissing('category');
+
         // Чесний лічильник: +1 лише раз за сесію відвідувача (не накручується F5).
         if (! $request->session()->has("viewed_news.{$news->id}")) {
             $news->increment('views');

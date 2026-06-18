@@ -10,15 +10,31 @@
         @endif
     </x-page-hero>
 
-    <section class="container-site py-12" x-data="{ open: false, src: '', cap: '' }">
+    <section @class(['container-site py-12', 'photo-archive' => $gallery->is_archive]) x-data="{ open: false, src: '', cap: '' }">
+        @if ($gallery->is_archive)
+            <p class="mb-6 inline-flex items-center gap-2 rounded-full bg-gold-50 px-3 py-1.5 text-sm font-medium text-gold-800 ring-1 ring-gold-200">
+                <x-ico name="archive-box" class="h-4 w-4" /> Архівний альбом
+            </p>
+        @endif
         @if ($gallery->photos->isNotEmpty())
-            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            <div class="photo-archive-grid grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                 @foreach ($gallery->photos as $photo)
                     <button type="button" @click="open = true; src = '{{ $photo->url }}'; cap = @js($photo->caption)"
-                            class="group relative aspect-square overflow-hidden rounded-xl bg-slate-100">
+                            @class([
+                                'photo-archive-item group relative aspect-square overflow-hidden bg-slate-100',
+                                'rounded-sm ring-2 ring-gold-300/60 shadow-[inset_0_0_24px_rgb(30_35_63/0.12)]' => $gallery->is_archive,
+                                'rounded-xl' => ! $gallery->is_archive,
+                            ])>
                         <x-picture :path="$photo->image" :alt="$photo->caption ?: $gallery->title" loading="lazy"
-                                   class="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
-                        <span class="absolute inset-0 bg-brand-950/0 transition group-hover:bg-brand-950/20"></span>
+                                   @class([
+                                       'h-full w-full object-cover transition duration-300 group-hover:scale-105',
+                                       'sepia-[0.18] contrast-[1.03]' => $gallery->is_archive,
+                                   ]) />
+                        <span @class([
+                            'absolute inset-0 transition',
+                            'bg-amber-950/0 group-hover:bg-amber-950/15' => $gallery->is_archive,
+                            'bg-brand-950/0 group-hover:bg-brand-950/20' => ! $gallery->is_archive,
+                        ])></span>
                     </button>
                 @endforeach
             </div>

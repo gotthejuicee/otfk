@@ -31,6 +31,10 @@ class GalleryResource extends Resource
             Forms\Components\Textarea::make('description')->label('Опис')->rows(2)->columnSpanFull(),
             Forms\Components\FileUpload::make('cover_image')->label('Обкладинка')->image()->directory('gallery')->imageEditor()->imageResizeMode('contain')->imageResizeTargetWidth('1600')->imageResizeTargetHeight('1600'),
             Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true),
+            Forms\Components\Toggle::make('is_archive')
+                ->label('Архівний стиль фото')
+                ->helperText('Сепія, рамки та «ламповий» вигляд для історичних альбомів.')
+                ->default(false),
             Forms\Components\Repeater::make('photos')
                 ->relationship()
                 ->label('Фотографії')
@@ -56,6 +60,7 @@ class GalleryResource extends Resource
                 Tables\Columns\TextColumn::make('photos_count')->label('Фото')->counts('photos')->badge(),
                 Tables\Columns\TextColumn::make('published_at')->label('Дата')->date('d.m.Y')->sortable(),
                 Tables\Columns\IconColumn::make('is_published')->label('Опубл.')->boolean(),
+                Tables\Columns\IconColumn::make('is_archive')->label('Архів')->boolean()->toggleable(),
             ])
             ->defaultSort('sort_order')
             ->actions([Tables\Actions\EditAction::make()])

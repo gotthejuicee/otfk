@@ -46,6 +46,16 @@ class News extends Model
         return $this->belongsTo(NewsCategory::class, 'category_id');
     }
 
+    /** Heritage з прапорця новини або з категорії (наприклад «Архів», «Історія»). */
+    public function usesHeritagePresentation(): bool
+    {
+        if ($this->is_heritage) {
+            return true;
+        }
+
+        return (bool) $this->category?->is_heritage;
+    }
+
     public function likeRecords()
     {
         return $this->hasMany(NewsLike::class);

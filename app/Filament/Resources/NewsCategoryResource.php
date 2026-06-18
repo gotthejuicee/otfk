@@ -28,6 +28,10 @@ class NewsCategoryResource extends Resource
             Forms\Components\TextInput::make('slug')->label('URL (slug)')->maxLength(255)
                 ->helperText('Залиште порожнім - згенерується автоматично.'),
             Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0),
+            Forms\Components\Toggle::make('is_heritage')
+                ->label('Heritage-стиль для всіх новин категорії')
+                ->helperText('Урочисте листоподібне оформлення для архіву, історії, ювілеїв. Можна вимкнути окремо в новині.')
+                ->default(false),
         ]);
     }
 
@@ -38,6 +42,7 @@ class NewsCategoryResource extends Resource
                 Tables\Columns\TextColumn::make('title')->label('Назва')->searchable()->weight('bold'),
                 Tables\Columns\TextColumn::make('slug')->label('URL')->color('gray'),
                 Tables\Columns\TextColumn::make('news_count')->label('Новин')->counts('news')->badge(),
+                Tables\Columns\IconColumn::make('is_heritage')->label('Heritage')->boolean()->toggleable(),
                 Tables\Columns\TextColumn::make('sort_order')->label('Порядок')->numeric()->sortable(),
             ])
             ->defaultSort('sort_order')
