@@ -36,6 +36,9 @@ class PageResource extends Resource
             ])->columns(2),
             Forms\Components\Section::make('Налаштування')->schema([
                 Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true),
+                Forms\Components\Toggle::make('is_heritage')
+                    ->label('Урочисте оформлення (heritage)')
+                    ->helperText('Для історії коледжу, хроніки та особливих сторінок — стиль «листа».'),
                 Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0),
                 Forms\Components\TextInput::make('section')->label('Розділ (службове поле)')->maxLength(255),
                 Forms\Components\TextInput::make('meta_title')->label('SEO-заголовок')->maxLength(255),
@@ -52,6 +55,7 @@ class PageResource extends Resource
                 Tables\Columns\TextColumn::make('parent.title')->label('Розділ')->badge()->placeholder('-')->sortable(),
                 Tables\Columns\TextColumn::make('slug')->label('URL')->color('gray')->toggleable(),
                 Tables\Columns\IconColumn::make('is_published')->label('Опубл.')->boolean(),
+                Tables\Columns\IconColumn::make('is_heritage')->label('Heritage')->boolean()->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('sort_order')->label('Порядок')->numeric()->sortable()->toggleable(),
             ])
             ->defaultSort('title')

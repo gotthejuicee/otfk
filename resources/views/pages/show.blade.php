@@ -9,7 +9,7 @@
         }
         $pageBreadcrumbs[] = ['label' => $page->title];
     @endphp
-    <x-page-hero :title="$page->title" :breadcrumbs="$pageBreadcrumbs" class="max-w-4xl leading-tight" />
+    <x-page-hero :title="$page->title" :breadcrumbs="$pageBreadcrumbs" :heritage="$page->is_heritage" class="max-w-4xl leading-tight" />
 
     <section class="container-site py-12">
         @if ($page->cover_image)
@@ -17,13 +17,17 @@
         @endif
 
         @if ($page->excerpt)
-            <p class="mb-6 max-w-3xl text-lg font-medium leading-relaxed text-slate-600">{{ $page->excerpt }}</p>
+            <p @class([
+                'mb-6 max-w-3xl text-lg leading-relaxed',
+                'font-heritage-display italic text-brand-800/90' => $page->is_heritage,
+                'font-medium text-slate-600' => ! $page->is_heritage,
+            ])>{{ $page->excerpt }}</p>
         @endif
 
         @if (filled($page->body))
-            <div class="prose-site">
+            <x-prose.article :heritage="$page->is_heritage">
                 {!! $page->body !!}
-            </div>
+            </x-prose.article>
         @endif
 
         {{-- Підрозділи (якщо це сторінка-розділ); відступ зверху — лише коли вище є контент --}}

@@ -41,6 +41,9 @@ class NewsResource extends Resource
                 ->label('Дата публікації')->default(now())->seconds(false),
             Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true),
             Forms\Components\Toggle::make('is_featured')->label('Рекомендована'),
+            Forms\Components\Toggle::make('is_heritage')
+                ->label('Урочисте оформлення (heritage)')
+                ->helperText('Листоподібний стиль для ювілеїв, історичних та особливих матеріалів.'),
         ]);
     }
 
@@ -54,6 +57,7 @@ class NewsResource extends Resource
                 Tables\Columns\TextColumn::make('published_at')->label('Дата')->dateTime('d.m.Y')->sortable(),
                 Tables\Columns\IconColumn::make('is_published')->label('Опубл.')->boolean(),
                 Tables\Columns\IconColumn::make('is_featured')->label('Реком.')->boolean()->toggleable(),
+                Tables\Columns\IconColumn::make('is_heritage')->label('Heritage')->boolean()->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('views')->label('Перегляди')->numeric()->sortable()->toggleable(),
                 Tables\Columns\TextColumn::make('likes')->label('Вподобайки')->numeric()->sortable()->toggleable(),
                 Tables\Columns\IconColumn::make('telegram_posted_at')->label('TG')->toggleable(isToggledHiddenByDefault: true)

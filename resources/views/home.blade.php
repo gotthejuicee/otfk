@@ -158,9 +158,12 @@
                 @endif
                 <div class="min-w-0 flex-1">
                     @php $sameDay = $onThisDay->published_at->format('m-d') === now()->format('m-d'); @endphp
-                    <p class="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-gold-600">
+                    <p class="inline-flex flex-wrap items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-gold-600">
                         <x-ico name="sparkles" class="h-3.5 w-3.5" />
                         {{ $sameDay ? 'Цього дня' : 'Цими днями' }} у {{ $onThisDay->published_at->year }} році
+                        @if ($onThisDay->is_heritage)
+                            <span class="rounded-full bg-gold-100 px-2 py-0.5 text-[10px] normal-case tracking-normal text-gold-800 ring-1 ring-gold-300/60">з архіву</span>
+                        @endif
                     </p>
                     <h3 class="mt-1 line-clamp-2 font-bold text-slate-900 transition group-hover:text-brand-700">{{ $onThisDay->title }}</h3>
                     <p class="mt-0.5 text-xs text-slate-400">{{ $onThisDay->published_at->translatedFormat('j F Y') }} · з архіву коледжу</p>
