@@ -13,17 +13,14 @@
 
     <section class="container-site py-12">
         @if ($q === '')
-            <div class="card p-12 text-center text-slate-500">Введіть запит, щоб знайти новини, сторінки, спеціальності та документи.</div>
+            <x-empty-state icon="magnifying-glass" title="Введіть запит, щоб знайти новини, сторінки, спеціальності та документи." />
         @elseif ($results->isEmpty())
-            <div class="card p-12 text-center text-slate-500">
-                <x-ico name="magnifying-glass" class="mx-auto h-10 w-10 text-slate-300" />
-                <p class="mt-3">За запитом «<span class="font-semibold text-slate-700">{{ $q }}</span>» нічого не знайдено.</p>
-            </div>
+            <x-empty-state icon="magnifying-glass" :title="'За запитом «' . $q . '» нічого не знайдено.'" />
         @else
             <p class="mb-6 text-sm text-slate-500">Знайдено результатів: <span class="font-semibold text-slate-800">{{ $results->count() }}</span></p>
             <ul class="space-y-3">
                 @foreach ($results as $r)
-                    <li class="card p-5 transition hover:shadow-md">
+                    <li class="card card-interactive p-5">
                         <a href="{{ $r['url'] }}" class="group block">
                             <span class="badge bg-brand-50 text-brand-700">{{ $r['type'] }}</span>
                             <p class="mt-2 font-bold text-slate-900 group-hover:text-brand-700">{{ $r['title'] }}</p>

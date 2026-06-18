@@ -21,7 +21,7 @@
         @endif
 
         @if (filled($page->body))
-            <div class="prose prose-slate max-w-none prose-headings:font-display prose-a:text-brand-700">
+            <div class="prose-site">
                 {!! $page->body !!}
             </div>
         @endif
@@ -30,7 +30,7 @@
         @if ($children->isNotEmpty())
             <div @class(['grid gap-4 sm:grid-cols-2 lg:grid-cols-3', 'mt-10' => $page->cover_image || filled($page->excerpt) || filled($page->body)])>
                 @foreach ($children as $child)
-                    <a href="{{ url('/' . $child->slug) }}" class="card group flex items-center justify-between gap-3 p-5 transition hover:-translate-y-0.5 hover:shadow-lg">
+                    <a href="{{ url('/' . $child->slug) }}" class="card card-interactive group flex items-center justify-between gap-3 p-5">
                         <span class="font-semibold text-slate-800 group-hover:text-brand-700">{{ $child->title }}</span>
                         <x-ico name="arrow-right" class="h-5 w-5 shrink-0 text-slate-300 transition group-hover:translate-x-1 group-hover:text-brand-600" />
                     </a>
@@ -39,10 +39,7 @@
         @endif
 
         @if (blank($page->body) && $children->isEmpty() && blank($page->excerpt))
-            <div class="card p-12 text-center text-slate-500">
-                <x-ico name="document-text" class="mx-auto h-10 w-10 text-slate-300" />
-                <p class="mt-3">Матеріали цього розділу незабаром буде додано.</p>
-            </div>
+            <x-empty-state icon="document-text" title="Матеріали цього розділу незабаром буде додано." />
         @endif
     </section>
 

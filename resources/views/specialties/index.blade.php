@@ -11,7 +11,7 @@
         @if ($specialties->isNotEmpty())
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 @foreach ($specialties as $sp)
-                    <a href="{{ route('specialties.show', $sp) }}" class="card group flex flex-col overflow-hidden transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+                    <a href="{{ route('specialties.show', $sp) }}" class="card card-interactive group flex flex-col overflow-hidden">
                         <div class="relative aspect-[16/9] overflow-hidden">
                             @if ($sp->cover_image)
                                 <x-picture :path="$sp->cover_image" :alt="$sp->title" loading="lazy" decoding="async" class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
@@ -38,7 +38,7 @@
                 @endforeach
             </div>
         @else
-            <div class="card p-12 text-center text-slate-500">Перелік спеціальностей незабаром буде додано.</div>
+            <x-empty-state icon="academic-cap" title="Перелік спеціальностей незабаром буде додано." />
         @endif
     </section>
 

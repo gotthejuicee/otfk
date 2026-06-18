@@ -25,10 +25,7 @@
     <section class="container-site py-12">
         <div class="mx-auto max-w-3xl">
             @if ($faqs->isEmpty())
-                <div class="card p-12 text-center text-slate-500">
-                    <x-ico name="question-mark-circle" class="mx-auto h-10 w-10 text-slate-300" />
-                    <p class="mt-3">Питання та відповіді скоро зʼявляться.</p>
-                </div>
+                <x-empty-state icon="question-mark-circle" title="Питання та відповіді скоро зʼявляться." />
             @else
                 <div class="space-y-3" x-data="{ open: null }">
                     @foreach ($faqs as $i => $faq)

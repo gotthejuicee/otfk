@@ -45,10 +45,7 @@
                     @endforeach
                 </ul>
             @else
-                <div class="card p-12 text-center text-slate-500">
-                    <x-ico name="folder-open" class="mx-auto h-10 w-10 text-slate-300" />
-                    <p class="mt-3">Документи цієї категорії незабаром буде додано.</p>
-                </div>
+                <x-empty-state icon="folder-open" title="Документи цієї категорії незабаром буде додано." />
             @endif
         </div>
     </section>

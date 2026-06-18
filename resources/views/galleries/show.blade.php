@@ -33,7 +33,7 @@
                 </figure>
             </div>
         @else
-            <div class="card p-12 text-center text-slate-500">Фотографій у цьому альбомі ще немає.</div>
+            <x-empty-state icon="photo" title="Фотографій у цьому альбомі ще немає." />
         @endif
 
         <a href="{{ route('galleries.index') }}" class="btn-outline mt-10"><x-ico name="arrow-left" class="h-4 w-4" /> До галереї</a>

@@ -1,6 +1,6 @@
 @props(['item'])
 
-<article class="card group flex flex-col overflow-hidden transition duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-300/40">
+<article class="card card-interactive group flex flex-col overflow-hidden">
     <a href="{{ route('news.show', $item) }}" class="block aspect-[16/9] overflow-hidden">
         @if ($item->cover_image)
             <x-picture :path="$item->cover_image" :alt="$item->title" loading="lazy" decoding="async"
