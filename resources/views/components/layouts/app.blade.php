@@ -12,6 +12,7 @@
     $favicon = ! empty($s['favicon']) ? asset('storage/' . $s['favicon']) : asset('favicon.svg');
     $metaDesc = $description ?: ($s['site_description'] ?? 'Офіційний сайт Одеського технічного фахового коледжу ОНТУ.');
     $year = date('Y');
+    $isHome = request()->routeIs('home');
     // Чи веде пункт меню на поточну сторінку (порівнюємо шлях без домену й слешів) — для aria-current
     $currentPath = rtrim(request()->getPathInfo(), '/') ?: '/';
     $navCurrent = function (?string $href) use ($currentPath) {
@@ -152,9 +153,11 @@
             </div>
         </div>
 
-        {{-- Липка частина: бренд + навігація --}}
-        <div class="sticky top-0 z-40 border-b border-transparent bg-white shadow-sm transition-[box-shadow,background-color,border-color] duration-300"
-             :class="scrolled ? 'border-slate-200/80 bg-white/90 shadow-md backdrop-blur-md' : ''">
+        {{-- Липка частина: бренд + навігація (на головній — темна, без білої «полички») --}}
+        <div class="sticky top-0 z-40 border-b transition-[box-shadow,background-color,border-color] duration-300"
+             :class="@js($isHome)
+                 ? (scrolled ? 'border-white/10 bg-brand-950/95 shadow-md backdrop-blur-md' : 'border-white/10 bg-brand-950 shadow-none')
+                 : (scrolled ? 'border-slate-200/80 bg-white/90 shadow-md backdrop-blur-md' : 'border-transparent bg-white shadow-sm')">
             {{-- Ряд бренду та дій --}}
             <div class="mx-auto flex h-20 w-full max-w-[1600px] items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
                 <a href="{{ route('home') }}" class="flex shrink-0 items-center gap-3">
@@ -166,8 +169,16 @@
                         </span>
                     @endif
                     <span class="leading-tight">
-                        <span class="font-display block whitespace-nowrap text-lg font-extrabold tracking-tight text-brand-900">{{ $s['brand_short'] ?? 'ОТФК ОНТУ' }}</span>
-                        <span class="hidden whitespace-nowrap text-xs text-slate-500 sm:block">{{ $s['brand_name'] ?? 'Одеський технічний фаховий коледж' }}</span>
+                        <span @class([
+                            'font-display block whitespace-nowrap text-lg font-extrabold tracking-tight',
+                            'text-white' => $isHome,
+                            'text-brand-900' => ! $isHome,
+                        ])>{{ $s['brand_short'] ?? 'ОТФК ОНТУ' }}</span>
+                        <span @class([
+                            'hidden whitespace-nowrap text-xs sm:block',
+                            'text-brand-200' => $isHome,
+                            'text-slate-500' => ! $isHome,
+                        ])>{{ $s['brand_name'] ?? 'Одеський технічний фаховий коледж' }}</span>
                     </span>
                 </a>
 
@@ -177,10 +188,18 @@
                          @click.outside="open = false" @keydown.escape.window="open = false"
                          class="relative hidden lg:block">
                         <form action="{{ route('search') }}" method="GET" class="relative">
-                            <x-ico name="magnifying-glass" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                            <x-ico name="magnifying-glass" @class([
+                                'pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2',
+                                'text-white/50' => $isHome,
+                                'text-slate-400' => ! $isHome,
+                            ]) />
                             <input type="search" name="q" placeholder="Пошук..." autocomplete="off"
                                    x-model="q" @input.debounce.250ms="suggest()" @focus="items.length && (open = true)"
-                                   class="w-48 rounded-full border-0 bg-slate-100 py-2 pl-9 pr-4 text-sm text-slate-700 ring-1 ring-transparent transition focus:w-64 focus:bg-white focus:ring-2 focus:ring-brand-500" />
+                                   @class([
+                                       'w-48 rounded-full border-0 py-2 pl-9 pr-4 text-sm ring-1 transition focus:w-64 focus:ring-2',
+                                       'bg-white/10 text-white placeholder:text-white/50 ring-white/15 focus:bg-white/15 focus:ring-white/30' => $isHome,
+                                       'bg-slate-100 text-slate-700 ring-transparent focus:bg-white focus:ring-brand-500' => ! $isHome,
+                                   ]) />
                         </form>
                         <div x-show="open" x-cloak
                              class="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl">
@@ -200,8 +219,8 @@
                     {{-- CTA --}}
                     <a href="{{ url('/abituriyentu') }}" class="btn-accent hidden whitespace-nowrap sm:inline-flex">Вступнику</a>
                     {{-- Мобільні дії --}}
-                    <a href="{{ route('search') }}" class="btn-ghost p-2 lg:hidden" aria-label="Пошук"><x-ico name="magnifying-glass" class="h-5 w-5" /></a>
-                    <button @click="mobile = true" class="btn-ghost p-2 xl:hidden" aria-label="Меню"><x-ico name="bars-3" class="h-6 w-6" /></button>
+                    <a href="{{ route('search') }}" @class(['btn-ghost p-2 lg:hidden', 'text-white hover:bg-white/10' => $isHome]) aria-label="Пошук"><x-ico name="magnifying-glass" class="h-5 w-5" /></a>
+                    <button @click="mobile = true" @class(['btn-ghost p-2 xl:hidden', 'text-white hover:bg-white/10' => $isHome]) aria-label="Меню"><x-ico name="bars-3" class="h-6 w-6" /></button>
                 </div>
             </div>
 

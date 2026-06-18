@@ -276,17 +276,7 @@
 /* Поява секцій при прокручуванні (scroll-reveal).
    Анімація вмикається ЛИШЕ коли є JS і користувач не просив зменшити рух —
    інакше весь контент показується одразу (доступність + надійність). */
-/* Повільний Ken Burns на фото банера (вимкнено при reduced-motion) */
 @media (prefers-reduced-motion: no-preference) {
-    .hero-ken-burns {
-        animation: hero-ken-burns 14s ease-out both;
-        will-change: transform;
-    }
-    @keyframes hero-ken-burns {
-        from { transform: scale(1); }
-        to { transform: scale(1.06); }
-    }
-
     html.js [data-reveal] {
         opacity: 0;
         transform: translateY(18px);

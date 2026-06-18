@@ -29,7 +29,15 @@ class TierOneTest extends TestCase
             ->assertOk()
             ->assertSee('aria-roledescription="carousel"', escape: false)
             ->assertSee('Попередній слайд')
-            ->assertSee('Наступний слайд');
+            ->assertSee('Наступний слайд')
+            ->assertDontSee('hero-ken-burns', escape: false);
+    }
+
+    public function test_home_header_uses_dark_brand_bar(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('bg-brand-950 shadow-none', escape: false);
     }
 
     public function test_single_banner_has_no_carousel_controls(): void
