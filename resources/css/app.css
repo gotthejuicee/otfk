@@ -111,9 +111,9 @@
                prose-hr:border-gold-200/80;
     }
 
-    /* Велика літера першого абзацу (drop cap) */
-    .prose-site > p:first-of-type::first-letter,
-    .prose-heritage > p:first-of-type::first-letter {
+    /* Велика літера першого абзацу (drop cap); вимикається класом prose-site--no-dropcap */
+    .prose-site:not(.prose-site--no-dropcap) > p:first-of-type::first-letter,
+    .prose-heritage:not(.prose-site--no-dropcap) > p:first-of-type::first-letter {
         float: left;
         margin: 0.06em 0.14em 0 0;
         font-family: var(--font-display);

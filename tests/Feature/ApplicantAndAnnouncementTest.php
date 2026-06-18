@@ -60,4 +60,11 @@ class ApplicantAndAnnouncementTest extends TestCase
     {
         $this->get('/abituriyentu')->assertOk()->assertSee('Залишити заявку');
     }
+
+    public function test_abituriyentu_pages_disable_drop_cap(): void
+    {
+        $this->get('/abituriyentu')
+            ->assertOk()
+            ->assertSee('prose-site--no-dropcap', escape: false);
+    }
 }
