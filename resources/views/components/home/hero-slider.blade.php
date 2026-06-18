@@ -49,9 +49,9 @@
                 <div class="pointer-events-none absolute inset-0 overflow-hidden">
                     @if ($banner->image)
                         @if ($i === 0)
-                            <x-picture :path="$banner->image" :alt="$banner->imageAlt()" class="hero-ken-burns h-full w-full object-cover" fetchpriority="high" decoding="async" />
+                            <x-picture :path="$banner->image" :alt="$banner->imageAlt()" class="h-full w-full object-cover" fetchpriority="high" decoding="async" />
                         @else
-                            <x-picture :path="$banner->image" :alt="$banner->imageAlt()" class="hero-ken-burns h-full w-full object-cover" loading="lazy" decoding="async" />
+                            <x-picture :path="$banner->image" :alt="$banner->imageAlt()" class="h-full w-full object-cover" loading="lazy" decoding="async" />
                         @endif
                         @if (BannerOverlay::hasOverlay())
                             <div class="absolute inset-0" style="{{ BannerOverlay::gradientStyle() }}"></div>
