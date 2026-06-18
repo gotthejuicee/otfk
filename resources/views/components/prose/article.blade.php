@@ -1,4 +1,4 @@
-@props(['heritage' => false, 'date' => null, 'dropCap' => true])
+@props(['heritage' => false, 'date' => null, 'dropCap' => false])
 
 @php
     $proseClass = 'prose-site' . ($dropCap ? '' : ' prose-site--no-dropcap');

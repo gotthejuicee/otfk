@@ -87,7 +87,7 @@
                     'font-medium text-slate-600' => ! $heritage,
                 ])>{{ $news->excerpt }}</p>
             @endif
-            <x-prose.article :heritage="$heritage" :date="$news->published_at">
+            <x-prose.article :heritage="$heritage" :date="$news->published_at" :drop-cap="false">
                 {!! $news->body !!}
             </x-prose.article>
 
