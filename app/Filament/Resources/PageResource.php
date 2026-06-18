@@ -31,14 +31,15 @@ class PageResource extends Resource
                 Forms\Components\Select::make('parent_id')->label('Батьківський розділ')
                     ->relationship('parent', 'title')->searchable()->preload(),
                 Forms\Components\Textarea::make('excerpt')->label('Короткий опис')->rows(2)->columnSpanFull(),
+                Forms\Components\Toggle::make('is_heritage')
+                    ->label('Урочисте оформлення (heritage)')
+                    ->helperText('Увімкніть для сторінок історії, хроніки та ювілейних матеріалів — стиль «листа» на сайті.')
+                    ->columnSpanFull(),
                 Forms\Components\RichEditor::make('body')->label('Основний текст')->columnSpanFull(),
                 Forms\Components\FileUpload::make('cover_image')->label('Зображення')->image()->directory('pages')->imageEditor()->imageResizeMode('contain')->imageResizeTargetWidth('1600')->imageResizeTargetHeight('1600')->columnSpanFull(),
             ])->columns(2),
             Forms\Components\Section::make('Налаштування')->schema([
                 Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true),
-                Forms\Components\Toggle::make('is_heritage')
-                    ->label('Урочисте оформлення (heritage)')
-                    ->helperText('Для історії коледжу, хроніки та особливих сторінок — стиль «листа».'),
                 Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0),
                 Forms\Components\TextInput::make('section')->label('Розділ (службове поле)')->maxLength(255),
                 Forms\Components\TextInput::make('meta_title')->label('SEO-заголовок')->maxLength(255),
