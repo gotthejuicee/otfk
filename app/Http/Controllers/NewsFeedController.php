@@ -16,6 +16,8 @@ class NewsFeedController extends Controller
 
         return response()
             ->view('feed.news', compact('news', 'siteName', 'description'), 200)
-            ->header('Content-Type', 'application/rss+xml; charset=UTF-8');
+            ->header('Content-Type', 'application/rss+xml; charset=UTF-8')
+            // Читалки/агрегатори опитують часто — нехай кешують пів години (і проксі теж).
+            ->header('Cache-Control', 'public, max-age=1800');
     }
 }
