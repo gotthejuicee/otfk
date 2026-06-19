@@ -85,6 +85,7 @@ php artisan optimize             # кеш конфигов/роутов/вью (
 ## Чек-лист «не забыть»
 
 - [ ] PHP **8.2+** выбран для сайта
+- [ ] PHP-расширение **GD с поддержкой WebP** (для авто-оптимизации картинок). Если нет — сайт работает, но изображения не сжимаются в WebP (молча пропускается). Проверка: `php -r "var_dump(function_exists('imagewebp'));"`
 - [ ] Корень сайта = **`public`**
 - [ ] `.env`: `APP_ENV=production`, `APP_DEBUG=false`, `APP_KEY` заполнен, `APP_URL=https://домен`, `DB_*`
 - [ ] `php artisan migrate --seed --force` (или импорт `otfk.sql`)

@@ -38,7 +38,8 @@ class ImageOptimizer
 
         $image = match ($ext) {
             'jpg', 'jpeg' => @imagecreatefromjpeg($fullPath),
-            'png' => @imagecreatefrompng($fullPath),
+            // function_exists — щоб на GD без PNG-підтримки не впасти у фатал «undefined function»
+            'png' => function_exists('imagecreatefrompng') ? @imagecreatefrompng($fullPath) : null,
             default => null,
         };
 
