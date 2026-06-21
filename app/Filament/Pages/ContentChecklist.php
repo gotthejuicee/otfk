@@ -50,7 +50,7 @@ class ContentChecklist extends FilamentPage
             ->map(fn (Page $p) => [
                 'label' => $p->title,
                 'meta' => $p->section ?: '—',
-                'url' => PageResource::getUrl('edit', ['record' => $p->getKey()]),
+                'url' => PageResource::getUrl('edit', ['record' => $p]),
             ])
             ->values()->all();
     }
@@ -63,7 +63,7 @@ class ContentChecklist extends FilamentPage
             ->map(fn (DocumentCategory $c) => [
                 'label' => $c->title,
                 'meta' => '0 документів',
-                'url' => DocumentCategoryResource::getUrl('edit', ['record' => $c->getKey()]),
+                'url' => DocumentCategoryResource::getUrl('edit', ['record' => $c]),
             ])
             ->values()->all();
     }
@@ -76,7 +76,7 @@ class ContentChecklist extends FilamentPage
             ->map(fn (Department $d) => [
                 'label' => $d->title,
                 'meta' => $d->staff_count === 0 ? 'немає персоналу' : 'короткий опис',
-                'url' => DepartmentResource::getUrl('edit', ['record' => $d->getKey()]),
+                'url' => DepartmentResource::getUrl('edit', ['record' => $d]),
             ])
             ->values()->all();
     }
@@ -89,7 +89,7 @@ class ContentChecklist extends FilamentPage
             ->map(fn (Gallery $g) => [
                 'label' => $g->title,
                 'meta' => '0 фото',
-                'url' => GalleryResource::getUrl('edit', ['record' => $g->getKey()]),
+                'url' => GalleryResource::getUrl('edit', ['record' => $g]),
             ])
             ->values()->all();
     }
@@ -118,7 +118,7 @@ class ContentChecklist extends FilamentPage
                     'label' => $label,
                     'meta' => $key,
                     'url' => $record
-                        ? SettingResource::getUrl('edit', ['record' => $record->getKey()])
+                        ? SettingResource::getUrl('edit', ['record' => $record])
                         : SettingResource::getUrl('index'),
                 ];
             }
