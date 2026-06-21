@@ -2,15 +2,40 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Pages\ContentChecklist;
 use App\Filament\Resources\PageResource;
+use App\Models\ChecklistDismissal;
 use App\Models\Page;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
 class ContentChecklistTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_hidden_item_drops_out_of_active_count(): void
+    {
+        $stub = Page::create([
+            'title' => 'Заглушка для приховування',
+            'slug' => 'zaglushka-hide-test',
+            'body' => '<p>коротко</p>',
+            'is_published' => true,
+        ]);
+        $key = 'page:' . $stub->getKey();
+
+        Cache::forget('content_checklist_badge');
+        $before = (int) ContentChecklist::getNavigationBadge();
+
+        // Ховаємо пункт вручну — він має зникнути з активного лічильника.
+        ChecklistDismissal::create(['item_key' => $key]);
+        Cache::forget('content_checklist_badge');
+        $after = (int) ContentChecklist::getNavigationBadge();
+
+        $this->assertSame($before - 1, $after);
+        $this->assertContains($key, (new ContentChecklist())->dismissedKeys());
+    }
 
     public function test_fill_links_resolve_not_404(): void
     {
