@@ -16,13 +16,7 @@
             <x-picture :path="$page->cover_image" :alt="$page->title" loading="lazy" decoding="async" class="mb-8 w-full rounded-2xl object-cover" />
         @endif
 
-        @if ($page->excerpt)
-            <p @class([
-                'mb-6 max-w-3xl text-lg leading-relaxed',
-                'font-heritage-display italic text-brand-800/90' => $page->is_heritage,
-                'font-medium text-slate-600' => ! $page->is_heritage,
-            ])>{{ $page->excerpt }}</p>
-        @endif
+        <x-lead-excerpt :excerpt="$page->excerpt" :body="$page->body" :heritage="$page->is_heritage" />
 
         @if (filled($page->body))
             <x-prose.article :heritage="$page->is_heritage" :drop-cap="$page->slug === 'istoriya'">
