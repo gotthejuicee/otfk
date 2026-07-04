@@ -80,13 +80,7 @@
             @if ($news->cover_image)
                 <x-picture :path="$news->cover_image" :alt="$news->title" loading="lazy" decoding="async" class="lightboxable mb-8 w-full rounded-2xl object-cover" />
             @endif
-            @if ($news->excerpt)
-                <p @class([
-                    'mb-6 text-lg leading-relaxed',
-                    'font-heritage-display italic text-brand-800/90' => $heritage,
-                    'font-medium text-slate-600' => ! $heritage,
-                ])>{{ $news->excerpt }}</p>
-            @endif
+            <x-lead-excerpt :excerpt="$news->excerpt" :body="$news->body" :heritage="$heritage" />
             <x-prose.article :heritage="$heritage" :date="$news->published_at" :drop-cap="false">
                 {!! $news->body !!}
             </x-prose.article>
