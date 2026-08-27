@@ -161,7 +161,7 @@ Telegram-автопост: `NewsObserver` (подключён PHP-атрибут
 
 ### `.github/workflows/deploy.yml` — CD («Deploy to production»)
 
-Триггер: push в `master` или ручной `workflow_dispatch`; `concurrency: deploy-production` (без отмены запущенного). Шаги: сборка фронта в CI (Node 22, `npm ci && npm run build`) → SSH на хостинг (`git fetch` + `git reset --hard origin/master`, `composer install --no-dev`) → rsync `public/build/` на сервер (`--delete`) → `migrate --force` + `optimize:clear` + `config:cache`/`route:cache`/`view:cache`. Репозиторий публичный, поэтому сервер тянет код по https без deploy key. Секреты: `REMOTE_KEY` (приватный SSH-ключ), `REMOTE_HOST`, `REMOTE_USER`, `REMOTE_PATH`, опционально `REMOTE_PORT` (дефолт 22). Деплой feature-веток не настроен — окружение одно.
+Триггер: push в `master` **или в `feature/**`** (осознанное решение для прототипа: прод-окружение одно, сервер встаёт на запушенную ветку, её миграции едут в живую БД; вернуть сайт на master = запушить/задеплоить master), либо ручной `workflow_dispatch`; `concurrency: deploy-production` (без отмены запущенного). Шаги: сборка фронта в CI (Node 22, `npm ci && npm run build`) → SSH на хостинг (`git fetch` + `git reset --hard origin/master`, `composer install --no-dev`) → rsync `public/build/` на сервер (`--delete`) → `migrate --force` + `optimize:clear` + `config:cache`/`route:cache`/`view:cache`. Репозиторий публичный, поэтому сервер тянет код по https без deploy key. Секреты: `REMOTE_KEY` (приватный SSH-ключ), `REMOTE_HOST`, `REMOTE_USER`, `REMOTE_PATH`, опционально `REMOTE_PORT` (дефолт 22).
 
 ### Фронтенд-бандл
 
@@ -214,3 +214,5 @@ Telegram-автопост: `NewsObserver` (подключён PHP-атрибут
 | 12 | Импорт-команды со скрейпингом legacy-сайта | `app/Console/Commands/ImportOtfk*` | Удалить после финального импорта |
 | 13 | Telegram-токен плейнтекстом в `settings` + открытое поле в админке | `SettingResource` | Маскировать поле / перенести в env |
 | 14 | Мёртвый груз: axios в бандле (не используется, всё на fetch), `laravel/sail` без compose.yaml, pest-plugin в allow-plugins | `resources/js/bootstrap.js`, `composer.json` | Удалить |
+| 15 | Тестовая золотая полоса «Тестовий деплой з гілки feature/…» вверху главной | `resources/views/home.blade.php` | Удалить после проверки CD feature-веток |
+| 16 | Автодеплой `feature/**` на единственный прод (ветка/миграции едут в живую БД) | `.github/workflows/deploy.yml` | Перед продом сузить триггер до `master` |
