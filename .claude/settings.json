@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "fp=$(/usr/bin/python3 -c 'import json,sys;print(json.load(sys.stdin).get(\"tool_input\",{}).get(\"file_path\",\"\"))'); case \"$fp\" in *ARCHITECTURE.html) echo \"BLOCKED: $fp — сгенерированный build-артефакт. Правь ARCHITECTURE.md и запусти: node DocsHtml/generate.mjs\" >&2; exit 2;; esac"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "fp=$(/usr/bin/python3 -c 'import json,sys;print(json.load(sys.stdin).get(\"tool_input\",{}).get(\"file_path\",\"\"))'); case \"$fp\" in *ARCHITECTURE.md) echo \"Напоминание: ARCHITECTURE.md изменён — перегенерируй HTML-твин в этой же правке: node DocsHtml/generate.mjs\" >&2; exit 2;; esac"
+          }
+        ]
+      }
+    ]
+  }
+}
