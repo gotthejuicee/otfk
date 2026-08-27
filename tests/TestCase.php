@@ -13,4 +13,16 @@ abstract class TestCase extends BaseTestCase
      * від порядку запуску).
      */
     protected bool $seed = true;
+
+    /**
+     * public/build не комітиться (збирається лише в CI/деплої), тому Vite
+     * у тестах вимкнено — інакше рендер будь-якої сторінки падає через
+     * відсутній manifest.json.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withoutVite();
+    }
 }
