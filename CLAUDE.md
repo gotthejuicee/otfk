@@ -28,7 +28,8 @@
 - **Не менять `'timezone' => 'UTC'`** в `config/app.php` без сквозной ревизии: даты хранятся как киевское wall-clock и вручную шифтуются в 5 местах (см. Gotcha «Таймзона»).
 - **Catch-all `/{page:slug}`** остаётся последним в `routes/web.php`; новый top-level путь → добавить в регексп исключений в той же правке.
 - **Не запускать `db:seed` / `SiteSeeder` на окружении с реальным контентом** — сидер деструктивен (delete меню, персонала, видео, баннеров).
-- **`public/build/` коммитится намеренно.** Тронул `resources/css|js`, `package*.json`, `vite.config.js` — или добавил новые Tailwind-классы в Blade — прогони `npm run build` и закоммить `public/build/` в той же правке.
+- **`public/build/` в git не коммитить** (он в `.gitignore`) — прод-бандл собирает деплой-workflow `deploy.yml` и заливает rsync-ом. Локально для проверки — `npm run build` или `npm run dev`.
+- **Деплой:** push в `master` = автодеплой на прод (`.github/workflows/deploy.yml`). Не пушить в `master` без явной просьбы пользователя (правило «не коммитить/не пушить» теперь ещё и деплоит).
 - **`ARCHITECTURE.html` и прочие HTML-твины руками не редактировать** — только `node DocsHtml/generate.mjs`.
 - Слаг `istoriya` (drop cap) и страница `abituriyentu` (7 хардкод-ссылок) — не переименовывать без правки шаблонов и тестов.
 - `NewsObserver` подключён атрибутом `#[ObservedBy]` на модели `News` — помни про Telegram-сайд-эффект при любых правках новостей.

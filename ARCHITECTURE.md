@@ -7,7 +7,7 @@
 
 - **Что это:** новый сайт Одесского технического фахового колледжа ОНТУ (замена старого otfk.od.ua), пишется с нуля как **proof-of-concept**. Публичная часть + админка.
 - **Стек (подтверждён по коду, НЕ «чистый PHP»):** PHP ^8.2 (CI/прод — 8.3), **Laravel 12**, **Filament 3** (вся админка), Blade + **Tailwind CSS v4** + **Alpine.js 3**, Vite 7. БД: SQLite в dev/тестах, **MySQL в проде**. Composer + npm.
-- **Хостинг:** shared-хостинг ukraine.com.ua (SSH, без Node, без queue-воркера) — отсюда два ключевых паттерна: **закоммиченный `public/build/`** и фоновые задачи только через `dispatch(...)->afterResponse()`.
+- **Хостинг:** shared-хостинг ukraine.com.ua (SSH, без Node, без queue-воркера) — отсюда ключевые паттерны: фронтенд собирается в CI и заливается на сервер rsync-ом (деплой-workflow), фоновые задачи только через `dispatch(...)->afterResponse()`.
 - **Локально:** `php artisan serve --port=8002` (см. `.claude/launch.json`), или `composer run dev`. Тесты: `composer test` (SQLite `:memory:`).
 - **PoC-статус:** ролей нет (любой пользователь = полный админ), сид-данные фейковые, в футере бейдж «Альфа-версія». Полный список — в разделе [PoC-only](#poc-only).
 
@@ -32,12 +32,11 @@
 | `routes/console.php` | Расписание: бэкап БД и prune визитов (еженедельно, UTC) |
 | `resources/views/` | Blade: единый layout `components/layouts/app.blade.php` + страницы |
 | `resources/css/app.css`, `resources/js/app.js` | Tailwind v4 тема + Alpine; весь кастомный JS — inline в layout |
-| `public/build/` | **Закоммиченный** прод-бандл Vite (на хостинге нет npm) |
-| `scripts/frontend-source-hash.mjs` | Fingerprint исходников фронта → `public/build/.source-hash` |
+| `public/build/` | Прод-бандл Vite; **в git не входит** — собирается локально (`npm run build`) и в CI при деплое |
 | `tests/Feature/` | 19 фиче-тестов; многие фиксируют поведенческие контракты |
 | `docs/posibnyk-administratora.html` | Ручной (не генерируемый) мануал админа для персонала |
 | `DocsHtml/generate.mjs` | Генератор HTML-твинов этой документации |
-| `.github/workflows/tests.yml` | Единственный CI-workflow (тесты + сборка фронта); CD нет |
+| `.github/workflows/` | `tests.yml` (тесты + сборка фронта) и `deploy.yml` (автодеплой `master` на хостинг) |
 | `DEPLOY.md`, `README.md` | Деплой на ukraine.com.ua; обзор фич |
 
 ## Карта: страницы → обработчики → хранилище
@@ -153,20 +152,24 @@ Telegram-автопост: `NewsObserver` (подключён PHP-атрибут
 
 ## CI / деплой
 
-### `.github/workflows/tests.yml` — единственный workflow («Тести»)
+### `.github/workflows/tests.yml` — CI («Тести»)
 
-Триггер: каждый `push` и `pull_request` (без фильтров). Секретов не использует. **CD-workflow нет — деплой ручной по SSH.**
+Триггер: каждый `push` и `pull_request` (без фильтров). Секретов не использует.
 
 - **Job `tests`** (ubuntu, PHP 8.3): checkout → setup-php (pdo_sqlite, gd, intl...) → composer-кэш → `composer install` → `composer audit` (advisory, `continue-on-error`) → `cp .env.example .env` + `key:generate` → `php artisan test`. Заметь: тесты на SQLite, прод на MySQL — MySQL-специфика CI не ловится.
-- **Job `assets`** (ubuntu, Node 20): `npm ci` → `npm run build` → `node scripts/frontend-source-hash.mjs --check`. **Проверка фактически неэффективна**: `npm run build` перезаписывает `.source-hash` до `--check`, поэтому check не может упасть; `git diff --exit-code public/build` тоже не делается.
+- **Job `assets`** (ubuntu, Node 20): `npm ci` → `npm run build` — smoke-проверка, что фронтенд собирается.
 
-### Деплой (DEPLOY.md, хостинг ukraine.com.ua «Кращий»)
+### `.github/workflows/deploy.yml` — CD («Deploy to production»)
 
-Вариант A: `git clone` → `composer install --no-dev` → `.env` из `.env.production.example` → `migrate --seed --force` (**обязательно до** `artisan optimize` — кэш конфига ломает env-чтение в сидере) → `filament:assets` → `storage:link` → `optimize` → document root на `public/`. Вариант B: zip с локально собранными `vendor/` и `public/build/`. Cron: `* * * * * php artisan schedule:run` (расписание: `otfk:backup` вс 03:30 UTC, prune `site_visits` вс 04:00 UTC).
+Триггер: push в `master` или ручной `workflow_dispatch`; `concurrency: deploy-production` (без отмены запущенного). Шаги: сборка фронта в CI (Node 22, `npm ci && npm run build`) → SSH на хостинг (`git fetch` + `git reset --hard origin/master`, `composer install --no-dev`) → rsync `public/build/` на сервер (`--delete`) → `migrate --force` + `optimize:clear` + `config:cache`/`route:cache`/`view:cache`. Репозиторий публичный, поэтому сервер тянет код по https без deploy key. Секреты: `REMOTE_KEY` (приватный SSH-ключ), `REMOTE_HOST`, `REMOTE_USER`, `REMOTE_PATH`, опционально `REMOTE_PORT` (дефолт 22). Деплой feature-веток не настроен — окружение одно.
 
-### Закоммиченный фронтенд-бандл
+### Фронтенд-бандл
 
-На хостинге нет npm ⇒ `public/build/` (manifest + assets) **намеренно в git** (строка в `.gitignore` закомментирована с пояснением). После любого изменения `resources/css|js`, `package*.json`, `vite.config.js` — обязательно `npm run build` и коммит `public/build/`. Fingerprint (`scripts/frontend-source-hash.mjs`) хэширует только эти 5 входов — **Blade-шаблоны не хэшируются**, а Tailwind v4 сканирует именно их: новые утилити-классы в шаблонах требуют ребилда, который fingerprint не потребует сам.
+`public/build/` **не коммитится** (в `.gitignore`): его собирает деплой-workflow и заливает rsync-ом. Локально — `npm run build`/`npm run dev`. (Ранее бандл коммитился в git, а `scripts/frontend-source-hash.mjs` следил за его свежестью — механизм удалён вместе с переходом на CD.)
+
+### Первичный деплой (DEPLOY.md, хостинг ukraine.com.ua «Кращий»)
+
+Вариант A: `git clone` → `composer install --no-dev` → `.env` из `.env.production.example` → `migrate --seed --force` (**обязательно до** `artisan optimize` — кэш конфига ломает env-чтение в сидере) → `filament:assets` → `storage:link` → `optimize` → document root на `public/`; `public/build` при первом деплое залить вручную. Вариант B: zip с локально собранными `vendor/` и `public/build/`. Cron: `* * * * * php artisan schedule:run` (расписание: `otfk:backup` вс 03:30 UTC, prune `site_visits` вс 04:00 UTC).
 
 ## Gotchas
 
@@ -188,7 +191,7 @@ Telegram-автопост: `NewsObserver` (подключён PHP-атрибут
 16. **`FILESYSTEM_DISK=local`** в env, но все загрузки/URL рассчитаны на диск `public` (Filament по умолчанию грузит в `public`). Код, использующий default-диск, запишет в недоступное место.
 17. **Тесты ловят контракты** — перед правкой поведения читай соответствующий Feature-тест (excerpt-дедупликация, heritage-типографика, чеклист контента, light-only и т.д.).
 18. **`SecurityHeaders` намеренно без CSP** (инлайн-скрипты Livewire/Alpine/Filament); `SESSION_SECURE_COOKIE` в прод-шаблоне не задан.
-19. **DEPLOY.md местами врёт/устарел:** утверждает, что `public/build` в `.gitignore` (нет), содержит чужой хардкод-путь крона `/home/tr461119/just-test.shop/www`; язык — смесь русского и украинского.
+19. **DEPLOY.md** — смесь русского и украинского языка; описывает первичный ручной деплой, обновления едут автодеплоем (`deploy.yml`).
 20. **`docs/posibnyk-administratora.html`** — ручной, без генератора, шрифты с внешнего CDN; дрейфует от админки при изменении фич.
 
 ## PoC-only (удалить/заменить перед продом)
@@ -210,5 +213,4 @@ Telegram-автопост: `NewsObserver` (подключён PHP-атрибут
 | 11 | Импортированные тексты старого сайта (не вычитаны) | миграции `import_*_content` | Редакторская вычитка |
 | 12 | Импорт-команды со скрейпингом legacy-сайта | `app/Console/Commands/ImportOtfk*` | Удалить после финального импорта |
 | 13 | Telegram-токен плейнтекстом в `settings` + открытое поле в админке | `SettingResource` | Маскировать поле / перенести в env |
-| 14 | Устаревшие куски DEPLOY.md (см. Gotchas #19) | `DEPLOY.md` | Вычистить |
-| 15 | Мёртвый груз: axios в бандле (не используется, всё на fetch), `laravel/sail` без compose.yaml, pest-plugin в allow-plugins | `resources/js/bootstrap.js`, `composer.json` | Удалить |
+| 14 | Мёртвый груз: axios в бандле (не используется, всё на fetch), `laravel/sail` без compose.yaml, pest-plugin в allow-plugins | `resources/js/bootstrap.js`, `composer.json` | Удалить |

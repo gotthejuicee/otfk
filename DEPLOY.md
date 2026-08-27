@@ -4,6 +4,9 @@
 
 > ✅ Перед прод-деплоем уже сделано в коде: `User::canAccessPanel()` (иначе Filament отдаёт 403 на проде) и шаблон `.env.production.example`.
 
+> 🚀 **Автодеплой:** после первичной настройки по этому документу обновления едут сами — workflow `.github/workflows/deploy.yml` на каждый push в `master` (или вручную через Run workflow): собирает фронтенд в CI, по SSH делает `git reset --hard origin/master` + `composer install`, заливает `public/build/` rsync-ом и выполняет `migrate --force` + пересборку кэшей. Нужны секреты репозитория `REMOTE_KEY` (приватный SSH-ключ), `REMOTE_HOST`, `REMOTE_USER`, `REMOTE_PATH` (каталог сайта), опционально `REMOTE_PORT`. Раздел «Обновление сайта потом» ниже — ручной запасной путь.
+> ⚠️ `public/build/` больше **не** коммитится в git — сборка живёт только в CI/деплое; локально `npm run build` или `npm run dev`.
+
 ---
 
 ## 0. Подготовка локально (один раз)
@@ -22,7 +25,7 @@ npm run build
 
 ## Вариант А — через Git + SSH (рекомендую: удобно обновлять)
 
-На сервере нет `vendor/` и `public/build` (они в `.gitignore`), поэтому `vendor` ставим Composer'ом на сервере, а `public/build` заливаем отдельно.
+На сервере нет `vendor/` и `public/build` (они в `.gitignore`): `vendor` ставим Composer'ом на сервере, а `public/build` при первом деплое собираем локально (`npm run build`) и заливаем в `~/ВАШ-ДОМЕН/www/public/build` (scp/sftp); дальше его обновляет автодеплой.
 
 ### 1. Залить код
 ```bash
@@ -61,7 +64,7 @@ php artisan filament:assets      # опубликовать CSS/JS админк�
 php artisan storage:link         # симлинк public/storage → storage/app/public (для загруженных фото)
 php artisan optimize             # кеш конфигов/роутов/вью (быстрее). При проблемах: php artisan optimize:clear
 ```
-`public/build` **комітиться в git** (на хостингу немає npm) — після `git pull` збірка вже на місці. Якщо змінювали `resources/css` або `resources/js` — локально `npm run build` і закомітьте `public/build` перед push.
+`public/build` в git **не** зберігається: при автодеплої його збирає CI і заливає rsync-ом; при першому ручному деплої зберіть локально (`npm run build`) і завантажте каталог самі.
 
 ### 5. Корень сайта → public
 В панели: **Сайти → Налаштування → Кореневий каталог** → указать `public`
@@ -91,7 +94,7 @@ php artisan optimize             # кеш конфигов/роутов/вью (
 - [ ] `php artisan migrate --seed --force` (или импорт `otfk.sql`)
 - [ ] `php artisan storage:link` (фото из админки)
 - [ ] `php artisan filament:assets` (стили админки)
-- [ ] `public/build` у репозиторії (локально `npm run build` перед push)
+- [ ] `public/build` залитий на сервер (автодеплоєм або вручну після `npm run build`)
 - [ ] права на запись: `chmod -R 775 storage bootstrap/cache` (если будут ошибки 500)
 
 ## Проверить после деплоя
@@ -109,7 +112,7 @@ php artisan optimize             # кеш конфигов/роутов/вью (
 Щоб це працювало, у панелі хостинга додайте **один** cron (щохвилини):
 
 ```bash
-* * * * * cd /home/tr461119/just-test.shop/www && php artisan schedule:run >> /dev/null 2>&1
+* * * * * cd /home/ЛОГІН/ВАШ-ДОМЕН/www && php artisan schedule:run >> /dev/null 2>&1
 ```
 
 Шлях `cd` замініть на свій каталог сайту. Перевірка вручну:
@@ -141,6 +144,8 @@ php artisan otfk:backup
 Повторить вручную: очистить `telegram_posted_at` у новости и пересохранить её.
 
 ## Обновление сайта потом (Вариант А)
+
+Обычно ничего делать не надо — push в `master` запускает автодеплой (`deploy.yml`). Ручной путь на случай, если CI недоступен (фронтенд тогда собрать локально и залить `public/build` самому):
 
 ```bash
 cd ~/ВАШ-ДОМЕН/www
