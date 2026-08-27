@@ -1,10 +1,5 @@
 <x-layouts.app>
 
-    {{-- PoC-only: тестова смуга для перевірки автодеплою feature-гілок. Видалити. --}}
-    <div class="bg-gold-500 py-3 text-center text-lg font-bold text-white">
-        🚀 Тестовий деплой з гілки feature/viacheslav-suggestions — якщо ви це бачите, CD для feature/** працює
-    </div>
-
     {{-- ===================== ГЕРОЙ / БАНЕР (слайдер) ===================== --}}
     <x-home.hero-slider :banners="$banners" />
 

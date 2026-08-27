@@ -214,5 +214,4 @@ Telegram-автопост: `NewsObserver` (подключён PHP-атрибут
 | 12 | Импорт-команды со скрейпингом legacy-сайта | `app/Console/Commands/ImportOtfk*` | Удалить после финального импорта |
 | 13 | Telegram-токен плейнтекстом в `settings` + открытое поле в админке | `SettingResource` | Маскировать поле / перенести в env |
 | 14 | Мёртвый груз: axios в бандле (не используется, всё на fetch), `laravel/sail` без compose.yaml, pest-plugin в allow-plugins | `resources/js/bootstrap.js`, `composer.json` | Удалить |
-| 15 | Тестовая золотая полоса «Тестовий деплой з гілки feature/…» вверху главной | `resources/views/home.blade.php` | Удалить после проверки CD feature-веток |
-| 16 | Автодеплой `feature/**` на единственный прод (ветка/миграции едут в живую БД) | `.github/workflows/deploy.yml` | Перед продом сузить триггер до `master` |
+| 15 | Автодеплой `feature/**` на единственный прод (ветка/миграции едут в живую БД) | `.github/workflows/deploy.yml` | Перед продом сузить триггер до `master` |
