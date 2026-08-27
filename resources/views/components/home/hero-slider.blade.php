@@ -5,10 +5,12 @@
 
     $slides = $banners->values();
     $count = $slides->count();
+    /* Чипи-факти в героя — топ-3 з «Коледж у цифрах» (адмінка → Показники) */
+    $heroStats = \App\Models\StatItem::active()->limit(3)->get();
 @endphp
 
 @if ($count > 0)
-    <section class="relative overflow-hidden bg-brand-950 @if ($count > 1) min-h-[460px] @endif"
+    <section class="relative overflow-hidden bg-brand-950 @if ($count > 1) min-h-[460px] lg:min-h-[560px] 2xl:min-h-[640px] @endif"
              @if ($count > 1)
                  x-data="{
                      index: 0,
@@ -45,7 +47,7 @@
                      x-transition:leave-end="opacity-0"
                      :aria-hidden="index !== {{ $i }}"
                  @endif
-                 class="@if ($count > 1) absolute inset-0 @endif flex min-h-[460px] flex-col justify-center">
+                 class="@if ($count > 1) absolute inset-0 @endif flex min-h-[460px] flex-col justify-center lg:min-h-[560px] 2xl:min-h-[640px]">
                 <div class="pointer-events-none absolute inset-0 overflow-hidden">
                     @if ($banner->image)
                         @if ($i === 0)
@@ -63,16 +65,36 @@
                         <div class="absolute bottom-0 left-1/4 h-72 w-72 rounded-full bg-gold-500/10 blur-3xl"></div>
                     @endif
                 </div>
-                <div class="container-site relative flex min-h-[460px] flex-col justify-center py-20 lg:py-28">
-                    <div class="max-w-2xl">
+                <div class="container-site relative flex min-h-[460px] flex-col justify-center py-20 lg:min-h-[560px] lg:py-28 2xl:min-h-[640px]">
+                    <div class="max-w-2xl xl:max-w-3xl">
                         @if ($banner->title)
-                            <h1 class="text-4xl font-extrabold leading-[1.1] text-white sm:text-5xl lg:text-6xl">{{ $banner->title }}</h1>
+                            {{-- Числа в заголовку («Вступ 2026») підсвічуємо золотом; e() екранує до вставки span --}}
+                            <h1 class="text-4xl font-extrabold leading-[1.1] text-white sm:text-5xl lg:text-6xl 2xl:text-7xl">{!! preg_replace('/\d+/', '<span class="text-gold-400">$0</span>', e($banner->title)) !!}</h1>
                         @endif
                         @if ($banner->subtitle)
-                            <p class="mt-5 max-w-xl text-lg leading-relaxed text-brand-100">{{ $banner->subtitle }}</p>
+                            <p class="mt-5 max-w-xl text-lg leading-relaxed text-brand-100 xl:text-xl">{{ $banner->subtitle }}</p>
                         @endif
-                        @if ($banner->link_url)
-                            <a href="{{ $banner->link_url }}" class="btn-accent mt-8">{{ $banner->link_label ?: 'Детальніше' }} <x-ico name="arrow-right" class="h-4 w-4" /></a>
+                        <div class="mt-8 flex flex-wrap items-center gap-3">
+                            @if ($banner->link_url)
+                                <a href="{{ $banner->link_url }}" class="btn-accent lg:px-6 lg:py-3 lg:text-base">{{ $banner->link_label ?: 'Детальніше' }} <x-ico name="arrow-right" class="h-4 w-4" /></a>
+                            @endif
+                            <a href="{{ route('specialties.index') }}" class="inline-flex items-center justify-center gap-2 rounded-lg bg-white/10 px-5 py-2.5 text-sm font-semibold text-white ring-1 ring-white/25 backdrop-blur transition hover:bg-white/20 lg:px-6 lg:py-3 lg:text-base">Спеціальності <x-ico name="arrow-right" class="h-4 w-4" /></a>
+                        </div>
+                        @if ($heroStats->isNotEmpty())
+                            {{-- Чипи ховаємо на мобільних: слайди absolute у секції з фіксованою min-h, високий контент переповнює її --}}
+                            <div class="mt-10 hidden flex-wrap gap-3 sm:flex">
+                                @foreach ($heroStats as $stat)
+                                    <div class="flex items-center gap-3 rounded-xl bg-brand-950/55 px-4 py-2.5 ring-1 ring-white/15 backdrop-blur">
+                                        <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gold-500/15 text-gold-400">
+                                            <x-ico :name="$stat->icon ?: 'academic-cap'" class="h-5 w-5" />
+                                        </span>
+                                        <span class="leading-tight">
+                                            <span class="block text-base font-bold text-white">{{ $stat->value }}</span>
+                                            <span class="block text-xs text-brand-100">{{ $stat->label }}</span>
+                                        </span>
+                                    </div>
+                                @endforeach
+                            </div>
                         @endif
                     </div>
                 </div>
@@ -81,7 +103,7 @@
 
         @if ($count > 1)
             <div class="pointer-events-none absolute inset-x-0 bottom-6 z-10 flex items-center justify-center gap-3">
-                <button type="button" @click="prev()" class="pointer-events-auto rounded-full bg-white/10 p-2 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white" aria-label="Попередній слайд">
+                <button type="button" @click="prev()" class="max-sm:hidden pointer-events-auto rounded-full bg-white/10 p-2 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white" aria-label="Попередній слайд">
                     <x-ico name="chevron-left" class="h-5 w-5" />
                 </button>
                 <div class="flex gap-2" role="tablist" aria-label="Слайди банера">
@@ -94,7 +116,7 @@
                                 aria-label="Слайд {{ $i + 1 }}"></button>
                     @endforeach
                 </div>
-                <button type="button" @click="next()" class="pointer-events-auto rounded-full bg-white/10 p-2 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white" aria-label="Наступний слайд">
+                <button type="button" @click="next()" class="max-sm:hidden pointer-events-auto rounded-full bg-white/10 p-2 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white" aria-label="Наступний слайд">
                     <x-ico name="chevron-right" class="h-5 w-5" />
                 </button>
             </div>

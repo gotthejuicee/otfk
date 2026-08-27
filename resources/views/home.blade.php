@@ -5,19 +5,25 @@
 
     {{-- ===================== ШВИДКІ РОЗДІЛИ ===================== --}}
     @if ($tiles->isNotEmpty())
-        <section class="container-site mt-12">
-            <h2 class="sr-only">Швидкі розділи</h2>
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <section class="container-site mt-14">
+            <div class="text-center">
+                <h2 class="text-2xl sm:text-3xl">Швидкі розділи</h2>
+                <div class="accent-rule mx-auto"></div>
+            </div>
+            <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
                 @foreach ($tiles as $tile)
                     <a href="{{ $tile->url }}" @if ($tile->open_new_tab) target="_blank" rel="noopener" @endif
-                       class="card card-interactive group flex flex-col p-5">
-                        <span class="grid h-12 w-12 place-items-center rounded-xl bg-{{ $tile->color }}-50 text-{{ $tile->color }}-600 transition group-hover:bg-{{ $tile->color }}-600 group-hover:text-white">
+                       class="card card-interactive group flex flex-col p-6">
+                        <span class="grid h-12 w-12 place-items-center rounded-full bg-{{ $tile->color }}-50 text-{{ $tile->color }}-600 transition group-hover:bg-{{ $tile->color }}-600 group-hover:text-white">
                             <x-ico :name="$tile->icon ?: 'academic-cap'" class="h-6 w-6" />
                         </span>
                         <h3 class="mt-4 font-bold text-slate-900">{{ $tile->title }}</h3>
                         @if ($tile->description)
-                            <p class="mt-1 text-sm text-slate-500">{{ $tile->description }}</p>
+                            <p class="mt-1 text-sm leading-relaxed text-slate-500">{{ $tile->description }}</p>
                         @endif
+                        <span class="mt-auto self-end pt-4 text-gold-600 transition group-hover:translate-x-1">
+                            <x-ico name="arrow-right" class="h-5 w-5" />
+                        </span>
                     </a>
                 @endforeach
             </div>
