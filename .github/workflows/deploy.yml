@@ -1,0 +1,63 @@
+name: Deploy to production
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # На хостингу немає node, тому фронтенд збираємо тут
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.REMOTE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p ${{ secrets.REMOTE_PORT || 22 }} -H ${{ secrets.REMOTE_HOST }} >> ~/.ssh/known_hosts
+
+      # Репозиторій публічний — сервер тягне код по https без deploy key
+      - name: Pull code and install dependencies
+        run: |
+          ssh -i ~/.ssh/deploy_key -p ${{ secrets.REMOTE_PORT || 22 }} ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} '
+            set -e
+            cd ${{ secrets.REMOTE_PATH }}
+            git fetch origin master
+            git reset --hard origin/master
+            composer install --no-dev --optimize-autoloader --no-interaction
+          '
+
+      # public/build у .gitignore (збірка живе тільки в CI), тому заливаємо окремо
+      - name: Upload built assets
+        run: |
+          rsync -avz --delete -e "ssh -i ~/.ssh/deploy_key -p ${{ secrets.REMOTE_PORT || 22 }}" \
+            public/build/ \
+            ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:${{ secrets.REMOTE_PATH }}/public/build/
+
+      - name: Migrate and rebuild caches
+        run: |
+          ssh -i ~/.ssh/deploy_key -p ${{ secrets.REMOTE_PORT || 22 }} ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} '
+            set -e
+            cd ${{ secrets.REMOTE_PATH }}
+            php artisan migrate --force
+            php artisan optimize:clear
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+          '
