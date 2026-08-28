@@ -1,9 +1,11 @@
 <x-layouts.app :title="$news->title" :description="$news->excerpt"
                :og-image="$news->cover_image ? asset('storage/' . $news->cover_image) : null">
 
-    @unless ($news->is_published)
+    @if (! empty($adminPreview))
+        <x-draft-notice message="Попередній перегляд — так виглядатиме новина. Зміни ще не збережено: поверніться до форми й натисніть «Зберегти»." />
+    @elseif (! $news->is_published)
         <x-draft-notice />
-    @endunless
+    @endif
 
     {{-- Розмітка NewsArticle для пошукових систем --}}
     @php

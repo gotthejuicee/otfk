@@ -57,6 +57,10 @@ Route::get('/poshuk/pidkazky', [SearchController::class, 'suggest'])
 
 Route::get('/kontakty', [ContactController::class, 'index'])->name('contacts');
 
+// Превʼю несохранённой форми з адмінки (слепок у кеші, лише для залогінених — інакше 404)
+Route::get('/admin-preview/{token}', [App\Http\Controllers\AdminPreviewController::class, 'show'])
+    ->name('admin.preview');
+
 // SEO
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
@@ -71,5 +75,5 @@ Route::get('/robots.txt', function () {
  | виключає службові префікси, щоб не перехоплювати /admin, /livewire тощо.
  */
 Route::get('/{page:slug}', [PageController::class, 'show'])
-    ->where('page', '^(?!(?:admin|livewire|novyny|video|kontakty|dokumenty|spetsialnosti|struktura|administratsiya|personal|halereya|poshuk|sitemap|storage|up|build|vendor)$).+$')
+    ->where('page', '^(?!(?:admin|admin-preview|livewire|novyny|video|kontakty|dokumenty|spetsialnosti|struktura|administratsiya|personal|halereya|poshuk|sitemap|storage|up|build|vendor)$).+$')
     ->name('pages.show');

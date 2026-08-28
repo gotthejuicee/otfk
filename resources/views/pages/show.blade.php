@@ -44,9 +44,11 @@
 
 <x-layouts.app :title="$page->meta_title ?: $page->title" :description="$page->meta_description ?: $page->excerpt">
 
-    @unless ($page->is_published)
+    @if (! empty($adminPreview))
+        <x-draft-notice message="Попередній перегляд — так виглядатиме сторінка. Зміни ще не збережено: поверніться до форми й натисніть «Зберегти»." />
+    @elseif (! $page->is_published)
         <x-draft-notice />
-    @endunless
+    @endif
 
     @if ($isHeritage)
         {{-- Урочиста сторінка — темна шапка з серифним заголовком лишається частиною стилю «листа» --}}
