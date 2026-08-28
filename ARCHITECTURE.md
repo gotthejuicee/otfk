@@ -85,7 +85,8 @@ flowchart LR
 | GET | `/dokumenty`, `/dokumenty/{cat:slug}` | documents.* | `DocumentController` | Публичная информация (категории документов) | нет |
 | GET | `/spetsialnosti`, `/spetsialnosti/{slug}` | specialties.* | `SpecialtyController` | Специальности + программы | нет |
 | GET | `/struktura`, `/struktura/{slug}` | structure.* | `StructureController` | Отделения/комиссии + персонал | нет |
-| GET | `/administratsiya` | staff.administration | `StaffController` | Администрация | нет |
+| GET | `/administratsiya` | staff.administration | `StaffController@administration` | Администрация | нет |
+| GET | `/personal/{staff:slug}` | staff.show | `StaffController@show` | Персональная страница работника: факты из `bio`, ссылки на CMS-страницы «проф. деятельность»/«повышение квалификации», коллеги по подразделению | нет |
 | GET | `/halereya`, `/halereya/{slug}` | galleries.* | `GalleryController` | Галереи, лайтбокс, архивный (сепия) режим | нет |
 | GET | `/poshuk`, `/poshuk/pidkazky` | search.* | `SearchController` | LIKE-поиск + JSON-подсказки (`throttle:60,1`) | нет |
 | GET/POST | `/kontakty` | contacts.* | `ContactController` | Контакты + форма обратной связи (honeypot, письмо) | нет |
@@ -123,7 +124,7 @@ flowchart LR
 | `banners` | Слайдер главной: image, image_alt, окно дат starts_at/ends_at |
 | `documents`, `document_categories` | Публичная информация: file_path или external_url (external — приоритет) |
 | `specialties`, `programs` | Специальности (slug, code 121/123/181/071...) + файлы программ |
-| `departments`, `staff` | Структура (type: viddilennya/tsyklova-komisiya/kafedra) и персонал (category: administration/teacher) |
+| `departments`, `staff` | Структура (type: viddilennya/tsyklova-komisiya/kafedra) и персонал (category: administration/teacher); `staff.slug` — unique, автогенерация из ПИБ в `Staff::booted()`, адрес персональной страницы |
 | `galleries`, `photos` | Фотоальбомы; `is_archive` → сепия-режим |
 | `videos` | YouTube-ролики (youtube_id → accessors embed/thumb) |
 | `events` | События; **starts_at хранится как киевское wall-clock время**, UTC — через `utcStart()/utcEnd()` |

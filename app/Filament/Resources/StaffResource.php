@@ -26,6 +26,8 @@ class StaffResource extends Resource
         return $form->schema([
             Forms\Components\FileUpload::make('photo')->label('Фото')->image()->avatar()->directory('staff')->imageEditor()->imageResizeMode('contain')->imageResizeTargetWidth('600')->imageResizeTargetHeight('600'),
             Forms\Components\TextInput::make('full_name')->label('ПІБ')->required()->maxLength(255)->columnSpanFull(),
+            Forms\Components\TextInput::make('slug')->label('Слаг (URL персональної сторінки)')->maxLength(255)->unique(ignoreRecord: true)
+                ->helperText('Порожній — згенерується з ПІБ.')->columnSpanFull(),
             Forms\Components\TextInput::make('position')->label('Посада')->maxLength(255)->columnSpanFull(),
             Forms\Components\Select::make('category')->label('Категорія')->required()->default('teacher')
                 ->options(Staff::CATEGORIES),

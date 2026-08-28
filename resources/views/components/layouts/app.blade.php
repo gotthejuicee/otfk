@@ -112,15 +112,18 @@
         {{-- Утилітарна стрічка --}}
         <div class="hidden bg-brand-950 text-brand-100 lg:block">
             <div class="mx-auto flex h-9 w-full max-w-[1600px] items-center justify-between px-4 text-xs sm:px-6 lg:px-8">
-                <div class="flex items-center gap-5">
+                <div class="flex items-center gap-4">
                     @if (! empty($s['contact_phone']))
-                        <a href="tel:{{ preg_replace('/[^+\d]/', '', $s['contact_phone']) }}" class="inline-flex items-center gap-1.5 hover:text-white">
-                            <x-ico name="phone" class="h-3.5 w-3.5" /> {{ $s['contact_phone'] }}
+                        <a href="tel:{{ preg_replace('/[^+\d]/', '', $s['contact_phone']) }}" class="inline-flex items-center gap-1.5 transition hover:text-white">
+                            <x-ico name="phone" class="h-3.5 w-3.5 text-gold-300" /> {{ $s['contact_phone'] }}
                         </a>
                     @endif
+                    @if (! empty($s['contact_phone']) && ! empty($s['contact_email']))
+                        <span aria-hidden="true" class="h-3.5 w-px bg-white/20"></span>
+                    @endif
                     @if (! empty($s['contact_email']))
-                        <a href="mailto:{{ $s['contact_email'] }}" class="inline-flex items-center gap-1.5 hover:text-white">
-                            <x-ico name="envelope" class="h-3.5 w-3.5" /> {{ $s['contact_email'] }}
+                        <a href="mailto:{{ $s['contact_email'] }}" class="inline-flex items-center gap-1.5 transition hover:text-white">
+                            <x-ico name="envelope" class="h-3.5 w-3.5 text-gold-300" /> {{ $s['contact_email'] }}
                         </a>
                     @endif
                     {{-- Жива позначка «зараз йде пара» (з розкладу дзвінків) --}}
@@ -138,14 +141,19 @@
                         </a>
                     @endif
                 </div>
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-3">
                     @if (! empty($s['social_facebook']))
-                        <a href="{{ $s['social_facebook'] }}" target="_blank" rel="noopener" class="hover:text-white">Facebook</a>
+                        <a href="{{ $s['social_facebook'] }}" target="_blank" rel="noopener" aria-label="Facebook коледжу"
+                           class="transition hover:text-white"><x-brand-ico name="facebook" class="h-4 w-4" /></a>
                     @endif
                     @if (! empty($s['social_instagram']))
-                        <a href="{{ $s['social_instagram'] }}" target="_blank" rel="noopener" class="hover:text-white">Instagram</a>
+                        <a href="{{ $s['social_instagram'] }}" target="_blank" rel="noopener" aria-label="Instagram коледжу"
+                           class="transition hover:text-white"><x-brand-ico name="instagram" class="h-4 w-4" /></a>
                     @endif
-                    <a href="{{ url('/admin') }}" class="inline-flex items-center gap-1.5 text-gold-300 hover:text-gold-200">
+                    @if (! empty($s['social_facebook']) || ! empty($s['social_instagram']))
+                        <span aria-hidden="true" class="h-3.5 w-px bg-white/20"></span>
+                    @endif
+                    <a href="{{ url('/admin') }}" class="inline-flex items-center gap-1.5 text-gold-300 transition hover:text-gold-200">
                         <x-ico name="lock-closed" class="h-3.5 w-3.5" /> Адмінпанель
                     </a>
                 </div>
@@ -181,7 +189,7 @@
                             <x-ico name="magnifying-glass" class="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                             <input type="search" name="q" placeholder="Пошук..." autocomplete="off"
                                    x-model="q" @input.debounce.250ms="suggest()" @focus="items.length && (open = true)"
-                                   class="w-48 rounded-full border-0 bg-slate-100 py-2 pl-9 pr-4 text-sm text-slate-700 ring-1 ring-transparent transition focus:w-64 focus:bg-white focus:ring-2 focus:ring-brand-500" />
+                                   class="w-52 rounded-full border-0 bg-white py-2 pl-9 pr-4 text-sm text-slate-700 shadow-sm ring-1 ring-slate-200 transition focus:w-72 focus:ring-2 focus:ring-brand-500" />
                         </form>
                         <div x-show="open" x-cloak
                              class="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl">
@@ -199,7 +207,10 @@
                         </div>
                     </div>
                     {{-- CTA --}}
-                    <a href="{{ url('/abituriyentu') }}" class="btn-accent hidden whitespace-nowrap sm:inline-flex">Вступнику</a>
+                    <a href="{{ url('/abituriyentu') }}" class="btn-accent group hidden whitespace-nowrap sm:inline-flex">
+                        Вступнику
+                        <x-ico name="arrow-right" class="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                    </a>
                     {{-- Мобільні дії --}}
                     <a href="{{ route('search') }}" class="btn-ghost p-2 lg:hidden" aria-label="Пошук"><x-ico name="magnifying-glass" class="h-5 w-5" /></a>
                     <button @click="mobile = true" class="btn-ghost p-2 xl:hidden" aria-label="Меню"><x-ico name="bars-3" class="h-6 w-6" /></button>
@@ -316,9 +327,10 @@
     </main>
 
     {{-- Підвал --}}
-    <footer class="border-t border-white/15 bg-brand-950 text-brand-100">
+    <footer class="border-t-2 border-gold-500/70 bg-brand-950 text-brand-100">
         <div class="container-site grid gap-10 py-14 md:grid-cols-2 lg:grid-cols-4">
             <div class="lg:col-span-1">
+                <h3 class="mb-4 text-sm font-semibold uppercase tracking-widest text-gold-300">Про коледж</h3>
                 <div class="flex items-center gap-3">
                     @if ($logo)
                         <span class="grid h-11 place-items-center rounded-xl bg-white px-2 ring-1 ring-white/15">
@@ -337,19 +349,32 @@
             </div>
 
             <div>
-                <h3 class="text-sm font-semibold uppercase tracking-wide text-white">Розділи</h3>
+                <h3 class="text-sm font-semibold uppercase tracking-widest text-gold-300">Розділи</h3>
+                @php
+                    // Швидкі розділи підвалу: маршрут => підпис
+                    $footerLinks = [
+                        route('home') => 'Головна',
+                        route('news.index') => 'Новини',
+                        route('events') => 'Події',
+                        route('specialties.index') => 'Спеціальності',
+                        route('galleries.index') => 'Галерея',
+                        route('contacts') => 'Контакти',
+                    ];
+                @endphp
                 <ul class="mt-4 space-y-2 text-sm text-brand-200">
-                    <li><a href="{{ route('home') }}" class="hover:text-white">Головна</a></li>
-                    <li><a href="{{ route('news.index') }}" class="hover:text-white">Новини</a></li>
-                    <li><a href="{{ route('events') }}" class="hover:text-white">Події</a></li>
-                    <li><a href="{{ route('specialties.index') }}" class="hover:text-white">Спеціальності</a></li>
-                    <li><a href="{{ route('galleries.index') }}" class="hover:text-white">Галерея</a></li>
-                    <li><a href="{{ route('contacts') }}" class="hover:text-white">Контакти</a></li>
+                    @foreach ($footerLinks as $href => $label)
+                        <li>
+                            <a href="{{ $href }}" class="group inline-flex items-center gap-1.5 transition hover:text-white">
+                                <x-ico name="chevron-right" class="h-3.5 w-3.5 shrink-0 text-gold-400 transition-transform group-hover:translate-x-0.5" />
+                                {{ $label }}
+                            </a>
+                        </li>
+                    @endforeach
                 </ul>
             </div>
 
             <div>
-                <h3 class="text-sm font-semibold uppercase tracking-wide text-white">Контакти</h3>
+                <h3 class="text-sm font-semibold uppercase tracking-widest text-gold-300">Контакти</h3>
                 <ul class="mt-4 space-y-3 text-sm text-brand-200">
                     @if (! empty($s['contact_address']))
                         <li class="flex gap-2"><x-ico name="map-pin" class="mt-0.5 h-4 w-4 shrink-0 text-gold-300" /> {{ $s['contact_address'] }}</li>
@@ -360,18 +385,33 @@
                     @if (! empty($s['contact_email']))
                         <li class="flex gap-2"><x-ico name="envelope" class="mt-0.5 h-4 w-4 shrink-0 text-gold-300" /> {{ $s['contact_email'] }}</li>
                     @endif
+                    @if (! empty($s['work_hours']))
+                        <li class="flex gap-2"><x-ico name="clock" class="mt-0.5 h-4 w-4 shrink-0 text-gold-300" /> {{ $s['work_hours'] }}</li>
+                    @endif
                 </ul>
             </div>
 
             <div>
-                <h3 class="text-sm font-semibold uppercase tracking-wide text-white">Партнери</h3>
+                <h3 class="text-sm font-semibold uppercase tracking-widest text-gold-300">Партнери</h3>
+                @php
+                    // Фолбек, якщо в адмінці ще немає партнерських посилань
+                    $partnerList = $partners->isNotEmpty()
+                        ? $partners->map(fn ($p) => ['url' => $p->url, 'title' => $p->title, 'blank' => (bool) $p->open_new_tab])
+                        : collect([
+                            ['url' => 'https://onaft.edu.ua', 'title' => 'ОНТУ', 'blank' => true],
+                            ['url' => 'https://mon.gov.ua', 'title' => 'МОН України', 'blank' => true],
+                        ]);
+                @endphp
                 <ul class="mt-4 space-y-2 text-sm text-brand-200">
-                    @forelse ($partners as $partner)
-                        <li><a href="{{ $partner->url }}" @if ($partner->open_new_tab) target="_blank" rel="noopener" @endif class="hover:text-white">{{ $partner->title }}</a></li>
-                    @empty
-                        <li><a href="https://onaft.edu.ua" target="_blank" rel="noopener" class="hover:text-white">ОНТУ</a></li>
-                        <li><a href="https://mon.gov.ua" target="_blank" rel="noopener" class="hover:text-white">МОН України</a></li>
-                    @endforelse
+                    @foreach ($partnerList as $partner)
+                        <li>
+                            <a href="{{ $partner['url'] }}" @if ($partner['blank']) target="_blank" rel="noopener" @endif
+                               class="inline-flex items-center gap-2 rounded-lg bg-white/5 px-2.5 py-1.5 ring-1 ring-white/10 transition hover:bg-white/10 hover:text-white">
+                                <x-ico name="academic-cap" class="h-4 w-4 shrink-0 text-gold-300" />
+                                {{ $partner['title'] }}
+                            </a>
+                        </li>
+                    @endforeach
                 </ul>
                 <div class="mt-5 flex gap-3">
                     @if (! empty($s['social_facebook']))

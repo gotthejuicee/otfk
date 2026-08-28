@@ -49,6 +49,7 @@ Route::get('/spetsialnosti/{specialty:slug}', [SpecialtyController::class, 'show
 Route::get('/struktura', [StructureController::class, 'index'])->name('structure.index');
 Route::get('/struktura/{department:slug}', [StructureController::class, 'show'])->name('structure.show');
 Route::get('/administratsiya', [StaffController::class, 'administration'])->name('staff.administration');
+Route::get('/personal/{staff:slug}', [StaffController::class, 'show'])->name('staff.show');
 
 // Галерея
 Route::get('/halereya', [GalleryController::class, 'index'])->name('galleries.index');
@@ -76,5 +77,5 @@ Route::get('/robots.txt', function () {
  | виключає службові префікси, щоб не перехоплювати /admin, /livewire тощо.
  */
 Route::get('/{page:slug}', [PageController::class, 'show'])
-    ->where('page', '^(?!(?:admin|livewire|novyny|video|kontakty|dokumenty|spetsialnosti|struktura|administratsiya|halereya|poshuk|sitemap|storage|up|build|vendor)$).+$')
+    ->where('page', '^(?!(?:admin|livewire|novyny|video|kontakty|dokumenty|spetsialnosti|struktura|administratsiya|personal|halereya|poshuk|sitemap|storage|up|build|vendor)$).+$')
     ->name('pages.show');
