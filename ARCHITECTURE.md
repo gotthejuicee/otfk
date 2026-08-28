@@ -23,7 +23,7 @@
 | `app/Support/` | `ImageOptimizer` (GD → WebP), `BannerOverlay` (inline-CSS градиенты) |
 | `app/Jobs/`, `app/Mail/` | `PostNewsToTelegram`; письма `ApplicantRequestReceived`, `FeedbackReceived` |
 | `app/Observers/` | `NewsObserver` — триггер Telegram-автопоста (подключён атрибутом на модели!) |
-| `app/Console/Commands/` | `otfk:backup`, `images:webp`, `otfk:import-docs`, `otfk:import-news` |
+| `app/Console/Commands/` | `otfk:backup`, `images:webp` и пять импорт-команд контента старого сайта: `otfk:import-news`, `otfk:import-docs`, `otfk:import-pages`, `otfk:import-staff`, `otfk:import-contacts` (см. «Импорт контента старого сайта»); общий трейт чтения зеркала — `Concerns/ReadsOtfkExport` |
 | `bootstrap/app.php` | Регистрация роутов, health `/up`, кастомные middleware |
 | `config/` | Сток Laravel 12, кроме `blade-icons.php` (отключён дефолтный `<x-icon>`) |
 | `database/migrations/` | Схема **и контент-фикстуры** (см. «Миграции как контент») |
@@ -144,6 +144,20 @@ flowchart LR
 - `SiteSeeder` — **демо-данные и деструктивен при повторном запуске**: делает `delete()` по `menu_items`, `staff`, `videos`, `banners` и документам/программам сидируемых категорий. Никогда не запускать `db:seed` на живом проде с реальным контентом.
 - `QuizSeeder` — 6 вопросов × 4 варианта, привязка к специальностям по `code`; идемпотентен; также вызывается изнутри миграции `2026_06_12_100000_create_quiz_tables`.
 
+## Импорт контента старого сайта (otfk:import-*)
+
+Пять artisan-команд переносят контент старого otfk.od.ua. Все умеют читать **локальное зеркало** (каталог аудита `site-audit/YYYY-MM-DD/` с `content-export/*.md`, `content-export/files|images/`, `_raw/html/`, `links-map.csv`; сам каталог в `.gitignore`) через опцию `--from-export=<путь>` — повторный скрейпинг живого сайта не нужен. У `otfk:import-news` и `otfk:import-docs` осталась и историческая HTTP-ветка (без опции — ходят на живой сайт).
+
+| Команда | Что делает | Идемпотентность |
+|---|---|---|
+| `otfk:import-news` | Новости (`content-export/news/*.md`) → `News`; фото копируются в `storage/news/imported/`, первое — обложка; `telegram_posted_at` ставится сразу (без автопоста). Опции: `--dry-run`, `--limit`, `--fresh` | маркер `<!--imported-from:URL-->` в body |
+| `otfk:import-docs` | PDF по мапам `$docMap` (18 разделов `public_information/*` → категории документов) и `$pageMap` (23 страницы) из сохранённого HTML `_raw/html/`; файлы → `storage/documents/…`, `storage/page-files/…`. Опции: `--dry-run`, `--audit`, `--fresh` | дедуп по названию внутри категории; блок `<!--imported-files-->` на страницах |
+| `otfk:import-pages` | Тексты всех содержательных страниц (~203) → CMS `Page`: известные страницы обновляются по мапе «старый путь → slug», новые создаются с транслит-slug и `parent_id` по разделам; картинки/PDF копируются в `storage/imported/{images,files}/<старый путь>`, внутренние ссылки переписываются. Пропускает: новости, `public_information/*`, страницы комиссий/кафедр (их ведёт import-staff), сервисные | маркер `<!--imported-from:URL-->`; повторный запуск обновляет на месте |
+| `otfk:import-staff` | `structure/*` → `Department` (4 відділення, 7 циклових комісій, 3 кафедри) + `Staff` из таблиц «Викладацький склад» и `about_us/leaders_of_the_college.md` (администрация). Ссылки на персональные страницы преподавателей резолвятся в CMS-страницы import-pages → **запускать после `otfk:import-pages`**. Опция `--replace-demo` удаляет только фейковые записи SiteSeeder | `updateOrCreate` по slug / full_name |
+| `otfk:import-contacts` | `content-export/contacts.md` → settings: `contact_address/phone/email`, `feedback_email`, `map_embed` + `Cache::forget('settings.map')`; дополнительные телефоны печатает в консоль | `updateOrCreate` по key |
+
+Рекомендуемый порядок полного прогона: `import-docs` → `import-pages` → `import-staff` → `import-news` → `import-contacts`. Ограничения зеркала: 233 iframe-PDF старого сайта — мёртвые (404 и на самом старом сайте; живые 34 дозобраны в зеркало 2026-08-28) — их ссылки/iframe остаются битыми на ~18 импортированных страницах, решение за редакцией (см. SYNC-PLAN.md в каталоге зеркала); у человека одна запись `Staff` (повторы одного преподавателя в нескольких подразделениях схлопываются — последний импортированный побеждает). Тесты — `tests/Feature/ImportFromExportCommandsTest.php` (фикстура-минизеркало `tests/fixtures/otfk-export/`).
+
 ## Фоновая работа без очереди
 
 На хостинге нет queue-воркера, поэтому **всё «фоновое» — `dispatch(...)->afterResponse()`** (выполняется в умирающем PHP-запросе): Telegram-пост, письма форм, WebP-конверсия загрузок. **Не переводить на `ShouldQueue`** — задокументированный запрет (DEPLOY.md).
@@ -187,7 +201,7 @@ Telegram-автопост: `NewsObserver` (подключён PHP-атрибут
 12. **Layout ходит в БД:** `app.blade.php` дергает `MenuItem::navigation()`, `Setting::map()`, `QuickLink`, `BellPeriod::active()` на каждой странице (частично кэшировано на 600с). Миграции, пишущие в `settings` напрямую, обязаны делать `Cache::forget('settings.map')`.
 13. **Неэкранированный HTML:** `{!! $news->body !!}`, `{!! $page->body !!}`, `map_embed` → iframe. Контент админский, но санитизации нет.
 14. **Sitemap без кэша** — 5 полных `->get()` по таблицам на каждый запрос; деградирует с ростом архива новостей (импортирован с 2014).
-15. **Импорт-команды `otfk:import-news|docs` ходят на живой legacy-сайт** otfk.od.ua; `--fresh` удаляет ранее импортированное. Не запускать бездумно.
+15. **Импорт-команды `otfk:import-news|docs` без `--from-export` ходят на живой legacy-сайт** otfk.od.ua; `--fresh` удаляет ранее импортированное. Предпочтительный режим — `--from-export=<site-audit/…>` (локальное зеркало, см. «Импорт контента старого сайта»). Не запускать бездумно.
 16. **`FILESYSTEM_DISK=local`** в env, но все загрузки/URL рассчитаны на диск `public` (Filament по умолчанию грузит в `public`). Код, использующий default-диск, запишет в недоступное место.
 17. **Тесты ловят контракты** — перед правкой поведения читай соответствующий Feature-тест (excerpt-дедупликация, heritage-типографика, чеклист контента, light-only и т.д.).
 18. **`SecurityHeaders` намеренно без CSP** (инлайн-скрипты Livewire/Alpine/Filament); `SESSION_SECURE_COOKIE` в прод-шаблоне не задан.
@@ -211,7 +225,7 @@ Telegram-автопост: `NewsObserver` (подключён PHP-атрибут
 | 9 | 3 канированных FAQ «о самом сайте», дефолтные времена звонков | сиды `2026_06_11_170000`, `2026_06_10_180000` | Проверить/заменить |
 | 10 | Квиз `/kviz`: клиентский скоринг, вопросы из `QuizSeeder` | `resources/views/quiz/index.blade.php` | Решить судьбу фичи; контент — методистам |
 | 11 | Импортированные тексты старого сайта (не вычитаны) | миграции `import_*_content` | Редакторская вычитка |
-| 12 | Импорт-команды со скрейпингом legacy-сайта | `app/Console/Commands/ImportOtfk*` | Удалить после финального импорта |
+| 12 | Импорт-команды контента legacy-сайта (HTTP-скрейпинг и режим `--from-export` по зеркалу `site-audit/`) | `app/Console/Commands/ImportOtfk*` + `Concerns/ReadsOtfkExport` | Удалить после финального импорта на прод (вместе с `tests/Feature/ImportFromExportCommandsTest.php` и `tests/fixtures/otfk-export/`) |
 | 13 | Telegram-токен плейнтекстом в `settings` + открытое поле в админке | `SettingResource` | Маскировать поле / перенести в env |
 | 14 | Мёртвый груз: axios в бандле (не используется, всё на fetch), `laravel/sail` без compose.yaml, pest-plugin в allow-plugins | `resources/js/bootstrap.js`, `composer.json` | Удалить |
 | 15 | Автодеплой `feature/**` на единственный прод (ветка/миграции едут в живую БД) | `.github/workflows/deploy.yml` | Перед продом сузить триггер до `master` |

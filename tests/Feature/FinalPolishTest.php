@@ -23,7 +23,9 @@ class FinalPolishTest extends TestCase
             'is_published' => true,
         ]);
 
-        $this->getJson('/poshuk/pidkazky?q=кібербезпеки')
+        // Кирилицю в query кодуємо явно: сирі не-ASCII байти в URL тестового
+        // клієнта губляться на частині локальних PHP-збірок (флак у тесті).
+        $this->getJson('/poshuk/pidkazky?q=' . rawurlencode('кібербезпеки'))
             ->assertOk()
             ->assertJsonPath('results.0.group', 'Новина')
             ->assertJsonPath('results.0.title', 'Унікальний турнір з кібербезпеки');
