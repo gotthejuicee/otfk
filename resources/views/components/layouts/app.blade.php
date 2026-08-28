@@ -168,22 +168,22 @@
             {{-- Ряд бренду та дій --}}
             <div class="border-b border-transparent bg-white shadow-sm transition-[box-shadow,background-color,border-color] duration-300"
                  :class="scrolled ? 'border-slate-200/80 bg-white/90 shadow-md backdrop-blur-md' : ''">
-                <div class="mx-auto flex h-16 w-full max-w-[1600px] items-center justify-between gap-3 px-4 sm:h-20 sm:gap-6 sm:px-6 lg:px-8">
-                <a href="{{ route('home') }}" class="flex min-w-0 items-center gap-2.5 sm:shrink-0 sm:gap-3">
+                <div class="mx-auto flex h-16 w-full max-w-[1600px] items-center justify-between gap-2 px-4 sm:h-20 sm:gap-6 sm:px-6 lg:px-8">
+                <a href="{{ route('home') }}" class="flex min-w-0 items-center gap-2 sm:shrink-0 sm:gap-3">
                     @if ($logo)
-                        <img src="{{ $logo }}" alt="ОТФК ОНТУ" class="h-10 w-auto shrink-0 sm:h-12 lg:h-16">
+                        <img src="{{ $logo }}" alt="ОТФК ОНТУ" class="h-9 w-auto shrink-0 sm:h-12 lg:h-16">
                     @else
-                        <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-700 to-brand-900 text-white shadow-sm sm:h-12 sm:w-12">
+                        <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-700 to-brand-900 text-white shadow-sm sm:h-12 sm:w-12">
                             <x-ico name="academic-cap" class="h-7 w-7" />
                         </span>
                     @endif
                     <span class="min-w-0 leading-tight">
-                        <span class="font-display block truncate text-base font-extrabold tracking-tight text-brand-900 sm:whitespace-nowrap sm:text-lg">{{ $s['brand_short'] ?? 'ОТФК ОНТУ' }}</span>
+                        <span class="font-display block truncate text-sm font-extrabold tracking-tight text-brand-900 sm:whitespace-nowrap sm:text-lg">{{ $s['brand_short'] ?? 'ОТФК ОНТУ' }}</span>
                         <span class="hidden whitespace-nowrap text-xs text-slate-500 sm:block">{{ $s['brand_name'] ?? 'Одеський технічний фаховий коледж' }}</span>
                     </span>
                 </a>
 
-                <div class="flex items-center gap-2 sm:gap-3">
+                <div class="flex items-center gap-1.5 sm:gap-3">
                     {{-- Пошук з миттєвими підказками (десктоп) --}}
                     <div x-data="liveSearch(@js(route('search.suggest')), @js(route('search')))"
                          @click.outside="open = false" @keydown.escape.window="open = false"
@@ -211,7 +211,7 @@
                     </div>
                     {{-- CTA --}}
                     {{-- Головна дія абітурієнта — лишається в шапці й на телефоні, лише компактніша --}}
-                    <a href="{{ url('/abituriyentu') }}" class="btn-accent group h-11 whitespace-nowrap px-3 text-xs sm:h-auto sm:px-5 sm:text-sm">
+                    <a href="{{ url('/abituriyentu') }}" class="btn-accent group h-11 whitespace-nowrap px-2.5 text-xs sm:h-auto sm:px-5 sm:text-sm">
                         Вступнику
                         <x-ico name="arrow-right" class="ml-1.5 hidden h-4 w-4 transition-transform group-hover:translate-x-0.5 sm:block" />
                     </a>

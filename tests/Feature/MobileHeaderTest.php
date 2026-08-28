@@ -20,7 +20,7 @@ class MobileHeaderTest extends TestCase
         $this->get('/')
             ->assertOk()
             // Компактний варіант кнопки, видимий з найменшої ширини
-            ->assertSee('btn-accent group h-11 whitespace-nowrap px-3 text-xs sm:h-auto sm:px-5 sm:text-sm', escape: false)
+            ->assertSee('btn-accent group h-11 whitespace-nowrap px-2.5 text-xs sm:h-auto sm:px-5 sm:text-sm', escape: false)
             // Старий варіант (кнопка зʼявлялась лише від sm) більше не повертати
             ->assertDontSee('btn-accent group hidden whitespace-nowrap sm:inline-flex', escape: false);
     }
@@ -79,5 +79,23 @@ class MobileHeaderTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('grid h-11 w-8 place-items-center', escape: false);
+    }
+
+    public function test_carousel_is_swipeable_and_does_not_die_on_touch(): void
+    {
+        Banner::query()->delete();
+        Banner::create(['title' => 'Перший', 'is_published' => true, 'sort_order' => 0]);
+        Banner::create(['title' => 'Другий', 'is_published' => true, 'sort_order' => 1]);
+
+        $res = $this->get('/')->assertOk();
+
+        // Гортання пальцем
+        $res->assertSee('@touchstart.passive="swipeStart($event)"', escape: false);
+        $res->assertSee('@touchend.passive="swipeEnd($event)"', escape: false);
+        // Пауза лише під справжньою мишкою: тап на телефоні синтезує mouseenter і назавжди спиняв автопрокрутку
+        $res->assertSee('@pointerenter="$event.pointerType === \'mouse\' && stop()"', escape: false);
+        $res->assertDontSee('@mouseenter="stop()"', escape: false);
+        // Стрілки видно й на телефоні
+        $res->assertDontSee('max-sm:hidden pointer-events-auto rounded-full', escape: false);
     }
 }

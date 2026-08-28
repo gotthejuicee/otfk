@@ -16,6 +16,7 @@
                      index: 0,
                      total: {{ $count }},
                      timer: null,
+                     touchX: null,
                      reduced: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
                      start() {
                          if (this.reduced || this.total < 2) return;
@@ -26,10 +27,21 @@
                      next() { this.index = (this.index + 1) % this.total; },
                      prev() { this.index = (this.index - 1 + this.total) % this.total; },
                      go(i) { this.index = i; },
+                     swipeStart(e) { this.touchX = e.changedTouches[0].clientX; },
+                     swipeEnd(e) {
+                         if (this.touchX === null) return;
+                         const dx = e.changedTouches[0].clientX - this.touchX;
+                         this.touchX = null;
+                         if (Math.abs(dx) < 40) return;
+                         dx < 0 ? this.next() : this.prev();
+                         this.start();
+                     },
                  }"
                  x-init="start()"
-                 @mouseenter="stop()"
-                 @mouseleave="start()"
+                 @pointerenter="$event.pointerType === 'mouse' && stop()"
+                 @pointerleave="$event.pointerType === 'mouse' && start()"
+                 @touchstart.passive="swipeStart($event)"
+                 @touchend.passive="swipeEnd($event)"
                  @focusin="stop()"
                  @focusout="start()"
                  role="region"
@@ -107,14 +119,14 @@
 
         @if ($count > 1)
             <div class="pointer-events-none absolute inset-x-0 bottom-4 z-10 flex items-center justify-center gap-2 sm:bottom-6 sm:gap-3">
-                <button type="button" @click="prev()" class="max-sm:hidden pointer-events-auto rounded-full bg-white/10 p-2 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white" aria-label="Попередній слайд">
+                <button type="button" @click="prev(); start()" class="pointer-events-auto grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white" aria-label="Попередній слайд">
                     <x-ico name="chevron-left" class="h-5 w-5" />
                 </button>
                 <div class="flex" role="tablist" aria-label="Слайди банера">
                     @foreach ($slides as $i => $banner)
                         {{-- Точка мала (10px), але тач-мішень — 44×32, інакше на телефоні в неї не влучити --}}
                         <button type="button" role="tab"
-                                @click="go({{ $i }})"
+                                @click="go({{ $i }}); start()"
                                 :aria-selected="index === {{ $i }}"
                                 class="pointer-events-auto grid h-11 w-8 place-items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
                                 aria-label="Слайд {{ $i + 1 }}">
@@ -123,7 +135,7 @@
                         </button>
                     @endforeach
                 </div>
-                <button type="button" @click="next()" class="max-sm:hidden pointer-events-auto rounded-full bg-white/10 p-2 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white" aria-label="Наступний слайд">
+                <button type="button" @click="next(); start()" class="pointer-events-auto grid h-11 w-11 place-items-center rounded-full bg-white/10 text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white" aria-label="Наступний слайд">
                     <x-ico name="chevron-right" class="h-5 w-5" />
                 </button>
             </div>
