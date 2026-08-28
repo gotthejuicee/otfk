@@ -21,6 +21,30 @@ class TelegramPoster
     }
 
     /**
+     * Надсилає тестове повідомлення (перевірка токена й каналу зі сторінки
+     * «Telegram» в адмінці). Повертає null при успіху або текст помилки.
+     */
+    public static function sendTest(string $token, string $channel): ?string
+    {
+        try {
+            $resp = Http::timeout(20)->post("https://api.telegram.org/bot{$token}/sendMessage", [
+                'chat_id' => $channel,
+                'text' => 'Тестове повідомлення з сайту коледжу — налаштування Telegram працюють.',
+            ]);
+
+            if ($resp->successful() && $resp->json('ok') === true) {
+                return null;
+            }
+
+            return (string) ($resp->json('description') ?? ('HTTP '.$resp->status()));
+        } catch (\Throwable $e) {
+            report($e);
+
+            return $e->getMessage();
+        }
+    }
+
+    /**
      * Публікує новину в Telegram-канал коледжу (якщо автопостинг увімкнено).
      * Повертає true при успішній відправці.
      */

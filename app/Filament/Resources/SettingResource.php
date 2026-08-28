@@ -16,9 +16,10 @@ class SettingResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
     protected static ?string $navigationGroup = 'Налаштування';
-    protected static ?string $navigationLabel = 'Налаштування сайту';
+    protected static ?string $navigationLabel = 'Розширені налаштування';
     protected static ?string $modelLabel = 'налаштування';
-    protected static ?string $pluralModelLabel = 'Налаштування сайту';
+    protected static ?string $pluralModelLabel = 'Розширені налаштування';
+    protected static ?int $navigationSort = 9;
 
     public static function form(Form $form): Form
     {
@@ -62,6 +63,7 @@ class SettingResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->description('Сирий key-value доступ на аварійний випадок. Звичайні налаштування зручніше міняти на сторінках «Контакти та соцмережі», «Оголошення», «Telegram», «Підвал і вигляд».')
             ->columns([
                 Tables\Columns\TextColumn::make('key')->label('Ключ')->searchable()->weight('bold'),
                 Tables\Columns\TextColumn::make('value')->label('Значення')->limit(60)->color('gray'),
