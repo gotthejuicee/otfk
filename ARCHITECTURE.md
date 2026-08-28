@@ -92,7 +92,7 @@ flowchart LR
 | GET/POST | `/kontakty` | contacts.* | `ContactController` | Контакты + форма обратной связи (honeypot, письмо) | нет |
 | GET | `/sitemap.xml`, `/robots.txt` | sitemap, robots | `SitemapController` / closure | Sitemap (без кэша!), robots | нет |
 | GET | `/up` | — | Laravel health | Health-check | нет |
-| GET | `/{page:slug}` | pages.show | `PageController@show` | **Catch-all** CMS-страницы из БД. Обязан быть последним | нет |
+| GET | `/{page:slug}` | pages.show | `PageController@show` | **Catch-all** CMS-страницы из БД. Обязан быть последним. Шаблон один (`pages/show.blade.php`), но три варианта вёрстки: хаб с дочерними страницами (`partials/hub`), обычная контентная страница с липким сайдбаром и навигацией по заголовкам (`partials/content`), heritage-«письмо» (`partials/neighbours` под ним) | нет |
 
 ### Админка
 
@@ -117,7 +117,7 @@ flowchart LR
 
 | Таблица | Назначение / ключевые колонки |
 |---|---|
-| `pages` | CMS-дерево (parent_id, slug unique, body longText, section, is_published, is_heritage, meta_*) |
+| `pages` | CMS-дерево (parent_id, slug unique, body longText, section, is_published, is_heritage, is_featured, meta_*). `is_featured` — «ключевая страница раздела»: на родительской странице-хабе выносится наверх отдельной карточкой (миграция `2026_08_28_170000`, тумблер в Filament) |
 | `news`, `news_categories`, `news_likes` | Новости: category_id, published_at, is_featured, is_heritage, views, likes, telegram_posted_at; лайки — unique(news_id, fingerprint) |
 | `menu_items` | Дерево навигации: link_type page/url/route, page_id, is_visible; кэш `menu.navigation` 600с |
 | `settings` | Key-value (key unique, group, type — тип виджета в Filament); кэш `settings.map` 600с. Соцсети: `social_facebook`, `social_instagram` (шапка + футер), `social_youtube` (блок-призыв на `/video`; пустое значение — блок скрыт). `bells_second_shift` — показывать ли вторую смену на `/rozklad-dzvinkiv` (кнопка-переключатель в разделе «Розклад дзвінків») |
@@ -196,7 +196,7 @@ Telegram-автопост: `NewsObserver` (подключён PHP-атрибут
 6. **`SiteSeeder` деструктивен** (delete меню/персонала/видео/баннеров) — только для пустых окружений.
 7. **Миграции используют Eloquent-модели** (`Page`, `MenuItem`, `DocumentCategory`, вызов `QuizSeeder`) — переименование модели/фила ломает `migrate` с нуля. Меню-миграции ищут корни по украинским label-строкам («Абітурієнту» и т.п.) — переименование пункта меню в админке ломает их идемпотентность.
 8. **Dynamic Tailwind-классы из БД:** `home.blade.php` строит `bg-{{ $tile->color }}-50`; работает только благодаря safelist `@source inline(...)` в `app.css` (brand/gold). Другой цвет тайла молча отрендерится без стилей.
-9. **Хардкод-слаги в шаблонах:** `url('/abituriyentu')` в 7 местах указывает на CMS-страницу из БД (удаление/переименование = 404 главного CTA); drop cap завязан на slug `istoriya` (`pages/show.blade.php`), закреплено тестом `HeritageProseTest`. Тот же слаг ищет `NewsController::abiturientLinks()` (сайдбар «Корисно для абітурієнта» на детальной новости) — не найдёт пункт меню, блок молча не рендерится.
+9. **Хардкод-слаги в шаблонах:** `url('/abituriyentu')` в 7 местах указывает на CMS-страницу из БД (удаление/переименование = 404 главного CTA); drop cap завязан на slug `istoriya` (`pages/partials/content.blade.php` и heritage-ветка `pages/show.blade.php`), закреплено тестом `HeritageProseTest`. Тот же слаг ищет `NewsController::abiturientLinks()` (сайдбар «Корисно для абітурієнта» на детальной новости) — не найдёт пункт меню, блок молча не рендерится.
 10. **Светлая тема — контракт.** Ночной режим удалён намеренно; `FrontendPolishTest::test_site_is_light_only_without_theme_toggle` следит, чтобы toggle/`localStorage theme` не вернулись. Настройка `night_opacity` удалена миграцией; остался только `banner_overlay_opacity` (затемнение баннеров, `App\Support\BannerOverlay`).
 11. **«Лампа» / Tier / Polish** в именах миграций и тестов — внутренние кодовые имена этапов сдачи, не фичи. `LampaTwo` = флаги `is_heritage`/`is_archive`.
 12. **Layout ходит в БД:** `app.blade.php` дергает `MenuItem::navigation()`, `Setting::map()`, `QuickLink`, `BellPeriod::active()` на каждой странице (частично кэшировано на 600с). Миграции, пишущие в `settings` напрямую, обязаны делать `Cache::forget('settings.map')`.

@@ -35,6 +35,10 @@ class PageResource extends Resource
                     ->label('Урочисте оформлення (heritage)')
                     ->helperText('Увімкніть для сторінок історії, хроніки та ювілейних матеріалів — стиль «листа» на сайті.')
                     ->columnSpanFull(),
+                Forms\Components\Toggle::make('is_featured')
+                    ->label('Ключова сторінка розділу')
+                    ->helperText('На сторінці батьківського розділу така сторінка виноситься нагору окремою великою карткою.')
+                    ->columnSpanFull(),
                 Forms\Components\RichEditor::make('body')->label('Основний текст')->columnSpanFull(),
                 Forms\Components\FileUpload::make('cover_image')->label('Зображення')->image()->directory('pages')->imageEditor()->imageResizeMode('contain')->imageResizeTargetWidth('1600')->imageResizeTargetHeight('1600')->columnSpanFull(),
             ])->columns(2),
@@ -57,6 +61,7 @@ class PageResource extends Resource
                 Tables\Columns\TextColumn::make('slug')->label('URL')->color('gray')->toggleable(),
                 Tables\Columns\IconColumn::make('is_published')->label('Опубл.')->boolean(),
                 Tables\Columns\IconColumn::make('is_heritage')->label('Heritage')->boolean()->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\IconColumn::make('is_featured')->label('Ключова')->boolean()->toggleable(),
                 Tables\Columns\TextColumn::make('sort_order')->label('Порядок')->numeric()->sortable()->toggleable(),
             ])
             ->defaultSort('title')
