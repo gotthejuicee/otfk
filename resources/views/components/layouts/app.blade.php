@@ -130,7 +130,7 @@
                     @php $bellPeriods = \App\Models\BellPeriod::active(); @endphp
                     @if ($bellPeriods->isNotEmpty())
                         <a href="{{ route('bells') }}"
-                           x-data="bellChip(@js($bellPeriods->map(fn ($b) => ['n' => $b->number, 's' => substr($b->starts, 0, 5), 'e' => substr($b->ends, 0, 5)])->values()))"
+                           x-data="bellChip(@js($bellPeriods->map(fn ($b) => ['n' => $b->number, 'sh' => $b->shift, 's' => substr($b->starts, 0, 5), 'e' => substr($b->ends, 0, 5)])->values()))"
                            x-init="tick(); setInterval(() => tick(), 30000)" x-show="label" x-cloak
                            class="inline-flex items-center gap-1.5 rounded-full bg-gold-400/15 px-2.5 py-0.5 font-medium text-gold-200 ring-1 ring-gold-400/30 transition hover:bg-gold-400/25">
                             <span class="relative flex h-1.5 w-1.5">
@@ -457,39 +457,69 @@
             const ORD = { 1: '1-ша', 2: '2-га', 3: '3-тя', 4: '4-та', 5: '5-та', 6: '6-та', 7: '7-ма', 8: '8-ма' };
             const toMin = t => +t.slice(0, 2) * 60 + +t.slice(3, 5);
 
-            // Повертає {current, status}: current — номер пари (або null), status — текст
+            // Повертає стан розкладу на зараз:
+            //   current — ключі пар, що зараз ідуть («зміна:номер»; у перехресті змін їх дві),
+            //   status  — повний текст для сторінки, short — короткий для плашки в шапці,
+            //   left/pct — скільки хвилин лишилось і відсоток проходження кожної активної пари.
             window.bellState = function (periods) {
+                const empty = { current: [], status: '', short: '', left: {}, pct: {} };
                 const d = new Date();
-                if (d.getDay() === 0 || !periods.length) return { current: null, status: '' }; // неділя
+                if (d.getDay() === 0 || !periods.length) return empty; // неділя
                 const cur = d.getHours() * 60 + d.getMinutes();
 
-                for (const p of periods) {
-                    const s = toMin(p.s), e = toMin(p.e);
-                    if (cur >= s && cur < e) {
-                        return { current: p.n, status: (ORD[p.n] ?? p.n) + ' пара · до кінця ' + (e - cur) + ' хв' };
-                    }
+                const multi = new Set(periods.map(p => p.sh)).size > 1;
+                const key = p => p.sh + ':' + p.n;
+                const name = p => (ORD[p.n] ?? p.n) + ' пара' + (multi ? ' (' + p.sh + ' зміна)' : '');
+
+                // Зміни накладаються (4-та пара 1-ї зміни йде разом з 1-ю парою 2-ї), тому пар може бути дві.
+                const running = periods.filter(p => cur >= toMin(p.s) && cur < toMin(p.e));
+
+                if (running.length) {
+                    const left = {}, pct = {};
+                    running.forEach(p => {
+                        const s = toMin(p.s), e = toMin(p.e);
+                        left[key(p)] = e - cur;
+                        pct[key(p)] = Math.round((cur - s) / (e - s) * 100);
+                    });
+                    const soonest = Math.min(...running.map(p => toMin(p.e)));
+
+                    return {
+                        current: running.map(key),
+                        status: running.map(name).join(' · ') + ' · до кінця ' + (soonest - cur) + ' хв',
+                        short: name(running[0]) + ' · до кінця ' + left[key(running[0])] + ' хв',
+                        left, pct,
+                    };
                 }
 
-                const next = periods.find(p => toMin(p.s) > cur);
+                const next = periods.filter(p => toMin(p.s) > cur).sort((a, b) => toMin(a.s) - toMin(b.s))[0];
                 if (next) {
                     // зранку показуємо за годину до першої пари; між парами — завжди
-                    const isBreak = cur >= toMin(periods[0].s);
-                    if (isBreak) return { current: null, status: 'Перерва · ' + (ORD[next.n] ?? next.n) + ' пара о ' + next.s };
-                    if (toMin(next.s) - cur <= 60) return { current: null, status: (ORD[next.n] ?? next.n) + ' пара о ' + next.s };
+                    const started = cur >= Math.min(...periods.map(p => toMin(p.s)));
+                    const text = started
+                        ? 'Перерва · далі ' + name(next) + ' о ' + next.s
+                        : name(next) + ' о ' + next.s;
+
+                    if (started || toMin(next.s) - cur <= 60) return { ...empty, status: text, short: text };
                 }
 
-                return { current: null, status: '' };
+                return empty;
             };
 
             window.bellChip = periods => ({
                 label: '',
-                tick() { this.label = window.bellState(periods).status; },
+                tick() { this.label = window.bellState(periods).short; },
             });
 
             window.bellSchedule = periods => ({
-                current: null,
+                current: [],
                 status: '',
-                tick() { const st = window.bellState(periods); this.current = st.current; this.status = st.status; },
+                left: {},
+                pct: {},
+                isNow(key) { return this.current.includes(key); },
+                tick() {
+                    const st = window.bellState(periods);
+                    this.current = st.current; this.status = st.status; this.left = st.left; this.pct = st.pct;
+                },
             });
 
             // Прелоад сторінок при наведенні: клік відчувається миттєвим.

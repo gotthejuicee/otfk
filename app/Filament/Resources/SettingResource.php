@@ -51,6 +51,7 @@ class SettingResource extends Resource
                     'announcement_url' => 'Необовʼязкове посилання, куди веде оголошення (напр., новина).',
                     'social_youtube' => 'Посилання на YouTube-канал коледжу. Показується у блоці-заклику на сторінці «Відео»; порожнє — блок приховано.',
                     'banner_overlay_opacity' => 'Затемнення фото банера (0–100). Зручніше змінювати в розділі «Банери».',
+                    'bells_second_shift' => 'Друга зміна в розкладі дзвінків: 1 — показувати, 0 — сховати. Зручніше перемикати кнопкою в розділі «Розклад дзвінків».',
                     default => null,
                 }),
             Forms\Components\TextInput::make('group')->label('Група')->default('general')->maxLength(255),

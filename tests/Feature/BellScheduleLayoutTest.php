@@ -1,0 +1,95 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Filament\Resources\BellPeriodResource;
+use App\Filament\Resources\BellPeriodResource\Pages\ListBellPeriods;
+use App\Models\BellPeriod;
+use App\Models\Setting;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
+use Tests\TestCase;
+
+class BellScheduleLayoutTest extends TestCase
+{
+    use RefreshDatabase;
+
+    private function forgetCaches(): void
+    {
+        cache()->forget('settings.map');
+        cache()->forget('bell_periods.v2');
+    }
+
+    public function test_page_shows_both_shifts_with_real_times(): void
+    {
+        $this->get('/rozklad-dzvinkiv')
+            ->assertOk()
+            ->assertSee('1 зміна')
+            ->assertSee('2 зміна')
+            ->assertSee('08:30 – 09:40')   // перша пара першої зміни
+            ->assertSee('17:00 – 18:10')   // остання пара другої зміни
+            ->assertSee('Дві зміни')
+            ->assertSee('Велика перерва'); // 11:00 → 11:30
+    }
+
+    public function test_second_shift_is_hidden_by_setting(): void
+    {
+        Setting::where('key', BellPeriod::SECOND_SHIFT_SETTING)->update(['value' => '0']);
+        $this->forgetCaches();
+
+        $this->assertFalse(BellPeriod::secondShiftEnabled());
+
+        $this->get('/rozklad-dzvinkiv')
+            ->assertOk()
+            ->assertSee('08:30 – 09:40')
+            ->assertSee('Одна зміна')
+            ->assertDontSee('2 зміна')
+            ->assertDontSee('17:00 – 18:10');
+    }
+
+    public function test_edited_times_and_inactive_pairs_reach_the_page(): void
+    {
+        BellPeriod::where('shift', 1)->where('number', 1)->update(['starts' => '08:00', 'ends' => '09:10']);
+        BellPeriod::where('shift', 1)->where('number', 4)->update(['is_active' => false]);
+        $this->forgetCaches();
+
+        $this->get('/rozklad-dzvinkiv')
+            ->assertOk()
+            ->assertSee('08:00 – 09:10')
+            ->assertDontSee('12:50 – 14:00');
+    }
+
+    public function test_admin_screen_lists_pairs_of_both_shifts(): void
+    {
+        $admin = User::firstOrFail(); // створюється сидером
+
+        $this->actingAs($admin)->get(BellPeriodResource::getUrl('index'))
+            ->assertOk()
+            ->assertSee('Вимкнути другу зміну')
+            ->assertSee('2 зміна');
+    }
+
+    public function test_admin_button_toggles_second_shift(): void
+    {
+        $this->actingAs(User::firstOrFail());
+
+        Livewire::test(ListBellPeriods::class)->callAction('toggleSecondShift');
+        $this->forgetCaches();
+        $this->assertFalse(BellPeriod::secondShiftEnabled());
+
+        Livewire::test(ListBellPeriods::class)->callAction('toggleSecondShift');
+        $this->forgetCaches();
+        $this->assertTrue(BellPeriod::secondShiftEnabled());
+    }
+
+    public function test_empty_state_when_no_periods(): void
+    {
+        BellPeriod::query()->delete();
+        $this->forgetCaches();
+
+        $this->get('/rozklad-dzvinkiv')
+            ->assertOk()
+            ->assertSee('Розклад дзвінків ще не налаштовано.');
+    }
+}

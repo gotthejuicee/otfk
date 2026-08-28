@@ -76,11 +76,11 @@ flowchart LR
 | GET | `/novyny/{news:slug}` | news.show | `NewsController@show` | Статья; +1 просмотр раз в сессию | нет |
 | POST | `/novyny/{slug}/vpodobayka` | news.like | `NewsController@like` | Лайк-тоггл (JSON), fingerprint = sha1(ip+UA), `throttle:30,1` | нет |
 | GET | `/video` | video.index | `VideoController@index` | Видео, пагинация 12; на 1-й странице — featured-ролик, плеер открывается в лайтбоксе (youtube-nocookie) | нет |
-| GET | `/rozklad-dzvinkiv` | bells | `BellScheduleController@index` | Расписание звонков + live-индикатор пары | нет |
+| GET | `/rozklad-dzvinkiv` | bells | `BellScheduleController@index` | Расписание звонков: карточка на каждую смену + live-подсветка текущей пары | нет |
 | GET | `/podiyi` | events | `EventController@index` | Предстоящие + 6 прошедших событий | нет |
 | GET | `/podiyi/{event}/ics` | events.ics | `EventController@ics` | Скачивание .ics | нет |
 | GET | `/faq` | faq | `FaqController@index` | FAQ + JSON-LD | нет |
-| GET | `/kviz` | quiz | `QuizController@index` | Профориентационный квиз, **скоринг целиком в клиентском JS** | **да** (PoC-форма) |
+| GET | `/kviz` | quiz | `QuizController@index` | Профориентационный квиз: вопросы и варианты рендерит сервер (`data-step`/`data-opt`), **скоринг целиком в клиентском Alpine** | **да** (PoC-форма) |
 | GET/POST | `/zayavka` | applicants.* | `ApplicantRequestController` | Заявка абитуриента; honeypot `website`, `throttle:5,1`, письмо afterResponse | нет |
 | GET | `/dokumenty`, `/dokumenty/{cat:slug}` | documents.* | `DocumentController` | Публичная информация (категории документов) | нет |
 | GET | `/spetsialnosti`, `/spetsialnosti/{slug}` | specialties.* | `SpecialtyController` | Специальности + программы | нет |
@@ -120,7 +120,7 @@ flowchart LR
 | `pages` | CMS-дерево (parent_id, slug unique, body longText, section, is_published, is_heritage, meta_*) |
 | `news`, `news_categories`, `news_likes` | Новости: category_id, published_at, is_featured, is_heritage, views, likes, telegram_posted_at; лайки — unique(news_id, fingerprint) |
 | `menu_items` | Дерево навигации: link_type page/url/route, page_id, is_visible; кэш `menu.navigation` 600с |
-| `settings` | Key-value (key unique, group, type — тип виджета в Filament); кэш `settings.map` 600с. Соцсети: `social_facebook`, `social_instagram` (шапка + футер), `social_youtube` (блок-призыв на `/video`; пустое значение — блок скрыт) |
+| `settings` | Key-value (key unique, group, type — тип виджета в Filament); кэш `settings.map` 600с. Соцсети: `social_facebook`, `social_instagram` (шапка + футер), `social_youtube` (блок-призыв на `/video`; пустое значение — блок скрыт). `bells_second_shift` — показывать ли вторую смену на `/rozklad-dzvinkiv` (кнопка-переключатель в разделе «Розклад дзвінків») |
 | `banners` | Слайдер главной: image, image_alt, окно дат starts_at/ends_at |
 | `documents`, `document_categories` | Публичная информация: file_path или external_url (external — приоритет) |
 | `specialties`, `programs` | Специальности (slug, code 121/123/181/071...) + файлы программ |
@@ -128,7 +128,7 @@ flowchart LR
 | `galleries`, `photos` | Фотоальбомы; `is_archive` → сепия-режим |
 | `videos` | YouTube-ролики (youtube_id → accessors `thumbnail`, `watch_url`, `embed_url`, `private_embed_url` — youtube-nocookie для лайтбокса) |
 | `events` | События; **starts_at хранится как киевское wall-clock время**, UTC — через `utcStart()/utcEnd()` |
-| `bell_periods` | Расписание звонков; кэш `bell_periods` 600с |
+| `bell_periods` | Расписание звонков: `shift` (1/2) + `number` (номер пары внутри смены), `starts`/`ends`, `is_active`; кэш `bell_periods.v2` 600с. Вторая смена целиком скрывается настройкой `bells_second_shift` (`0`/`1`) — фильтрация после кэша, строки в БД остаются |
 | `stat_items`, `testimonials`, `faqs` | Блоки главной («Коледж у цифрах», отзывы, FAQ) |
 | `quiz_questions`, `quiz_options` | Квиз: options с points и specialty_id |
 | `applicant_requests`, `feedback_messages` | Заявки и обращения (name, phone, email, ip, is_processed/is_read) |
@@ -207,7 +207,8 @@ Telegram-автопост: `NewsObserver` (подключён PHP-атрибут
 17. **Тесты ловят контракты** — перед правкой поведения читай соответствующий Feature-тест (excerpt-дедупликация, heritage-типографика, чеклист контента, light-only и т.д.).
 18. **`SecurityHeaders` намеренно без CSP** (инлайн-скрипты Livewire/Alpine/Filament); `SESSION_SECURE_COOKIE` в прод-шаблоне не задан.
 19. **DEPLOY.md** — смесь русского и украинского языка; описывает первичный ручной деплой, обновления едут автодеплоем (`deploy.yml`).
-20. **`docs/posibnyk-administratora.html`** — ручной, без генератора, шрифты с внешнего CDN; дрейфует от админки при изменении фич.
+20. **Расписание звонков — две смены.** Смены накладываются (4-я пара 1-й смены 12:50–14:00 идёт одновременно с 1-й парой 2-й смены 13:00–14:10), поэтому `bellState()` в `app.blade.php` возвращает МАССИВ текущих пар (ключ `«смена:номер»`), а не одно число. Номер пары уникален только внутри смены. Миграция `2026_08_28_150000` переписала дефолтные времена на реальные, но только если их ещё не правили в админке (guard по точному совпадению со старым набором). Кэш-ключ сменился на `bell_periods.v2` — старый `bell_periods` на проде не содержит колонку `shift`.
+21. **`docs/posibnyk-administratora.html`** — ручной, без генератора, шрифты с внешнего CDN; дрейфует от админки при изменении фич.
 
 ## PoC-only (удалить/заменить перед продом)
 
@@ -223,7 +224,7 @@ Telegram-автопост: `NewsObserver` (подключён PHP-атрибут
 | 6 | Чужие YouTube-ролики (M7lc1UVf-VE и др.) | `SiteSeeder` | Заменить видео колледжа |
 | 7 | Плейсхолдер-контакты `+38 (048) 000-00-00`, `info@otfk.od.ua`, generic-карта Одессы | настройки из `SiteSeeder` | Реальные контакты в админке |
 | 8 | Хардкод-статистика «1000+ / 90+ / 6 / 80+» | сид в `2026_06_11_090000_create_stats_and_events.php` | Проверить/актуализировать в админке |
-| 9 | 3 канированных FAQ «о самом сайте», дефолтные времена звонков | сиды `2026_06_11_170000`, `2026_06_10_180000` | Проверить/заменить |
+| 9 | 3 канированных FAQ «о самом сайте» | сид `2026_06_11_170000` | Проверить/заменить |
 | 10 | Квиз `/kviz`: клиентский скоринг, вопросы из `QuizSeeder` | `resources/views/quiz/index.blade.php` | Решить судьбу фичи; контент — методистам |
 | 11 | Импортированные тексты старого сайта (не вычитаны) | миграции `import_*_content` | Редакторская вычитка |
 | 12 | Импорт-команды контента legacy-сайта (HTTP-скрейпинг и режим `--from-export` по зеркалу `site-audit/`) | `app/Console/Commands/ImportOtfk*` + `Concerns/ReadsOtfkExport` | Удалить после финального импорта на прод (вместе с `tests/Feature/ImportFromExportCommandsTest.php` и `tests/fixtures/otfk-export/`) |
