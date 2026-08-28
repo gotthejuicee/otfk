@@ -65,4 +65,30 @@ class SpecialtiesContentImportTest extends TestCase
             ->where('description', 'like', 'Демонстраційний запис%')
             ->count());
     }
+
+    public function test_link_opp_programs_command_backfills_missing_pdfs(): void
+    {
+        $category = \App\Models\DocumentCategory::firstOrCreate(
+            ['slug' => 'osvitno-profesiyni-prohramy'],
+            ['title' => 'Освітньо-професійні програми', 'sort_order' => 99]
+        );
+
+        \App\Models\Document::create([
+            'document_category_id' => $category->id,
+            'title' => "ОПП спеціальність: G4 «Енерговиробництво». Освітньо-професійна програма: «Монтаж і обслуговування холодильнокомпресорних машин та установок»",
+            'file_path' => 'documents/osvitno-profesiyni-prohramy/test-g4.pdf',
+            'published_at' => now(),
+            'sort_order' => 1,
+            'is_published' => true,
+        ]);
+
+        $program = Specialty::where('slug', 'enerhovyrobnytstvo')->first()
+            ->programs()->where('title', 'Монтаж і обслуговування холодильно-компресорних машин та установок')->first();
+        $program->update(['file_path' => null]);
+
+        $this->artisan('otfk:link-opp-programs')->assertExitCode(0);
+
+        // Дефіс/без дефіса у назві — нормалізація має знайти файл 2025 року
+        $this->assertSame('documents/osvitno-profesiyni-prohramy/test-g4.pdf', $program->fresh()->file_path);
+    }
 }
