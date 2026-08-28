@@ -90,7 +90,7 @@ flowchart LR
 | GET | `/admin-preview/{token}` | admin.preview | `AdminPreviewController@show` | Превью несохранённой формы страницы/новости из админки (кнопка «Превʼю»): слепок состояния формы в кэше на 10 мин (`App\Support\AdminPreview`), рендер публичного шаблона без записи в БД, плашка «Попередній перегляд». Только залогиненным, иначе 404; путь добавлен в регексп исключений catch-all | нет |
 | GET | `/sitemap.xml`, `/robots.txt` | sitemap, robots | `SitemapController` / closure | Sitemap (без кэша!), robots | нет |
 | GET | `/up` | — | Laravel health | Health-check | нет |
-| GET | `/{page:slug}` | pages.show | `PageController@show` | **Catch-all** CMS-страницы из БД. Обязан быть последним. Неопубликованную страницу видит залогиненный админ — превью с плашкой «Чернетка» (`components/draft-notice.blade.php`), гостям — 404. Шаблон один (`pages/show.blade.php`), но три варианта вёрстки: хаб с дочерними страницами (`partials/hub`), обычная контентная страница с липким сайдбаром и навигацией по заголовкам (`partials/content`), heritage-«письмо» (`partials/neighbours` под ним) | нет |
+| GET | `/{page:slug}` | pages.show | `PageController@show` | **Catch-all** CMS-страницы из БД. Обязан быть последним. Неопубликованную страницу видит залогиненный админ — превью с плашкой «Чернетка» (`components/draft-notice.blade.php`), гостям — 404. Шаблон один (`pages/show.blade.php`), но три варианта вёрстки: хаб с дочерними страницами (`partials/hub`; короткий `body` ≤800 знаков — в сайдбаре «Про розділ», длинный — статьёй в основной колонке под карточками), обычная контентная страница с липким сайдбаром и навигацией по заголовкам (`partials/content`), heritage-«письмо» (`partials/neighbours` под ним) | нет |
 
 ### Админка
 

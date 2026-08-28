@@ -73,6 +73,25 @@ class PageVariantsTest extends TestCase
             ->assertDontSee('Пошук по сторінках розділу…', escape: false);
     }
 
+    public function test_hub_keeps_short_body_in_sidebar_and_moves_long_body_to_main_column(): void
+    {
+        $hub = $this->hubWithChildren(3);
+
+        // Короткий опис — у сайдбарі, без блока «Про розділ» в основній колонці
+        $this->get('/testovyy-rozdil')
+            ->assertOk()
+            ->assertSee('Про розділ')
+            ->assertDontSee('id="pro-rozdil"', escape: false);
+
+        // Довгий текст не читається у вузькому сайдбарі — показується статтею в основній колонці
+        $hub->update(['body' => '<p>' . str_repeat('Виховна робота в коледжі. ', 60) . '</p>']);
+
+        $this->get('/testovyy-rozdil')
+            ->assertOk()
+            ->assertSee('id="pro-rozdil"', escape: false)
+            ->assertSee('Виховна робота в коледжі.');
+    }
+
     public function test_content_page_builds_table_of_contents_from_headings(): void
     {
         Page::create([

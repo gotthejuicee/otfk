@@ -3,6 +3,10 @@
 @php
     // Пошук по назвах — на клієнті, без запитів на сервер (сторінок у розділі до кількох десятків)
     $needles = $rest->map(fn ($child) => mb_strtolower($child->title))->values();
+
+    // Сайдбар «Про розділ» розрахований на короткий опис; довгий текст (як-от «Виховна робота»)
+    // у вузькій липкій колонці не читається — показуємо його статтею в основній колонці
+    $bodyIsLong = mb_strlen(trim(strip_tags((string) $page->body))) > 800;
 @endphp
 
 <section class="container-site py-10 lg:py-14">
@@ -107,11 +111,21 @@
             @if ($rest->isEmpty() && $featured->isEmpty())
                 <x-empty-state icon="document-text" title="Матеріали цього розділу незабаром буде додано." />
             @endif
+
+            @if (filled($page->body) && $bodyIsLong)
+                <div id="pro-rozdil" class="mt-12">
+                    <h2 class="text-2xl font-extrabold text-brand-950">Про розділ</h2>
+                    <div class="accent-rule"></div>
+                    <x-prose.article :drop-cap="false" class="mt-6 !max-w-none">
+                        {!! $page->body !!}
+                    </x-prose.article>
+                </div>
+            @endif
         </div>
 
         {{-- Сайдбар розділу: короткий опис зі сторінки + прямий контакт --}}
         <aside class="space-y-6 lg:sticky lg:top-24 lg:self-start">
-            @if (filled($page->body))
+            @if (filled($page->body) && ! $bodyIsLong)
                 <div class="card p-6">
                     <h2 class="text-lg font-bold text-brand-950">Про розділ</h2>
                     <div class="accent-rule"></div>
