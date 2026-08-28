@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PageResource\Pages;
+use App\Filament\Support\ViewOnSite;
 use App\Models\Page;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -65,7 +66,10 @@ class PageResource extends Resource
                 Tables\Columns\TextColumn::make('sort_order')->label('Порядок')->numeric()->sortable()->toggleable(),
             ])
             ->defaultSort('title')
-            ->actions([Tables\Actions\EditAction::make()])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                ViewOnSite::table(fn (Page $record) => url('/' . $record->slug)),
+            ])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
     }
 

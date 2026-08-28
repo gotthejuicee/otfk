@@ -71,7 +71,7 @@ flowchart LR
 | GET | `/` | home | `HomeController@index` | Баннеры, тайлы, статистика, события, новости, видео, «В этот день» | нет |
 | GET | `/novyny` | news.index | `NewsController@index` | Список новостей, пагинация 9, фильтры `?category=`, `?year=` | нет |
 | GET | `/novyny/feed.xml` | news.feed | `NewsFeedController` | RSS 30 последних, `max-age=1800` | нет |
-| GET | `/novyny/{news:slug}` | news.show | `NewsController@show` | Статья; +1 просмотр раз в сессию | нет |
+| GET | `/novyny/{news:slug}` | news.show | `NewsController@show` | Статья; +1 просмотр раз в сессию (только опубликованных). Неопубликованную видит залогиненный админ — превью с плашкой «Чернетка», без накрутки просмотров | нет |
 | POST | `/novyny/{slug}/vpodobayka` | news.like | `NewsController@like` | Лайк-тоггл (JSON), fingerprint = sha1(ip+UA), `throttle:30,1` | нет |
 | GET | `/video` | video.index | `VideoController@index` | Видео, пагинация 12; на 1-й странице — featured-ролик, плеер открывается в лайтбоксе (youtube-nocookie) | нет |
 | GET | `/rozklad-dzvinkiv` | bells | `BellScheduleController@index` | Расписание звонков: карточка на каждую смену + live-подсветка текущей пары | нет |
@@ -89,11 +89,13 @@ flowchart LR
 | GET | `/kontakty` | contacts | `ContactController@index` | Контакты (карточки из `settings`, карта, соцсети); формы обратной связи нет — на otfk.od.ua её тоже нет | нет |
 | GET | `/sitemap.xml`, `/robots.txt` | sitemap, robots | `SitemapController` / closure | Sitemap (без кэша!), robots | нет |
 | GET | `/up` | — | Laravel health | Health-check | нет |
-| GET | `/{page:slug}` | pages.show | `PageController@show` | **Catch-all** CMS-страницы из БД. Обязан быть последним. Шаблон один (`pages/show.blade.php`), но три варианта вёрстки: хаб с дочерними страницами (`partials/hub`), обычная контентная страница с липким сайдбаром и навигацией по заголовкам (`partials/content`), heritage-«письмо» (`partials/neighbours` под ним) | нет |
+| GET | `/{page:slug}` | pages.show | `PageController@show` | **Catch-all** CMS-страницы из БД. Обязан быть последним. Неопубликованную страницу видит залогиненный админ — превью с плашкой «Чернетка» (`components/draft-notice.blade.php`), гостям — 404. Шаблон один (`pages/show.blade.php`), но три варианта вёрстки: хаб с дочерними страницами (`partials/hub`), обычная контентная страница с липким сайдбаром и навигацией по заголовкам (`partials/content`), heritage-«письмо» (`partials/neighbours` под ним) | нет |
 
 ### Админка
 
 Ручных админ-роутов **нет** — всё генерирует Filament (`app/Providers/Filament/AdminPanelProvider.php`): путь `/admin`, login/logout/profile встроенные, **регистрация и сброс пароля отключены**. Auto-discovery ресурсов из `app/Filament/Resources` (Banner, Department, Document(+Category), Event, Faq, Gallery, MenuItem, News(+Category), Page, Program, QuickLink, QuizQuestion, Setting, Specialty, Staff, StatItem, User, Video), страницы `ContentChecklist` («Що ще наповнити»; страницы-плитки перехватываемых роутов — `rozklad-dzvinkiv`, `faq`, `kviz` — и хабы с опубликованными детьми не считаются заглушками) и `BellSchedule` («Розклад дзвінків» — форма настроек вместо CRUD), виджеты дашборда (QuickActions, StatsOverview, VisitsChart, TopNews, TopPages).
+
+Во всех ресурсах есть действие «Переглянути на сайті» (общий хелпер `app/Filament/Support/ViewOnSite.php`): открывает публичную страницу записи (страницы, новости, специальности, подразделения, персонал, галереи, категории документов) или соответствующий раздел сайта (события, FAQ, видео, баннеры, статистика, квиз, меню, быстрые ссылки, расписание звонков) в новой вкладке — и как кнопка в шапке Edit-страницы, и как действие строки таблицы. Для страниц и новостей кнопка работает и для черновиков: залогиненный админ видит неопубликованный контент с плашкой «Чернетка» (тест `DraftPreviewTest`).
 
 ### API / webhooks
 

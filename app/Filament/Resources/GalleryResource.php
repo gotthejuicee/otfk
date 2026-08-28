@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\GalleryResource\Pages;
+use App\Filament\Support\ViewOnSite;
 use App\Models\Gallery;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -63,7 +64,10 @@ class GalleryResource extends Resource
                 Tables\Columns\IconColumn::make('is_archive')->label('Архів')->boolean()->toggleable(),
             ])
             ->defaultSort('sort_order')
-            ->actions([Tables\Actions\EditAction::make()])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                ViewOnSite::table(fn (Gallery $record) => route('galleries.show', $record)),
+            ])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
     }
 

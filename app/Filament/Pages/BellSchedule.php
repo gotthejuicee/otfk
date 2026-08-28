@@ -111,6 +111,14 @@ class BellSchedule extends FilamentPage implements HasForms
     }
 
     /** @return array<Action> */
+    protected function getHeaderActions(): array
+    {
+        return [
+            \App\Filament\Support\ViewOnSite::header(route('bells')),
+        ];
+    }
+
+    /** @return array<Action> */
     public function getFormActions(): array
     {
         return [

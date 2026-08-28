@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\NewsResource\Pages;
+use App\Filament\Support\ViewOnSite;
 use App\Models\News;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -66,7 +67,10 @@ class NewsResource extends Resource
                     ->tooltip(fn ($state) => $state ? 'Опубліковано в Telegram' : 'Не публікувалось у Telegram'),
             ])
             ->defaultSort('published_at', 'desc')
-            ->actions([Tables\Actions\EditAction::make()])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                ViewOnSite::table(fn (News $record) => route('news.show', $record)),
+            ])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
     }
 

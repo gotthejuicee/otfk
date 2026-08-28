@@ -42,12 +42,14 @@ class NewsController extends Controller
 
     public function show(Request $request, News $news)
     {
-        abort_unless($news->is_published, 404);
+        // Чернетки бачать лише залогінені адміністратори (превʼю з адмінки).
+        abort_unless($news->is_published || auth()->check(), 404);
 
         $news->loadMissing('category');
 
-        // Чесний лічильник: +1 лише раз за сесію відвідувача (не накручується F5).
-        if (! $request->session()->has("viewed_news.{$news->id}")) {
+        // Чесний лічильник: +1 лише раз за сесію відвідувача (не накручується F5);
+        // превʼю чернетки перегляди не накручує.
+        if ($news->is_published && ! $request->session()->has("viewed_news.{$news->id}")) {
             $news->increment('views');
             $request->session()->put("viewed_news.{$news->id}", true);
         }

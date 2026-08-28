@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\DocumentCategoryResource\Pages;
+use App\Filament\Support\ViewOnSite;
 use App\Models\DocumentCategory;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -40,7 +41,10 @@ class DocumentCategoryResource extends Resource
                 Tables\Columns\TextColumn::make('sort_order')->label('Порядок')->numeric()->sortable(),
             ])
             ->defaultSort('sort_order')
-            ->actions([Tables\Actions\EditAction::make()])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                ViewOnSite::table(fn (DocumentCategory $record) => route('documents.category', $record)),
+            ])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
     }
 

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\DocumentResource\Pages;
+use App\Filament\Support\ViewOnSite;
 use App\Models\Document;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -58,7 +59,11 @@ class DocumentResource extends Resource
                 Tables\Columns\IconColumn::make('is_published')->label('Опубл.')->boolean(),
             ])
             ->defaultSort('sort_order')
-            ->actions([Tables\Actions\EditAction::make()])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                ViewOnSite::table(fn (Document $record) => route('documents.category', $record->category))
+                    ->visible(fn (Document $record) => $record->category !== null),
+            ])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
     }
 

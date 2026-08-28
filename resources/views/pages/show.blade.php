@@ -44,6 +44,10 @@
 
 <x-layouts.app :title="$page->meta_title ?: $page->title" :description="$page->meta_description ?: $page->excerpt">
 
+    @unless ($page->is_published)
+        <x-draft-notice />
+    @endunless
+
     @if ($isHeritage)
         {{-- Урочиста сторінка — темна шапка з серифним заголовком лишається частиною стилю «листа» --}}
         <x-page-hero :title="$page->title" :breadcrumbs="$pageBreadcrumbs" heritage class="max-w-4xl leading-tight" />

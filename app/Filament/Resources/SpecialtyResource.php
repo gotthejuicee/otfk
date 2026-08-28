@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SpecialtyResource\Pages;
+use App\Filament\Support\ViewOnSite;
 use App\Models\Specialty;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -55,7 +56,10 @@ class SpecialtyResource extends Resource
                 Tables\Columns\IconColumn::make('is_published')->label('Опубл.')->boolean(),
             ])
             ->defaultSort('sort_order')
-            ->actions([Tables\Actions\EditAction::make()])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                ViewOnSite::table(fn (Specialty $record) => route('specialties.show', $record)),
+            ])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
     }
 

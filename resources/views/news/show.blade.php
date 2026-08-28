@@ -1,6 +1,10 @@
 <x-layouts.app :title="$news->title" :description="$news->excerpt"
                :og-image="$news->cover_image ? asset('storage/' . $news->cover_image) : null">
 
+    @unless ($news->is_published)
+        <x-draft-notice />
+    @endunless
+
     {{-- Розмітка NewsArticle для пошукових систем --}}
     @php
         $articleLd = array_filter([

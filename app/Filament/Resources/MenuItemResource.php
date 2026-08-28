@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\MenuItemResource\Pages;
+use App\Filament\Support\ViewOnSite;
 use App\Models\MenuItem;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -53,7 +54,11 @@ class MenuItemResource extends Resource
                 Tables\Columns\TextColumn::make('sort_order')->label('Порядок')->numeric()->sortable(),
             ])
             ->defaultSort('sort_order')
-            ->actions([Tables\Actions\EditAction::make()])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                ViewOnSite::table(fn (MenuItem $record) => $record->href)
+                    ->visible(fn (MenuItem $record) => $record->href !== '#'),
+            ])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
     }
 
