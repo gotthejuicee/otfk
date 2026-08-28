@@ -82,7 +82,7 @@ flowchart LR
 | GET | `/faq` | faq | `FaqController@index` | FAQ + JSON-LD | нет |
 | GET | `/kviz` | quiz | `QuizController@index` | Профориентационный квиз: вопросы и варианты рендерит сервер (`data-step`/`data-opt`), **скоринг целиком в клиентском Alpine** | **да** (PoC-форма) |
 | GET/POST | `/zayavka` | applicants.* | `ApplicantRequestController` | Заявка абитуриента; honeypot `website`, `throttle:5,1`, письмо afterResponse | нет |
-| GET | `/dokumenty`, `/dokumenty/{cat:slug}` | documents.* | `DocumentController` | Публичная информация (категории документов) | нет |
+| GET | `/dokumenty`, `/dokumenty/{cat:slug}` | documents.* | `DocumentController` | Публичная информация: список разделов с клиентским фильтром (Alpine); страница категории — пагинация 20/стр., поиск `?q=` (фильтрация в PHP через `mb_stripos` — SQLite не видит регистра кириллицы в `LIKE`), метаданные файла из акцессоров `Document::file_extension` / `file_size_label` | нет |
 | GET | `/spetsialnosti`, `/spetsialnosti/{slug}` | specialties.* | `SpecialtyController` | Специальности + программы | нет |
 | GET | `/struktura`, `/struktura/{slug}` | structure.* | `StructureController` | Отделения/комиссии + персонал | нет |
 | GET | `/administratsiya` | staff.administration | `StaffController@administration` | Администрация: директор отдельным блоком, остальные — группами «Заступники директора» / «Керівники відділень та служб» (роль выводится из `position` акцессором `Staff::administration_role`), контакты приёмной из `settings` | нет |
@@ -208,7 +208,8 @@ Telegram-автопост: `NewsObserver` (подключён PHP-атрибут
 18. **`SecurityHeaders` намеренно без CSP** (инлайн-скрипты Livewire/Alpine/Filament); `SESSION_SECURE_COOKIE` в прод-шаблоне не задан.
 19. **DEPLOY.md** — смесь русского и украинского языка; описывает первичный ручной деплой, обновления едут автодеплоем (`deploy.yml`).
 20. **Расписание звонков — две смены.** Смены накладываются (4-я пара 1-й смены 12:50–14:00 идёт одновременно с 1-й парой 2-й смены 13:00–14:10), поэтому `bellState()` в `app.blade.php` возвращает МАССИВ текущих пар (ключ `«смена:номер»`), а не одно число. Номер пары уникален только внутри смены. Миграция `2026_08_28_150000` переписала дефолтные времена на реальные, но только если их ещё не правили в админке (guard по точному совпадению со старым набором). Кэш-ключ сменился на `bell_periods.v2` — старый `bell_periods` на проде не содержит колонку `shift`. Золотой цвет на странице означает ровно «идёт прямо сейчас»: длинная перемена статически серая, золотой фон ей даёт только `isGapNow()` (ключ перерывы — пара, ПОСЛЕ которой она идёт). После последней пары `bellState()` отдаёт `status: 'Пари на сьогодні завершено'`, в воскресенье — `'Неділя — вихідний'`; в оба случая `short` пустой, чтобы плашка в шапке молчала.
-21. **`docs/posibnyk-administratora.html`** — ручной, без генератора, шрифты с внешнего CDN; дрейфует от админки при изменении фич.
+21. **`LIKE` не видит регистра кириллицы в SQLite.** Dev/тесты идут на SQLite, где `LIKE` (и `LOWER()`) регистронезависимы только для ASCII: `?q=положення` не найдёт «Положення …», хотя на проде (MySQL, `utf8mb4_unicode_ci`) найдёт. Поиск по документам внутри категории (`DocumentController@category`) поэтому фильтрует коллекцию в PHP через `mb_stripos`. Общий поиск `/poshuk` (`SearchController`) остался на `where('title','like',…)` — на SQLite он регистрозависим по кириллице, на проде работает.
+22. **`docs/posibnyk-administratora.html`** — ручной, без генератора, шрифты с внешнего CDN; дрейфует от админки при изменении фич.
 
 ## PoC-only (удалить/заменить перед продом)
 

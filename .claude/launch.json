@@ -40,6 +40,16 @@
         "--port=8005"
       ],
       "port": 8005
+    },
+    {
+      "name": "otfk-docs",
+      "runtimeExecutable": "php",
+      "runtimeArgs": [
+        "artisan",
+        "serve",
+        "--port=8006"
+      ],
+      "port": 8006
     }
   ]
 }
