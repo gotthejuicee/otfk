@@ -34,6 +34,29 @@ class Specialty extends Model
         return $this->hasMany(Program::class)->orderBy('sort_order');
     }
 
+    /**
+     * Декоративна іконка напряму підготовки — обкладинок у спеціальностей немає,
+     * тож картки тримаються на коді та іконці. Спершу точний код, далі галузь знань
+     * (перші дві цифри коду), інакше — загальна «академічна шапочка».
+     */
+    public function getIconNameAttribute(): string
+    {
+        $code = preg_replace('/\D/', '', (string) $this->code);
+
+        return match ($code) {
+            '121' => 'code-bracket',
+            '123' => 'cpu-chip',
+            '181' => 'beaker',
+            '071' => 'calculator',
+            default => match (substr($code, 0, 2)) {
+                '12' => 'computer-desktop',
+                '18' => 'beaker',
+                '07' => 'chart-bar',
+                default => 'academic-cap',
+            },
+        };
+    }
+
     public function scopePublished($query)
     {
         return $query->where('is_published', true);
