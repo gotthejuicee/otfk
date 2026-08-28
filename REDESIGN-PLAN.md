@@ -11,11 +11,12 @@
 - [x] **Футер** — там же, `components/layouts/app.blade.php`
 - [x] **Хлебные крошки** — `components/breadcrumbs.blade.php` (ChatGPT-макет новостей сохранил текущий вид: Головна › Новини в hero — оставлено как есть)
 - [ ] **Общие компоненты**: `page-hero`, `news-card`, `staff-card`, `empty-state`, `lead-excerpt`, `heritage-frame`, `prose/article` — обновлять по ходу первых внутренних страниц, фиксировать единый стиль
+  - `breadcrumbs` получил проп `tone` (`dark` по умолчанию, `light` — для страниц со светлой шапкой; впервые задействован на детальной новости)
 
 ## 1. Новости и медиа
 
 - [x] **Список новостей** — `/novyny` — `news/index.blade.php` (featured-карточка на 1-й странице без фильтров; бейдж категории на фото; подзаголовок в hero; украинская пагинация `vendor/pagination/tailwind.blade.php` — общая, задействована и на `/video`)
-- [ ] **Новость (детальная)** — `/novyny/{slug}` — `news/show.blade.php` (лайк-кнопка, шаринг; помнить про `NewsObserver`/Telegram — контент не трогать)
+- [x] **Новость (детальная)** — `/novyny/{slug}` — `news/show.blade.php` (светлая шапка-карточка с контуром здания вместо navy-героя, время чтения, сайдбар с миниатюрами + «Корисно для абітурієнта» из меню, «предыдущая/следующая новость», финальный CTA «Стати студентом»; тесты — `NewsArticleLayoutTest`)
 - [ ] **Видео** — `/video` — `videos/index.blade.php`
 - [ ] **Галереи (список)** — `/halereya` — `galleries/index.blade.php`
 - [ ] **Галерея (детальная, лайтбокс)** — `/halereya/{slug}` — `galleries/show.blade.php`

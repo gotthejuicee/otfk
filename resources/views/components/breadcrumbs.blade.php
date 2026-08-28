@@ -1,7 +1,8 @@
-@props(['items' => []])
+@props(['items' => [], 'tone' => 'dark'])
 
 @php
     $count = count($items);
+    $light = $tone === 'light';
     $breadcrumbLd = [
         '@context' => 'https://schema.org',
         '@type' => 'BreadcrumbList',
@@ -14,15 +15,16 @@
     ];
 @endphp
 
-<nav aria-label="Навігаційний ланцюжок" class="flex flex-wrap items-center gap-2 text-sm text-brand-300">
+<nav aria-label="Навігаційний ланцюжок"
+     @class(['flex flex-wrap items-center gap-2 text-sm', 'text-slate-500' => $light, 'text-brand-300' => ! $light])>
     @foreach ($items as $i => $item)
         @if ($i > 0)
             <x-ico name="chevron-right" class="h-4 w-4 shrink-0" aria-hidden="true" />
         @endif
         @if (! empty($item['url']) && $i < $count - 1)
-            <a href="{{ $item['url'] }}" class="hover:text-white">{{ $item['label'] }}</a>
+            <a href="{{ $item['url'] }}" @class(['hover:text-brand-700' => $light, 'hover:text-white' => ! $light])>{{ $item['label'] }}</a>
         @else
-            <span class="text-white" @if ($i === $count - 1) aria-current="page" @endif>{{ $item['label'] }}</span>
+            <span @class(['text-slate-700' => $light, 'text-white' => ! $light]) @if ($i === $count - 1) aria-current="page" @endif>{{ $item['label'] }}</span>
         @endif
     @endforeach
 </nav>

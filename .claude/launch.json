@@ -4,14 +4,32 @@
     {
       "name": "otfk",
       "runtimeExecutable": "php",
-      "runtimeArgs": ["artisan", "serve", "--port=8002"],
+      "runtimeArgs": [
+        "artisan",
+        "serve",
+        "--port=8002"
+      ],
       "port": 8002
     },
     {
       "name": "otfk-alt",
       "runtimeExecutable": "php",
-      "runtimeArgs": ["artisan", "serve", "--port=8003"],
+      "runtimeArgs": [
+        "artisan",
+        "serve",
+        "--port=8003"
+      ],
       "port": 8003
+    },
+    {
+      "name": "otfk-alt2",
+      "runtimeExecutable": "php",
+      "runtimeArgs": [
+        "artisan",
+        "serve",
+        "--port=8004"
+      ],
+      "port": 8004
     }
   ]
 }

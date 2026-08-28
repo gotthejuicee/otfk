@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MenuItem;
 use App\Models\News;
 use App\Models\NewsCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 
 class NewsController extends Controller
 {
@@ -56,10 +58,61 @@ class NewsController extends Controller
 
         $related = News::published()->recent()
             ->whereKeyNot($news->id)
-            ->limit(3)
+            ->limit(5)
             ->get();
 
-        return view('news.show', compact('news', 'related', 'liked'));
+        [$prev, $next] = $this->neighbours($news);
+
+        return view('news.show', [
+            'news' => $news,
+            'related' => $related,
+            'liked' => $liked,
+            'prev' => $prev,
+            'next' => $next,
+            'abiturientLinks' => $this->abiturientLinks(),
+        ]);
+    }
+
+    /**
+     * Сусідні новини у стрічці: [попередня (старіша), наступна (новіша)].
+     * Порядок такий самий, як у scopeRecent — дата, далі id.
+     *
+     * @return array{0: ?News, 1: ?News}
+     */
+    private function neighbours(News $news): array
+    {
+        if (! $news->published_at) {
+            return [null, null];
+        }
+
+        $at = $news->published_at;
+
+        $prev = News::published()
+            ->where(fn ($q) => $q->where('published_at', '<', $at)
+                ->orWhere(fn ($q2) => $q2->where('published_at', $at)->where('id', '<', $news->id)))
+            ->recent()
+            ->first();
+
+        $next = News::published()
+            ->where(fn ($q) => $q->where('published_at', '>', $at)
+                ->orWhere(fn ($q2) => $q2->where('published_at', $at)->where('id', '>', $news->id)))
+            ->orderBy('published_at')->orderBy('id')
+            ->first();
+
+        return [$prev, $next];
+    }
+
+    /**
+     * Корисні посилання для абітурієнта — діти пункту меню «Абітурієнту».
+     * Нічого не хардкодимо: немає такого пункту в меню — блок не показуємо.
+     */
+    private function abiturientLinks(): Collection
+    {
+        $root = MenuItem::navigation()
+            ->first(fn (MenuItem $item) => $item->page?->slug === 'abituriyentu'
+                || str_ends_with($item->href, '/abituriyentu'));
+
+        return $root ? $root->children->take(5) : collect();
     }
 
     /** Вподобайка без реєстрації: один лайк на відвідувача, повторний клік знімає. */
