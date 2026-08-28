@@ -83,6 +83,22 @@ class BellScheduleLayoutTest extends TestCase
         $this->assertTrue(BellPeriod::secondShiftEnabled());
     }
 
+    public function test_long_break_is_not_highlighted_statically(): void
+    {
+        $html = $this->get('/rozklad-dzvinkiv')->assertOk()->getContent();
+
+        // Велика перерва 11:00 → 11:30 стоїть після 2-ї пари першої зміни.
+        // У розмітці вона сіра: золото на сторінці означає лише «просто зараз»,
+        // і дає його виключно Alpine через isGapNow().
+        $this->assertMatchesRegularExpression(
+            '/<li class="[^"]*bg-slate-50[^"]*"\s+:class="[^"]*isGapNow\(.1:2.\)[^"]*">\s*Велика перерва/u',
+            $html
+        );
+
+        // Золотий фон перерви існує лише всередині Alpine-виразу, а не в самому class=""
+        $this->assertDoesNotMatchRegularExpression('/<li class="[^"]*bg-gold-50[^"]*"/u', $html);
+    }
+
     public function test_empty_state_when_no_periods(): void
     {
         BellPeriod::query()->delete();

@@ -25,6 +25,15 @@ class StructureController extends Controller
 
         $department->load(['staff' => fn ($q) => $q->where('is_published', true)->orderBy('sort_order')]);
 
-        return view('structure.show', compact('department'));
+        // Блок «Інші підрозділи» — сусіди тієї ж групи (відділення / комісія / кафедра)
+        $others = Department::published()
+            ->where('type', $department->type)
+            ->whereKeyNot($department->getKey())
+            ->ordered()
+            ->withCount('staff')
+            ->take(4)
+            ->get();
+
+        return view('structure.show', compact('department', 'others'));
     }
 }

@@ -459,17 +459,28 @@
 
             // Повертає стан розкладу на зараз:
             //   current — ключі пар, що зараз ідуть («зміна:номер»; у перехресті змін їх дві),
+            //   gaps    — ключі пар, після яких просто зараз триває перерва,
             //   status  — повний текст для сторінки, short — короткий для плашки в шапці,
             //   left/pct — скільки хвилин лишилось і відсоток проходження кожної активної пари.
             window.bellState = function (periods) {
-                const empty = { current: [], status: '', short: '', left: {}, pct: {} };
+                const empty = { current: [], gaps: [], status: '', short: '', left: {}, pct: {} };
+                if (!periods.length) return empty;
+
                 const d = new Date();
-                if (d.getDay() === 0 || !periods.length) return empty; // неділя
                 const cur = d.getHours() * 60 + d.getMinutes();
 
                 const multi = new Set(periods.map(p => p.sh)).size > 1;
                 const key = p => p.sh + ':' + p.n;
                 const name = p => (ORD[p.n] ?? p.n) + ' пара' + (multi ? ' (' + p.sh + ' зміна)' : '');
+
+                if (d.getDay() === 0) return { ...empty, status: 'Неділя — вихідний' };
+
+                // Перерва між сусідніми парами однієї зміни; ключ — пара, після якої вона йде.
+                const gaps = periods.filter((p, i) => {
+                    const nx = periods[i + 1];
+
+                    return nx && nx.sh === p.sh && cur >= toMin(p.e) && cur < toMin(nx.s);
+                }).map(key);
 
                 // Зміни накладаються (4-та пара 1-ї зміни йде разом з 1-ю парою 2-ї), тому пар може бути дві.
                 const running = periods.filter(p => cur >= toMin(p.s) && cur < toMin(p.e));
@@ -485,6 +496,7 @@
 
                     return {
                         current: running.map(key),
+                        gaps,
                         status: running.map(name).join(' · ') + ' · до кінця ' + (soonest - cur) + ' хв',
                         short: name(running[0]) + ' · до кінця ' + left[key(running[0])] + ' хв',
                         left, pct,
@@ -499,10 +511,13 @@
                         ? 'Перерва · далі ' + name(next) + ' о ' + next.s
                         : name(next) + ' о ' + next.s;
 
-                    if (started || toMin(next.s) - cur <= 60) return { ...empty, status: text, short: text };
+                    if (started || toMin(next.s) - cur <= 60) return { ...empty, gaps, status: text, short: text };
+
+                    return empty; // задовго до першої пари — мовчимо
                 }
 
-                return empty;
+                // Наступних пар немає — день уже скінчився. У шапці про це не пишемо, лише на сторінці.
+                return { ...empty, status: 'Пари на сьогодні завершено' };
             };
 
             window.bellChip = periods => ({
@@ -512,13 +527,16 @@
 
             window.bellSchedule = periods => ({
                 current: [],
+                gaps: [],
                 status: '',
                 left: {},
                 pct: {},
                 isNow(key) { return this.current.includes(key); },
+                isGapNow(key) { return this.gaps.includes(key); },
                 tick() {
                     const st = window.bellState(periods);
-                    this.current = st.current; this.status = st.status; this.left = st.left; this.pct = st.pct;
+                    this.current = st.current; this.gaps = st.gaps; this.status = st.status;
+                    this.left = st.left; this.pct = st.pct;
                 },
             });
 

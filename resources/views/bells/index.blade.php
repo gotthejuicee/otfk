@@ -128,6 +128,9 @@
                                     $key = $shift.':'.$p->number;
                                     $next = $shiftPeriods->get($i + 1);
                                     $gap = $next ? $mins($p->ends, $next->starts) : 0;
+
+                                    // Золото на сторінці означає «просто зараз», тому перерва в спокої — сіра
+                                    $gapIdle = $gap >= 20 ? 'bg-slate-50 font-semibold text-slate-500' : 'bg-slate-50 text-slate-400';
                                 @endphp
 
                                 <li class="relative px-5 py-4 transition-colors sm:px-6"
@@ -160,8 +163,11 @@
                                 </li>
 
                                 @if ($next && $gap > 0)
-                                    <li class="px-5 py-2 text-center text-xs sm:px-6 {{ $gap >= 20 ? 'bg-gold-50 font-semibold text-gold-700' : 'bg-slate-50 text-slate-400' }}">
+                                    {{-- Об'єктний синтаксис: спокійні класи стоять у розмітці (без миготіння до старту Alpine) і знімаються, коли перерва йде --}}
+                                    <li class="px-5 py-2 text-center text-xs transition-colors sm:px-6 {{ $gapIdle }}"
+                                        :class="{ '{{ $gapIdle }}': ! isGapNow('{{ $key }}'), 'bg-gold-50 font-semibold text-gold-700': isGapNow('{{ $key }}') }">
                                         {{ $gap >= 20 ? 'Велика перерва' : 'Перерва' }} · {{ $gap }} хв
+                                        <span x-show="isGapNow('{{ $key }}')" x-cloak>· зараз</span>
                                     </li>
                                 @endif
                             @endforeach
