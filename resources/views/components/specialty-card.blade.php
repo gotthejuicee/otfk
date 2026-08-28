@@ -53,10 +53,19 @@
             ])>{{ $specialty->short_description }}</p>
         @endif
 
+        {{-- Усі ОПП спеціальності одразу видно в картці (як на старому сайті) —
+             абітурієнт шукає конкретну програму, а не назву спеціальності --}}
         @if ($showProgram && $specialty->programs->isNotEmpty())
-            <div class="mt-5 flex items-start gap-2.5 border-t border-slate-100 pt-5 text-sm">
-                <x-ico name="book-open" class="mt-0.5 h-4 w-4 shrink-0 text-brand-500" aria-hidden="true" />
-                <span class="min-w-0 font-semibold text-slate-800">{{ $specialty->programs->first()->title }}</span>
+            <div class="mt-5 border-t border-slate-100 pt-5">
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Освітньо-професійні програми</p>
+                <ul class="mt-3 space-y-2.5">
+                    @foreach ($specialty->programs as $program)
+                        <li class="flex items-start gap-2.5">
+                            <x-ico name="book-open" class="mt-1 h-4 w-4 shrink-0 text-brand-500" aria-hidden="true" />
+                            <span class="min-w-0 text-[15px] font-bold leading-snug text-slate-900">{{ $program->title }}</span>
+                        </li>
+                    @endforeach
+                </ul>
             </div>
         @endif
 

@@ -57,13 +57,21 @@ class SpecialtiesContentImportTest extends TestCase
 
     public function test_imported_specialties_have_no_demo_programs(): void
     {
-        // Демо-запис сидера допустимий лише для спеціальностей без реального
-        // контенту (071); у 9 імпортованих його бути не повинно.
-        $importedIds = Specialty::where('slug', '!=', 'oblik-i-opodatkuvannya')->pluck('id');
+        $this->assertSame(0, Program::where('description', 'like', 'Демонстраційний запис%')->count());
+    }
 
-        $this->assertSame(0, Program::whereIn('specialty_id', $importedIds)
-            ->where('description', 'like', 'Демонстраційний запис%')
-            ->count());
+    /**
+     * Чистка демо-залишків (міграція remove_demo_specialty_and_fix_descriptions):
+     * демо-спеціальності 071 немає, демо-описи замінені реальними,
+     * порядок — як на старому сайті (першою йде F7).
+     */
+    public function test_demo_accounting_specialty_removed_and_descriptions_are_real(): void
+    {
+        $this->assertNull(Specialty::where('slug', 'oblik-i-opodatkuvannya')->first());
+
+        $this->assertSame(0, Specialty::where('short_description', 'like', 'Сучасна підготовка фахівців%')->count());
+
+        $this->assertSame('kompyuterna-inzheneriya', Specialty::published()->ordered()->first()->slug);
     }
 
     public function test_link_opp_programs_command_backfills_missing_pdfs(): void

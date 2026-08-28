@@ -142,7 +142,6 @@ class SiteSeeder extends Seeder
             ['Інженерія програмного забезпечення', 'inzheneriya-programnoho-zabezpechennya', 'F2'],
             ['Комп’ютерна інженерія', 'kompyuterna-inzheneriya', 'F7'],
             ['Харчові технології', 'kharchovi-tekhnolohiyi', 'G13'],
-            ['Облік і оподаткування', 'oblik-i-opodatkuvannya', '071'],
         ];
 
         foreach ($items as $i => [$title, $slug, $code]) {

@@ -76,19 +76,21 @@ class SpecialtyPageTest extends TestCase
         $this->assertSame('academic-cap', $this->makeSpecialty('Без коду', 'bez-kodu', '')->icon_name);
     }
 
-    public function test_index_shows_program_title_and_final_cta(): void
+    /** Картка показує ВСІ ОПП спеціальності (не лише першу) — як список на старому сайті. */
+    public function test_index_shows_all_program_titles_and_final_cta(): void
     {
-        $specialty = $this->makeSpecialty('Харчові технології', 'kharchovi', '181', 0);
+        $specialty = $this->makeSpecialty('Комп’ютерна інженерія', 'kompyuterna-inzheneriya', 'F7', 0);
 
-        Program::create([
-            'specialty_id' => $specialty->id,
-            'title' => 'Освітньо-професійна програма «Харчові технології»',
-            'sort_order' => 0,
-        ]);
+        foreach (['Обслуговування комп’ютерних систем і мереж', 'Комп’ютерна графіка і Web-дизайн', 'Безпека комп’ютерних систем і мереж'] as $i => $title) {
+            Program::create(['specialty_id' => $specialty->id, 'title' => $title, 'sort_order' => $i]);
+        }
 
         $this->get('/spetsialnosti')
             ->assertOk()
-            ->assertSee('Освітньо-професійна програма «Харчові технології»')
+            ->assertSee('Освітньо-професійні програми')
+            ->assertSee('Обслуговування комп’ютерних систем і мереж')
+            ->assertSee('Комп’ютерна графіка і Web-дизайн')
+            ->assertSee('Безпека комп’ютерних систем і мереж')
             // Фінальний блок веде на заявку та квіз
             ->assertSee('Готові зробити перший крок до професії?')
             ->assertSee(route('applicants.create'), false)
