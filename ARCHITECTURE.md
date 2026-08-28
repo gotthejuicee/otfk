@@ -33,7 +33,7 @@
 | `resources/views/` | Blade: единый layout `components/layouts/app.blade.php` + страницы |
 | `resources/css/app.css`, `resources/js/app.js` | Tailwind v4 тема + Alpine; весь кастомный JS — inline в layout |
 | `public/build/` | Прод-бандл Vite; **в git не входит** — собирается локально (`npm run build`) и в CI при деплое |
-| `tests/Feature/` | 19 фиче-тестов; многие фиксируют поведенческие контракты |
+| `tests/Feature/` | 25 фиче-тестов; многие фиксируют поведенческие контракты |
 | `docs/posibnyk-administratora.html` | Ручной (не генерируемый) мануал админа для персонала |
 | `DocsHtml/generate.mjs` | Генератор HTML-твинов этой документации |
 | `.github/workflows/` | `tests.yml` (тесты + сборка фронта) и `deploy.yml` (автодеплой `master` на хостинг) |
