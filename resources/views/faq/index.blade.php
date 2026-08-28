@@ -204,10 +204,7 @@
                         @endif
 
                         <div class="mt-6 space-y-3">
-                            <a href="{{ route('applicants.create') }}" class="btn-accent w-full">
-                                Залишити заявку <x-ico name="arrow-right" class="h-4 w-4" />
-                            </a>
-                            <a href="{{ route('contacts') }}" class="btn-outline w-full border-gold-300 text-gold-700 ring-gold-300 hover:bg-gold-50">
+                            <a href="{{ route('contacts') }}" class="btn-accent w-full">
                                 Контакти <x-ico name="arrow-right" class="h-4 w-4" />
                             </a>
                         </div>
@@ -249,8 +246,8 @@
                         <a href="{{ route('contacts') }}" class="btn-accent">
                             Звʼязатися з приймальною комісією <x-ico name="arrow-right" class="h-4 w-4" />
                         </a>
-                        <a href="{{ route('applicants.create') }}" class="btn-outline">
-                            Залишити заявку <x-ico name="arrow-right" class="h-4 w-4" />
+                        <a href="{{ route('specialties.index') }}" class="btn-outline">
+                            Наші спеціальності <x-ico name="arrow-right" class="h-4 w-4" />
                         </a>
                     </div>
                 </div>

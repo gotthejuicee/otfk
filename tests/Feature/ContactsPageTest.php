@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 /**
  * Редизайн контактів: світла шапка з швидкими діями, картки контактів із
- * налаштувань, форма зворотного звʼязку зі станами помилки/успіху та карта.
+ * налаштувань та карта. Форми зворотного звʼязку немає — як і на otfk.od.ua.
  */
 class ContactsPageTest extends TestCase
 {
@@ -45,8 +45,7 @@ class ContactsPageTest extends TestCase
             ->assertSee('Звʼяжіться з коледжем', false)
             // Телефон клікабельний, адреса веде на карти
             ->assertSee('tel:0487531651', false)
-            ->assertSee('Прокласти маршрут')
-            ->assertSee('href="#forma"', false);
+            ->assertSee('Прокласти маршрут');
     }
 
     public function test_contact_cards_come_from_settings(): void
@@ -73,8 +72,8 @@ class ContactsPageTest extends TestCase
         $response->assertDontSee('Прокласти маршрут');
         $response->assertDontSee('Як нас знайти');
         $response->assertDontSee('Ми в соцмережах');
-        // Сама форма лишається — це головна дія сторінки
-        $response->assertSee('Надіслати звернення');
+        // Блок для вступників не залежить від налаштувань
+        $response->assertSee('Плануєте вступати?');
     }
 
     public function test_map_block_renders_when_embed_is_set(): void
@@ -91,32 +90,12 @@ class ContactsPageTest extends TestCase
             ->assertSee('Відкрити в Google Maps');
     }
 
-    public function test_validation_errors_show_summary_and_keep_input(): void
+    public function test_feedback_form_is_gone(): void
     {
-        $this->from('/kontakty')
-            ->post('/kontakty', ['name' => '', 'message' => '', 'email' => 'не-пошта'])
-            ->assertRedirect('/kontakty');
-
-        $this->followingRedirects()
-            ->from('/kontakty')
-            ->post('/kontakty', ['name' => 'Відвідувач', 'message' => '', 'email' => 'не-пошта'])
-            ->assertOk()
-            ->assertSee('форму не надіслано', false)
-            ->assertSee('ring-rose-400', false)
-            // Введене імʼя не губиться
-            ->assertSee('value="Відвідувач"', false);
-    }
-
-    public function test_successful_submission_shows_confirmation(): void
-    {
-        $this->followingRedirects()
-            ->from('/kontakty')
-            ->post('/kontakty', ['name' => 'Відвідувач', 'message' => 'Питання щодо вступу'])
-            ->assertOk()
-            ->assertSee('успішно надіслано', false)
-            ->assertSee('bg-emerald-50', false);
-
-        $this->assertDatabaseHas('feedback_messages', ['name' => 'Відвідувач']);
+        // Функціонал звернень видалено: ні форми, ні POST-маршруту.
+        $this->get('/kontakty')->assertOk()->assertDontSee('Надіслати звернення');
+        $this->post('/kontakty', ['name' => 'Відвідувач', 'message' => 'Питання'])
+            ->assertStatus(405);
     }
 
     public function test_socials_block_uses_settings(): void

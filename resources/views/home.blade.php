@@ -117,38 +117,6 @@
         </section>
     @endif
 
-    {{-- ===================== ВІДГУКИ ===================== --}}
-    @if ($testimonials->isNotEmpty())
-        <section data-reveal class="container-site py-16">
-            <div class="text-center">
-                <h2 class="text-3xl font-extrabold text-slate-900">Відгуки студентів та випускників</h2>
-                <div class="accent-rule mx-auto"></div>
-            </div>
-            <div class="mt-10 grid gap-6 md:grid-cols-3">
-                @foreach ($testimonials as $t)
-                    <figure class="card flex flex-col p-6">
-                        <x-ico name="chat-bubble-bottom-center-text" variant="solid" class="h-7 w-7 text-gold-400" />
-                        <blockquote class="mt-4 flex-1 text-sm leading-relaxed text-slate-600">«{{ $t->quote }}»</blockquote>
-                        <figcaption class="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
-                            @if ($t->photo)
-                                <x-picture :path="$t->photo" :alt="$t->name" loading="lazy" decoding="async"
-                                           class="h-11 w-11 rounded-full object-cover ring-2 ring-brand-100" />
-                            @else
-                                <span class="grid h-11 w-11 place-items-center rounded-full bg-brand-700 text-sm font-bold text-white">{{ $t->initials }}</span>
-                            @endif
-                            <span>
-                                <span class="block text-sm font-bold text-slate-900">{{ $t->name }}</span>
-                                @if ($t->role)
-                                    <span class="block text-xs text-slate-500">{{ $t->role }}</span>
-                                @endif
-                            </span>
-                        </figcaption>
-                    </figure>
-                @endforeach
-            </div>
-        </section>
-    @endif
-
     {{-- ===================== ЦЬОГО ДНЯ В КОЛЕДЖІ ===================== --}}
     @if ($onThisDay)
         @php

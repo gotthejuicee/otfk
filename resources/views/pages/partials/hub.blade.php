@@ -160,9 +160,6 @@
                     <a href="{{ route('contacts') }}" class="btn-primary w-full">
                         Контакти коледжу <x-ico name="arrow-right" class="h-4 w-4" />
                     </a>
-                    <a href="{{ route('applicants.create') }}" class="btn-outline w-full border-gold-300 text-gold-700 ring-gold-300 hover:bg-gold-50">
-                        Залишити заявку <x-ico name="arrow-right" class="h-4 w-4" />
-                    </a>
                 </div>
             </div>
         </aside>

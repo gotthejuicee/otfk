@@ -21,12 +21,13 @@
 | `app/Models/` | 28 Eloquent-моделей + трейт `Concerns/OptimizesUploadedImages` |
 | `app/Services/` | `TelegramPoster` — исходящий постинг новостей в Telegram-канал |
 | `app/Support/` | `ImageOptimizer` (GD → WebP), `BannerOverlay` (inline-CSS градиенты) |
-| `app/Jobs/`, `app/Mail/` | `PostNewsToTelegram`; письма `ApplicantRequestReceived`, `FeedbackReceived` |
+| `app/Jobs/`, `app/Mail/` | `PostNewsToTelegram` (писем больше нет — формы заявок/обращений удалены) |
 | `app/Observers/` | `NewsObserver` — триггер Telegram-автопоста (подключён атрибутом на модели!) |
 | `app/Console/Commands/` | `otfk:backup`, `images:webp` и пять импорт-команд контента старого сайта: `otfk:import-news`, `otfk:import-docs`, `otfk:import-pages`, `otfk:import-staff`, `otfk:import-contacts` (см. «Импорт контента старого сайта»); общий трейт чтения зеркала — `Concerns/ReadsOtfkExport` |
 | `bootstrap/app.php` | Регистрация роутов, health `/up`, кастомные middleware |
 | `config/` | Сток Laravel 12, кроме `blade-icons.php` (отключён дефолтный `<x-icon>`) |
 | `database/migrations/` | Схема **и контент-фикстуры** (см. «Миграции как контент») |
+| `database/content/` | HTML-тела страниц для контент-миграций (сняты со старого otfk.od.ua): `digital-publications/*.html` |
 | `database/seeders/` | `DatabaseSeeder` (админ), `SiteSeeder` (демо-данные, деструктивен!), `QuizSeeder` |
 | `routes/web.php` | Единственный файл роутов (API/webhook-роутов нет) |
 | `routes/console.php` | Расписание: бэкап БД и prune визитов (еженедельно, UTC) |
@@ -47,15 +48,12 @@ flowchart LR
     Home["/ Главная"] --> HomeC[HomeController]
     NewsP["/novyny ..."] --> NewsC[NewsController]
     Pages["/{page:slug} catch-all"] --> PageC[PageController]
-    Forms["/zayavka, /kontakty POST"] --> FormC[Applicant/ContactController]
-    Misc["/podiyi /faq /kviz /dokumenty ..."] --> MiscC[Прочие контроллеры]
+    Misc["/podiyi /faq /kviz /dokumenty /kontakty ..."] --> MiscC[Прочие контроллеры]
   end
   subgraph Admin["Админка /admin"]
-    Filament[Filament 3 Panel<br/>24 Resources + Checklist + Widgets]
+    Filament[Filament 3 Panel<br/>20 Resources + Checklist + Widgets]
   end
-  HomeC & NewsC & PageC & MiscC --> DB[(MySQL / SQLite<br/>~35 таблиц)]
-  FormC --> DB
-  FormC -. afterResponse .-> Mail[SMTP / log mailer]
+  HomeC & NewsC & PageC & MiscC --> DB[(MySQL / SQLite<br/>~32 таблицы)]
   Filament --> DB
   Filament --> Storage[storage/app/public<br/>→ public/storage symlink]
   NewsC -. NewsObserver, afterResponse .-> TG[api.telegram.org]
@@ -70,7 +68,7 @@ flowchart LR
 
 | Метод | Путь | Имя | Обработчик | Что делает | PoC-only |
 |---|---|---|---|---|---|
-| GET | `/` | home | `HomeController@index` | Баннеры, тайлы, статистика, события, новости, видео, отзывы, «В этот день» | нет |
+| GET | `/` | home | `HomeController@index` | Баннеры, тайлы, статистика, события, новости, видео, «В этот день» | нет |
 | GET | `/novyny` | news.index | `NewsController@index` | Список новостей, пагинация 9, фильтры `?category=`, `?year=` | нет |
 | GET | `/novyny/feed.xml` | news.feed | `NewsFeedController` | RSS 30 последних, `max-age=1800` | нет |
 | GET | `/novyny/{news:slug}` | news.show | `NewsController@show` | Статья; +1 просмотр раз в сессию | нет |
@@ -81,7 +79,6 @@ flowchart LR
 | GET | `/podiyi/{event}/ics` | events.ics | `EventController@ics` | Скачивание .ics | нет |
 | GET | `/faq` | faq | `FaqController@index` | FAQ + JSON-LD | нет |
 | GET | `/kviz` | quiz | `QuizController@index` | Профориентационный квиз: вопросы и варианты рендерит сервер (`data-step`/`data-opt`), **скоринг целиком в клиентском Alpine** | **да** (PoC-форма) |
-| GET/POST | `/zayavka` | applicants.* | `ApplicantRequestController` | Заявка абитуриента; honeypot `website`, `throttle:5,1`, письмо afterResponse | нет |
 | GET | `/dokumenty`, `/dokumenty/{cat:slug}` | documents.* | `DocumentController` | Публичная информация: список разделов с клиентским фильтром (Alpine); страница категории — пагинация 20/стр., поиск `?q=` (фильтрация в PHP через `mb_stripos` — SQLite не видит регистра кириллицы в `LIKE`), метаданные файла из акцессоров `Document::file_extension` / `file_size_label` | нет |
 | GET | `/spetsialnosti`, `/spetsialnosti/{slug}` | specialties.* | `SpecialtyController` | Специальности + программы | нет |
 | GET | `/struktura`, `/struktura/{slug}` | structure.* | `StructureController` | Отделения/комиссии + персонал | нет |
@@ -89,14 +86,14 @@ flowchart LR
 | GET | `/personal/{staff:slug}` | staff.show | `StaffController@show` | Персональная страница работника: факты из `bio`, ссылки на CMS-страницы «проф. деятельность»/«повышение квалификации», коллеги по подразделению | нет |
 | GET | `/halereya`, `/halereya/{slug}` | galleries.* | `GalleryController` | Галереи: список с пагинацией (12/стр.) и рекомендованным альбомом; альбом — мозаичная сетка + лайтбокс с перелистыванием, блок «Інші альбоми»; архивный (сепия) режим | нет |
 | GET | `/poshuk`, `/poshuk/pidkazky` | search.* | `SearchController` | поиск по названиям (5 типов, фильтр `?type=`, пагинация 12/стр.) + JSON-подсказки (`throttle:60,1`) | нет |
-| GET/POST | `/kontakty` | contacts.* | `ContactController` | Контакты (карточки из `settings`, карта, соцсети) + форма обратной связи (honeypot, письмо) | нет |
+| GET | `/kontakty` | contacts | `ContactController@index` | Контакты (карточки из `settings`, карта, соцсети); формы обратной связи нет — на otfk.od.ua её тоже нет | нет |
 | GET | `/sitemap.xml`, `/robots.txt` | sitemap, robots | `SitemapController` / closure | Sitemap (без кэша!), robots | нет |
 | GET | `/up` | — | Laravel health | Health-check | нет |
 | GET | `/{page:slug}` | pages.show | `PageController@show` | **Catch-all** CMS-страницы из БД. Обязан быть последним. Шаблон один (`pages/show.blade.php`), но три варианта вёрстки: хаб с дочерними страницами (`partials/hub`), обычная контентная страница с липким сайдбаром и навигацией по заголовкам (`partials/content`), heritage-«письмо» (`partials/neighbours` под ним) | нет |
 
 ### Админка
 
-Ручных админ-роутов **нет** — всё генерирует Filament (`app/Providers/Filament/AdminPanelProvider.php`): путь `/admin`, login/logout/profile встроенные, **регистрация и сброс пароля отключены**. Auto-discovery ресурсов из `app/Filament/Resources` (ApplicantRequest, Banner, Department, Document(+Category), Event, Faq, FeedbackMessage, Gallery, MenuItem, News(+Category), Page, Program, QuickLink, QuizQuestion, Setting, Specialty, Staff, StatItem, Testimonial, User, Video), страницы `ContentChecklist` («Що ще наповнити») и `BellSchedule` («Розклад дзвінків» — форма настроек вместо CRUD), виджеты дашборда (QuickActions, StatsOverview, VisitsChart, TopNews, TopPages, LatestFeedback).
+Ручных админ-роутов **нет** — всё генерирует Filament (`app/Providers/Filament/AdminPanelProvider.php`): путь `/admin`, login/logout/profile встроенные, **регистрация и сброс пароля отключены**. Auto-discovery ресурсов из `app/Filament/Resources` (Banner, Department, Document(+Category), Event, Faq, Gallery, MenuItem, News(+Category), Page, Program, QuickLink, QuizQuestion, Setting, Specialty, Staff, StatItem, User, Video), страницы `ContentChecklist` («Що ще наповнити»; страницы-плитки перехватываемых роутов — `rozklad-dzvinkiv`, `faq`, `kviz` — и хабы с опубликованными детьми не считаются заглушками) и `BellSchedule` («Розклад дзвінків» — форма настроек вместо CRUD), виджеты дашборда (QuickActions, StatsOverview, VisitsChart, TopNews, TopPages).
 
 ### API / webhooks
 
@@ -130,9 +127,8 @@ flowchart LR
 | `videos` | YouTube-ролики (youtube_id → accessors `thumbnail`, `watch_url`, `embed_url`, `private_embed_url` — youtube-nocookie для лайтбокса) |
 | `events` | События; **starts_at хранится как киевское wall-clock время**, UTC — через `utcStart()/utcEnd()` |
 | `bell_periods` | Расписание звонков: `shift` (1/2) + `number` (номер пары внутри смены), `starts`/`ends`, `is_active`; кэш `bell_periods.v2` 600с. Ровно 8 строк — по 4 пары на смену (`BellPeriod::PAIRS_PER_SHIFT`), админка их не создаёт и не удаляет, только правит времена (`updateOrCreate`). Вторая смена целиком скрывается настройкой `bells_second_shift` (`0`/`1`) — фильтрация после кэша, строки в БД остаются |
-| `stat_items`, `testimonials`, `faqs` | Блоки главной («Коледж у цифрах», отзывы, FAQ) |
+| `stat_items`, `faqs` | Блоки главной («Коледж у цифрах») и страница FAQ |
 | `quiz_questions`, `quiz_options` | Квиз: options с points и specialty_id |
-| `applicant_requests`, `feedback_messages` | Заявки и обращения (name, phone, email, ip, is_processed/is_read) |
 | `site_visits` | Аналитика без кук: unique(date, path), без timestamps; спец-путь `_visits` для уникальных визитов; prune > 180 дней |
 | users, sessions, cache, jobs... | Стоковые таблицы Laravel |
 
@@ -154,16 +150,16 @@ flowchart LR
 |---|---|---|
 | `otfk:import-news` | Новости (`content-export/news/*.md`) → `News`; фото копируются в `storage/news/imported/`, первое — обложка; `telegram_posted_at` ставится сразу (без автопоста). Опции: `--dry-run`, `--limit`, `--fresh` | маркер `<!--imported-from:URL-->` в body |
 | `otfk:import-docs` | PDF по мапам `$docMap` (19 разделов → категории документов: 18 из `public_information/*` + `applicant/educational_and_professional_programs` → категория `osvitno-profesiyni-prohramy`, ~60 PDF ОПП/учебных планов) и `$pageMap` (23 страницы) из сохранённого HTML `_raw/html/`; файлы → `storage/documents/…`, `storage/page-files/…`. Опции: `--dry-run`, `--audit`, `--fresh` | дедуп по названию внутри категории; блок `<!--imported-files-->` на страницах |
-| `otfk:import-pages` | Тексты всех содержательных страниц (~203) → CMS `Page`: известные страницы обновляются по мапе «старый путь → slug», новые создаются с транслит-slug и `parent_id` по разделам; картинки/PDF копируются в `storage/imported/{images,files}/<старый путь>`, внутренние ссылки переписываются. Пропускает: новости, `public_information/*`, страницы комиссий/кафедр (их ведёт import-staff), сервисные | маркер `<!--imported-from:URL-->`; повторный запуск обновляет на месте |
+| `otfk:import-pages` | Тексты всех содержательных страниц (~203) → CMS `Page`: известные страницы обновляются по мапе «старый путь → slug», новые создаются с транслит-slug и `parent_id` по разделам; картинки/PDF копируются в `storage/imported/{images,files}/<старый путь>`, внутренние ссылки переписываются. Пропускает: новости, `public_information/*`, страницы комиссий/кафедр (их ведёт import-staff), сервисные | маркер `<!--imported-from:URL-->`; повторный запуск обновляет на месте. Артефакты ранних прогонов (дубли `information-about-college-2`, `akademicna-dobrocesnist`, `administraciia`; кривые названия/слаги каталогов «Цифрові видання у галузях» из `digital_publications_in_industries/*`) чинит data-миграция `2026_08_29_090000_cleanup_imported_pages_…` — тела берёт из `database/content/digital-publications/*.html`, маркеры сохраняет |
 | `otfk:import-staff` | `structure/*` → `Department` (4 відділення, 7 циклових комісій, 3 кафедри) + `Staff` из таблиц «Викладацький склад» и `about_us/leaders_of_the_college.md` (администрация). Ссылки на персональные страницы преподавателей резолвятся в CMS-страницы import-pages → **запускать после `otfk:import-pages`**. Опция `--replace-demo` удаляет только фейковые записи SiteSeeder | `updateOrCreate` по slug / full_name |
 | `otfk:link-opp-programs` | Підв'язує PDF з категорії документів `osvitno-prohramy` (slug `osvitno-profesiyni-prohramy`) до записів `Program` за назвою ОПП (нормалізація апострофів/дефісів, перевага файлам з новим літерним кодом). Потрібна, коли `otfk:import-docs` запускається ПІСЛЯ міграції `import_specialties_content` (типовий випадок на сервері). Опція `--force` — перепривʼязати всі | пропускає програми, де файл уже є |
-| `otfk:import-contacts` | `content-export/contacts.md` → settings: `contact_address/phone/email`, `feedback_email`, `map_embed` + `Cache::forget('settings.map')`; дополнительные телефоны печатает в консоль | `updateOrCreate` по key |
+| `otfk:import-contacts` | `content-export/contacts.md` → settings: `contact_address/phone/email`, `feedback_email` (ключ legacy — приложением больше не используется), `map_embed` + `Cache::forget('settings.map')`; дополнительные телефоны печатает в консоль | `updateOrCreate` по key |
 
 Рекомендуемый порядок полного прогона: `import-docs` → `import-pages` → `import-staff` → `import-news` → `import-contacts`. Ограничения зеркала: 233 iframe-PDF старого сайта — мёртвые (404 и на самом старом сайте; живые 34 дозобраны в зеркало 2026-08-28) — их ссылки/iframe остаются битыми на ~18 импортированных страницах, решение за редакцией (см. SYNC-PLAN.md в каталоге зеркала); у человека одна запись `Staff` (повторы одного преподавателя в нескольких подразделениях схлопываются — последний импортированный побеждает). Тесты — `tests/Feature/ImportFromExportCommandsTest.php` (фикстура-минизеркало `tests/fixtures/otfk-export/`).
 
 ## Фоновая работа без очереди
 
-На хостинге нет queue-воркера, поэтому **всё «фоновое» — `dispatch(...)->afterResponse()`** (выполняется в умирающем PHP-запросе): Telegram-пост, письма форм, WebP-конверсия загрузок. **Не переводить на `ShouldQueue`** — задокументированный запрет (DEPLOY.md).
+На хостинге нет queue-воркера, поэтому **всё «фоновое» — `dispatch(...)->afterResponse()`** (выполняется в умирающем PHP-запросе): Telegram-пост, WebP-конверсия загрузок. **Не переводить на `ShouldQueue`** — задокументированный запрет (DEPLOY.md).
 
 Telegram-автопост: `NewsObserver` (подключён PHP-атрибутом `#[ObservedBy]` на модели `News`, НЕ в провайдере) атомарно ставит `telegram_posted_at` (`whereNull->update`) и диспатчит `PostNewsToTelegram`. Включается тремя настройками из БД: `telegram_autopost === '1'`, `telegram_bot_token`, `telegram_channel`.
 

@@ -230,8 +230,8 @@
                                 @endif
 
                                 <div class="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
-                                    <a href="{{ route('applicants.create') }}?specialty_id={{ $specialty->id }}" class="btn-accent justify-center px-8 py-3.5 text-base">
-                                        Залишити заявку <x-ico name="arrow-right" class="h-4 w-4" />
+                                    <a href="{{ route('contacts') }}" class="btn-accent justify-center px-8 py-3.5 text-base">
+                                        Звʼязатися з коледжем <x-ico name="arrow-right" class="h-4 w-4" />
                                     </a>
                                     <a href="{{ route('specialties.show', $specialty) }}" class="btn-outline justify-center px-8 py-3.5 text-base">
                                         Про спеціальність <x-ico name="arrow-right" class="h-4 w-4" />

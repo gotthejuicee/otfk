@@ -67,7 +67,7 @@ class QuizPageLayoutTest extends TestCase
             ->assertSee('Назад');
     }
 
-    public function test_result_screen_links_to_specialty_and_prefilled_application(): void
+    public function test_result_screen_links_to_specialty_and_contacts(): void
     {
         $specialty = Specialty::published()->ordered()->first();
 
@@ -75,7 +75,7 @@ class QuizPageLayoutTest extends TestCase
             ->assertOk()
             ->assertSee('Твій результат')
             ->assertSee('Як розподілилися твої відповіді')
-            ->assertSee(route('applicants.create').'?specialty_id='.$specialty->id, false)
+            ->assertSee(route('contacts'), false)
             ->assertSee(route('specialties.show', $specialty), false)
             ->assertSee('Пройти ще раз');
     }

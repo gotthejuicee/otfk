@@ -158,8 +158,8 @@
                     @endforeach
                 </dl>
 
-                <a href="{{ route('applicants.create', ['specialty_id' => $specialty->id]) }}" class="btn-primary mt-5 w-full">
-                    Подати заявку <x-ico name="arrow-right" class="h-4 w-4" />
+                <a href="{{ route('contacts') }}" class="btn-primary mt-5 w-full">
+                    Звʼязатися з приймальною комісією <x-ico name="arrow-right" class="h-4 w-4" />
                 </a>
                 <a href="{{ route('quiz') }}" class="btn-outline mt-3 w-full border-gold-300 text-gold-700 ring-gold-300 hover:bg-gold-50">
                     Пройти квіз на вибір спеціальності <x-ico name="arrow-right" class="h-4 w-4" />

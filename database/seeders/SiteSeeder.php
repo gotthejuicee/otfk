@@ -56,7 +56,6 @@ class SiteSeeder extends Seeder
             ['contact_address', 'м. Одеса, вул. Прикладна, 1', 'contacts', 'text'],
             ['contact_phone', '+38 (048) 000-00-00', 'contacts', 'text'],
             ['contact_email', 'info@otfk.od.ua', 'contacts', 'text'],
-            ['feedback_email', '', 'contacts', 'text'],
             ['work_hours', 'Пн-Пт: 08:00-17:00', 'contacts', 'text'],
             ['social_facebook', 'https://www.facebook.com/', 'social', 'url'],
             ['social_instagram', 'https://www.instagram.com/', 'social', 'url'],
@@ -276,8 +275,7 @@ class SiteSeeder extends Seeder
                 'Взаємодія з роботодавцями' => 'vzayemodiya-z-robotodavtsyamy',
             ]],
             'abituriyentu' => ['title' => 'Абітурієнту', 'children' => [
-                // Сторінки-плитки: слаги перехоплюються маршрутами заявки, FAQ та квізу
-                'Залишити заявку' => 'zayavka',
+                // Сторінки-плитки: слаги перехоплюються маршрутами FAQ та квізу
                 'Питання та відповіді' => 'faq',
                 'Яка спеціальність мені підходить?' => 'kviz',
                 'Правила прийому' => 'pravyla-pryyomu', 'Вартість навчання' => 'vartist-navchannya',

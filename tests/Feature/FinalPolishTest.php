@@ -44,7 +44,7 @@ class FinalPolishTest extends TestCase
     {
         $body = $this->get('/sitemap.xml')->assertOk()->getContent();
 
-        foreach (['/podiyi', '/faq', '/rozklad-dzvinkiv', '/zayavka'] as $path) {
+        foreach (['/podiyi', '/faq', '/rozklad-dzvinkiv'] as $path) {
             $this->assertStringContainsString(url($path), $body);
         }
     }

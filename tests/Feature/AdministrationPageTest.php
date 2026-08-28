@@ -143,14 +143,13 @@ class AdministrationPageTest extends TestCase
             ->assertDontSee('Контакти приймальні');
     }
 
-    public function test_final_call_to_action_links_to_application_and_contacts(): void
+    public function test_final_call_to_action_links_to_contacts(): void
     {
         $this->makeTeam();
 
         $this->get('/administratsiya')
             ->assertOk()
             ->assertSee('Потрібна консультація щодо вступу?')
-            ->assertSee('href="' . route('applicants.create') . '"', false)
             ->assertSee('href="' . route('contacts') . '"', false);
     }
 

@@ -302,8 +302,8 @@
                         Обирай спеціальність, яка відкриє для тебе нові можливості.
                     </p>
                     <div class="mt-6 flex flex-wrap gap-3">
-                        <a href="{{ route('applicants.create') }}" class="btn-accent">
-                            Подати заявку <x-ico name="arrow-right" class="h-4 w-4" />
+                        <a href="{{ route('contacts') }}" class="btn-accent">
+                            Звʼязатися з коледжем <x-ico name="arrow-right" class="h-4 w-4" />
                         </a>
                         <a href="{{ route('specialties.index') }}" class="btn-outline">
                             Дізнатися про спеціальності

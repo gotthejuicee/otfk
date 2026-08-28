@@ -91,9 +91,9 @@ class SpecialtyPageTest extends TestCase
             ->assertSee('Обслуговування комп’ютерних систем і мереж')
             ->assertSee('Комп’ютерна графіка і Web-дизайн')
             ->assertSee('Безпека комп’ютерних систем і мереж')
-            // Фінальний блок веде на заявку та квіз
+            // Фінальний блок веде на контакти та квіз
             ->assertSee('Готові зробити перший крок до професії?')
-            ->assertSee(route('applicants.create'), false)
+            ->assertSee(route('contacts'), false)
             ->assertSee(route('quiz'), false);
     }
 
@@ -124,14 +124,12 @@ class SpecialtyPageTest extends TestCase
             ->assertSee('"@type":"Course"', false);
     }
 
-    public function test_show_sidebar_links_to_prefilled_application_and_quiz(): void
+    public function test_show_sidebar_links_to_contacts_and_quiz(): void
     {
         $specialty = $this->makeSpecialty('Облік і оподаткування', 'oblik', '071', 0);
 
         $this->get(route('specialties.show', $specialty))
             ->assertOk()
-            // Заявка відкривається з уже обраною спеціальністю
-            ->assertSee(route('applicants.create', ['specialty_id' => $specialty->id]), false)
             ->assertSee('Пройти квіз на вибір спеціальності')
             ->assertSee(route('quiz'), false)
             // Смуга з виходом на приймальну комісію

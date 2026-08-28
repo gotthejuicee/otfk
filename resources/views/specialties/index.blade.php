@@ -73,8 +73,8 @@
                         </p>
                     </div>
                     <div class="flex flex-wrap gap-3">
-                        <a href="{{ route('applicants.create') }}" class="btn-primary">
-                            Подати заявку <x-ico name="arrow-right" class="h-4 w-4" />
+                        <a href="{{ route('contacts') }}" class="btn-primary">
+                            Звʼязатися з приймальною комісією <x-ico name="arrow-right" class="h-4 w-4" />
                         </a>
                         <a href="{{ route('quiz') }}" class="btn-outline border-gold-300 text-gold-700 ring-gold-300 hover:bg-gold-50">
                             Пройти квіз на вибір спеціальності <x-ico name="arrow-right" class="h-4 w-4" />

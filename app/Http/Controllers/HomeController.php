@@ -19,10 +19,9 @@ class HomeController extends Controller
         $events = Event::published()->upcoming()->limit(3)->get();
         $news = News::published()->recent()->with('category')->limit(6)->get();
         $videos = Video::published()->ordered()->limit(6)->get();
-        $testimonials = \App\Models\Testimonial::active()->limit(3)->get();
         $onThisDay = $this->onThisDay();
 
-        return view('home', compact('banners', 'tiles', 'stats', 'events', 'news', 'videos', 'testimonials', 'onThisDay'));
+        return view('home', compact('banners', 'tiles', 'stats', 'events', 'news', 'videos', 'onThisDay'));
     }
 
     /**

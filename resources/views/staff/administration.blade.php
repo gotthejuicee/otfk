@@ -203,14 +203,11 @@
                 <div class="max-w-2xl">
                     <h2 class="text-2xl font-extrabold text-white">Потрібна консультація щодо вступу?</h2>
                     <p class="mt-2 text-brand-100">
-                        Звертайтеся до приймальної комісії або залиште заявку — ми зв'яжемося з вами.
+                        Звертайтеся до приймальної комісії — підкажемо документи, терміни та наступні кроки.
                     </p>
                 </div>
                 <div class="flex flex-wrap gap-3">
-                    <a href="{{ route('applicants.create') }}" class="btn-accent">
-                        Залишити заявку <x-ico name="arrow-right" class="h-4 w-4" aria-hidden="true" />
-                    </a>
-                    <a href="{{ route('contacts') }}" class="btn-outline bg-transparent text-white ring-white/40 hover:bg-white/10">
+                    <a href="{{ route('contacts') }}" class="btn-accent">
                         Контакти коледжу <x-ico name="arrow-right" class="h-4 w-4" aria-hidden="true" />
                     </a>
                 </div>

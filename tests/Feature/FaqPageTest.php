@@ -126,14 +126,13 @@ class FaqPageTest extends TestCase
             ->assertDontSee('дзвінки у робочий час');
     }
 
-    public function test_page_leads_to_application_and_contacts(): void
+    public function test_page_leads_to_contacts(): void
     {
         $this->makeFaq('Питання?');
 
         $this->get('/faq')
             ->assertOk()
             ->assertSee('Є питання щодо вступу?')
-            ->assertSee(route('applicants.create'), false)
             ->assertSee(route('contacts'), false);
     }
 

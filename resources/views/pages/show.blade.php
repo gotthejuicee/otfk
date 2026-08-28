@@ -165,11 +165,11 @@
                         </p>
                     </div>
                     <div class="flex flex-wrap gap-3">
-                        <a href="{{ route('applicants.create') }}" class="btn-accent">
-                            Подати заявку <x-ico name="arrow-right" class="h-4 w-4" />
-                        </a>
-                        <a href="{{ route('contacts') }}" class="btn-outline border-white/30 bg-white/5 text-white ring-white/30 hover:bg-white/10">
+                        <a href="{{ route('contacts') }}" class="btn-accent">
                             Контакти <x-ico name="arrow-right" class="h-4 w-4" />
+                        </a>
+                        <a href="{{ route('faq') }}" class="btn-outline border-white/30 bg-white/5 text-white ring-white/30 hover:bg-white/10">
+                            Часті запитання <x-ico name="arrow-right" class="h-4 w-4" />
                         </a>
                     </div>
                 </div>

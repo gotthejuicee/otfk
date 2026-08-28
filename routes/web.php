@@ -32,11 +32,6 @@ Route::get('/podiyi/{event}/ics', [App\Http\Controllers\EventController::class, 
 Route::get('/faq', [App\Http\Controllers\FaqController::class, 'index'])->name('faq');
 Route::get('/kviz', [App\Http\Controllers\QuizController::class, 'index'])->name('quiz');
 
-// Заявка абітурієнта
-Route::get('/zayavka', [App\Http\Controllers\ApplicantRequestController::class, 'create'])->name('applicants.create');
-Route::post('/zayavka', [App\Http\Controllers\ApplicantRequestController::class, 'store'])
-    ->middleware('throttle:5,1')->name('applicants.store');
-
 // Публічна інформація (документи)
 Route::get('/dokumenty', [DocumentController::class, 'index'])->name('documents.index');
 Route::get('/dokumenty/{documentCategory:slug}', [DocumentController::class, 'category'])->name('documents.category');
@@ -61,7 +56,6 @@ Route::get('/poshuk/pidkazky', [SearchController::class, 'suggest'])
     ->middleware('throttle:60,1')->name('search.suggest');
 
 Route::get('/kontakty', [ContactController::class, 'index'])->name('contacts');
-Route::post('/kontakty', [ContactController::class, 'store'])->middleware('throttle:5,1')->name('contacts.store');
 
 // SEO
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');

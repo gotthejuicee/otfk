@@ -17,7 +17,7 @@ class SitemapController extends Controller
 
         // Статичні розділи: пріоритет вручну, без точної дати зміни.
         $sections = [
-            'news.index' => '0.9', 'specialties.index' => '0.9', 'applicants.create' => '0.9',
+            'news.index' => '0.9', 'specialties.index' => '0.9',
             'events' => '0.8', 'documents.index' => '0.6', 'structure.index' => '0.6',
             'galleries.index' => '0.6', 'contacts' => '0.6', 'faq' => '0.6',
             'staff.administration' => '0.5', 'video.index' => '0.5', 'bells' => '0.5',
