@@ -108,7 +108,10 @@
     @endif
 
     {{-- ============================ ШАПКА ============================ --}}
-    <header x-data="{ mobile: false, scrolled: false }" @scroll.window.throttle.50ms="scrolled = window.scrollY > 40">
+    <header x-data="{ mobile: false, scrolled: false }"
+            x-effect="document.body.classList.toggle('overflow-hidden', mobile)"
+            @keydown.escape.window="mobile = false"
+            @scroll.window.throttle.50ms="scrolled = window.scrollY > 40">
         {{-- Утилітарна стрічка --}}
         <div class="hidden bg-brand-950 text-brand-100 lg:block">
             <div class="mx-auto flex h-9 w-full max-w-[1600px] items-center justify-between px-4 text-xs sm:px-6 lg:px-8">
@@ -165,17 +168,17 @@
             {{-- Ряд бренду та дій --}}
             <div class="border-b border-transparent bg-white shadow-sm transition-[box-shadow,background-color,border-color] duration-300"
                  :class="scrolled ? 'border-slate-200/80 bg-white/90 shadow-md backdrop-blur-md' : ''">
-                <div class="mx-auto flex h-20 w-full max-w-[1600px] items-center justify-between gap-6 px-4 sm:px-6 lg:px-8">
-                <a href="{{ route('home') }}" class="flex shrink-0 items-center gap-3">
+                <div class="mx-auto flex h-16 w-full max-w-[1600px] items-center justify-between gap-3 px-4 sm:h-20 sm:gap-6 sm:px-6 lg:px-8">
+                <a href="{{ route('home') }}" class="flex min-w-0 items-center gap-2.5 sm:shrink-0 sm:gap-3">
                     @if ($logo)
-                        <img src="{{ $logo }}" alt="ОТФК ОНТУ" class="h-12 w-auto shrink-0 lg:h-16">
+                        <img src="{{ $logo }}" alt="ОТФК ОНТУ" class="h-10 w-auto shrink-0 sm:h-12 lg:h-16">
                     @else
-                        <span class="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-700 to-brand-900 text-white shadow-sm">
+                        <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-700 to-brand-900 text-white shadow-sm sm:h-12 sm:w-12">
                             <x-ico name="academic-cap" class="h-7 w-7" />
                         </span>
                     @endif
-                    <span class="leading-tight">
-                        <span class="font-display block whitespace-nowrap text-lg font-extrabold tracking-tight text-brand-900">{{ $s['brand_short'] ?? 'ОТФК ОНТУ' }}</span>
+                    <span class="min-w-0 leading-tight">
+                        <span class="font-display block truncate text-base font-extrabold tracking-tight text-brand-900 sm:whitespace-nowrap sm:text-lg">{{ $s['brand_short'] ?? 'ОТФК ОНТУ' }}</span>
                         <span class="hidden whitespace-nowrap text-xs text-slate-500 sm:block">{{ $s['brand_name'] ?? 'Одеський технічний фаховий коледж' }}</span>
                     </span>
                 </a>
@@ -207,13 +210,15 @@
                         </div>
                     </div>
                     {{-- CTA --}}
-                    <a href="{{ url('/abituriyentu') }}" class="btn-accent group hidden whitespace-nowrap sm:inline-flex">
+                    {{-- Головна дія абітурієнта — лишається в шапці й на телефоні, лише компактніша --}}
+                    <a href="{{ url('/abituriyentu') }}" class="btn-accent group h-11 whitespace-nowrap px-3 text-xs sm:h-auto sm:px-5 sm:text-sm">
                         Вступнику
-                        <x-ico name="arrow-right" class="ml-1.5 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                        <x-ico name="arrow-right" class="ml-1.5 hidden h-4 w-4 transition-transform group-hover:translate-x-0.5 sm:block" />
                     </a>
                     {{-- Мобільні дії --}}
-                    <a href="{{ route('search') }}" class="btn-ghost p-2 lg:hidden" aria-label="Пошук"><x-ico name="magnifying-glass" class="h-5 w-5" /></a>
-                    <button @click="mobile = true" class="btn-ghost p-2 xl:hidden" aria-label="Меню"><x-ico name="bars-3" class="h-6 w-6" /></button>
+                    <a href="{{ route('search') }}" class="btn-ghost hidden h-11 w-11 p-0 sm:inline-flex lg:hidden" aria-label="Пошук"><x-ico name="magnifying-glass" class="h-5 w-5" /></a>
+                    <button @click="mobile = true" class="btn-ghost h-11 w-11 p-0 xl:hidden" aria-label="Меню"
+                            aria-controls="mobile-menu" :aria-expanded="mobile ? 'true' : 'false'"><x-ico name="bars-3" class="h-6 w-6" /></button>
                 </div>
                 </div>
             </div>
@@ -258,13 +263,18 @@
         </div>
 
         {{-- Мобільне меню (off-canvas) --}}
-        <div x-show="mobile" x-cloak class="fixed inset-0 z-50 xl:hidden">
+        <div id="mobile-menu" x-show="mobile" x-cloak class="fixed inset-0 z-50 xl:hidden">
             <div @click="mobile = false" class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
             <div class="absolute right-0 top-0 flex h-full w-80 max-w-[88%] flex-col bg-white shadow-2xl"
                  x-transition:enter="transition ease-out duration-200" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0">
-                <div class="flex h-16 items-center justify-between border-b border-slate-200 px-5">
-                    <span class="font-display font-extrabold text-brand-900">Меню</span>
-                    <button @click="mobile = false" class="btn-ghost p-2"><x-ico name="x-mark" class="h-6 w-6" /></button>
+                <div class="flex h-16 items-center justify-between border-b border-slate-200 pl-4 pr-2">
+                    <span class="flex min-w-0 items-center gap-2.5">
+                        @if ($logo)
+                            <img src="{{ $logo }}" alt="" aria-hidden="true" class="h-9 w-auto shrink-0">
+                        @endif
+                        <span class="font-display truncate font-extrabold text-brand-900">{{ $s['brand_short'] ?? 'ОТФК ОНТУ' }}</span>
+                    </span>
+                    <button @click="mobile = false" class="btn-ghost h-11 w-11 shrink-0 p-0" aria-label="Закрити меню"><x-ico name="x-mark" class="h-6 w-6" /></button>
                 </div>
                 <div class="border-b border-slate-100 p-4">
                     <div x-data="liveSearch(@js(route('search.suggest')), @js(route('search')))" class="relative">
@@ -284,13 +294,27 @@
                             <a :href="allUrl()" class="block border-t border-slate-100 px-3.5 py-2.5 text-sm font-semibold text-brand-700">Усі результати →</a>
                         </div>
                     </div>
-                    <a href="{{ url('/abituriyentu') }}" class="btn-accent mt-3 w-full">Вступнику</a>
+                    <a href="{{ url('/abituriyentu') }}" class="btn-accent mt-3 w-full py-3">Вступнику</a>
+                    {{-- Три найчастіші дії з телефона — щоб не шукати їх у 12 пунктах меню --}}
+                    <div class="mt-3 grid grid-cols-3 gap-2">
+                        @foreach ([
+                            ['url' => route('specialties.index'), 'icon' => 'academic-cap', 'label' => 'Спеціальності'],
+                            ['url' => route('bells'), 'icon' => 'clock', 'label' => 'Дзвінки'],
+                            ['url' => route('contacts'), 'icon' => 'map-pin', 'label' => 'Контакти'],
+                        ] as $quick)
+                            <a href="{{ $quick['url'] }}"
+                               class="flex flex-col items-center gap-1.5 rounded-xl bg-slate-50 px-2 py-3 text-center text-[11px] font-semibold leading-tight text-slate-700 ring-1 ring-slate-200 transition hover:bg-brand-50 hover:text-brand-800">
+                                <x-ico :name="$quick['icon']" class="h-5 w-5 text-brand-700" />
+                                {{ $quick['label'] }}
+                            </a>
+                        @endforeach
+                    </div>
                 </div>
                 <nav class="flex-1 overflow-y-auto p-3">
                     @foreach ($menu as $item)
                         @if ($item->children->isNotEmpty())
                             <div x-data="{ sub: false }" class="border-b border-slate-100">
-                                <button @click="sub = !sub" class="flex w-full items-center justify-between px-3 py-3 text-sm font-semibold text-slate-800">
+                                <button @click="sub = !sub" class="flex w-full items-center justify-between px-3 py-3.5 text-sm font-semibold text-slate-800">
                                     {{ $item->label }}
                                     <x-ico name="chevron-down" class="h-4 w-4 transition" ::class="sub && 'rotate-180'" />
                                 </button>
@@ -299,7 +323,7 @@
                                         <a href="{{ $child->href }}" @if ($child->open_new_tab) target="_blank" @endif
                                            @if ($navCurrent($child->href)) aria-current="page" @endif
                                            @class([
-                                               'block rounded-lg px-5 py-2 text-sm hover:bg-brand-50 hover:text-brand-800',
+                                               'block rounded-lg px-5 py-2.5 text-sm hover:bg-brand-50 hover:text-brand-800',
                                                'text-slate-600' => ! $navCurrent($child->href),
                                                'bg-brand-50 font-semibold text-brand-800' => $navCurrent($child->href),
                                            ])>{{ $child->label }}</a>
@@ -310,13 +334,39 @@
                             <a href="{{ $item->href }}" @if ($item->open_new_tab) target="_blank" @endif
                                @if ($navCurrent($item->href)) aria-current="page" @endif
                                @class([
-                                   'block border-b border-slate-100 px-3 py-3 text-sm font-semibold hover:text-brand-800',
+                                   'block border-b border-slate-100 px-3 py-3.5 text-sm font-semibold hover:text-brand-800',
                                    'text-slate-800' => ! $navCurrent($item->href),
                                    'text-brand-700' => $navCurrent($item->href),
                                ])>{{ $item->label }}</a>
                         @endif
                     @endforeach
                 </nav>
+                {{-- Утилітарна стрічка прихована на мобільному — її вміст живе тут --}}
+                <div class="border-t border-slate-200 bg-slate-50 px-4 py-4 text-sm">
+                    @if (! empty($s['contact_phone']))
+                        <a href="tel:{{ preg_replace('/[^+\d]/', '', $s['contact_phone']) }}" class="flex items-center gap-2.5 py-2 font-semibold text-brand-800">
+                            <x-ico name="phone" class="h-4 w-4 text-gold-600" /> {{ $s['contact_phone'] }}
+                        </a>
+                    @endif
+                    @if (! empty($s['contact_email']))
+                        <a href="mailto:{{ $s['contact_email'] }}" class="flex items-center gap-2.5 py-2 text-slate-600">
+                            <x-ico name="envelope" class="h-4 w-4 text-gold-600" /> {{ $s['contact_email'] }}
+                        </a>
+                    @endif
+                    <div class="mt-2 flex items-center gap-3">
+                        @if (! empty($s['social_facebook']))
+                            <a href="{{ $s['social_facebook'] }}" target="_blank" rel="noopener" aria-label="Facebook коледжу"
+                               class="grid h-10 w-10 place-items-center rounded-full bg-white text-brand-700 ring-1 ring-slate-200"><x-brand-ico name="facebook" class="h-4 w-4" /></a>
+                        @endif
+                        @if (! empty($s['social_instagram']))
+                            <a href="{{ $s['social_instagram'] }}" target="_blank" rel="noopener" aria-label="Instagram коледжу"
+                               class="grid h-10 w-10 place-items-center rounded-full bg-white text-brand-700 ring-1 ring-slate-200"><x-brand-ico name="instagram" class="h-4 w-4" /></a>
+                        @endif
+                        <a href="{{ url('/admin') }}" class="ml-auto inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500">
+                            <x-ico name="lock-closed" class="h-3.5 w-3.5" /> Адмінпанель
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </header>
