@@ -273,7 +273,7 @@ class SiteSeeder extends Seeder
                 'Яка спеціальність мені підходить?' => 'kviz',
                 'Правила прийому' => 'pravyla-pryyomu', 'Вартість навчання' => 'vartist-navchannya',
                 'Наші спеціальності' => ['url', '/spetsialnosti'],
-                'Освітньо-професійні програми' => ['url', '/spetsialnosti'],
+                'Освітньо-професійні програми' => ['url', '/dokumenty/osvitno-profesiyni-prohramy'],
                 'Розклад вступних випробувань' => 'rozklad-vstupnykh-vyprobuvan',
                 'Результати вступних іспитів' => 'rezultaty-vstupnykh-ispytiv', 'Рейтингові списки' => 'reytynhovi-spysky',
             ]],

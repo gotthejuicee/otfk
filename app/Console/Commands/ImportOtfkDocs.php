@@ -43,6 +43,10 @@ class ImportOtfkDocs extends Command
         // Звірено із sitemap.json дзеркала site-audit/2026-08-28: єдиний розділ
         // public_information/*, якого бракувало в мапі (категорія вже існує в БД).
         '/public_information/tot_acception/' => 'vyznannya-rezultativ-tot',
+        // Освітньо-професійні програми та навчальні плани (~62 PDF) — окремий
+        // розділ «Абітурієнту» на старому сайті; категорію створює міграція
+        // 2026_08_28_190000_seed_opp_document_category_and_menu.
+        '/applicant/educational_and_professional_programs/' => 'osvitno-profesiyni-prohramy',
     ];
 
     /** Сторінка old-сайту => slug нашої СТОРІНКИ (файли вставляються в тіло сторінки). */
