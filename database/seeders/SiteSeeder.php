@@ -77,7 +77,7 @@ class SiteSeeder extends Seeder
             ['home_tile', 'Студенту', 'Навчання, гуртожиток, життя коледжу', '/studentu', 'user-group', 'gold', 2],
             ['home_tile', 'Про коледж', 'Історія, адміністрація, структура', '/pro-koledzh', 'building-library', 'brand', 3],
             ['home_tile', 'Публічна інформація', 'Документи, звіти, нормативна база', '/dokumenty', 'document-text', 'gold', 4],
-            ['footer_partner', 'ОНТУ', null, 'https://onaft.edu.ua', null, 'brand', 1],
+            ['footer_partner', 'ОНТУ', null, 'https://ontu.edu.ua', null, 'brand', 1],
             ['footer_partner', 'МОН України', null, 'https://mon.gov.ua', null, 'brand', 2],
         ];
 

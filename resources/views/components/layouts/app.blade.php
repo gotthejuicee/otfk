@@ -398,7 +398,7 @@
                     $partnerList = $partners->isNotEmpty()
                         ? $partners->map(fn ($p) => ['url' => $p->url, 'title' => $p->title, 'blank' => (bool) $p->open_new_tab])
                         : collect([
-                            ['url' => 'https://onaft.edu.ua', 'title' => 'ОНТУ', 'blank' => true],
+                            ['url' => 'https://ontu.edu.ua', 'title' => 'ОНТУ', 'blank' => true],
                             ['url' => 'https://mon.gov.ua', 'title' => 'МОН України', 'blank' => true],
                         ]);
                 @endphp
