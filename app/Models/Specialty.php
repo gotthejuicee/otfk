@@ -36,22 +36,29 @@ class Specialty extends Model
 
     /**
      * Декоративна іконка напряму підготовки — обкладинок у спеціальностей немає,
-     * тож картки тримаються на коді та іконці. Спершу точний код, далі галузь знань
-     * (перші дві цифри коду), інакше — загальна «академічна шапочка».
+     * тож картки тримаються на коді та іконці. Спершу точний код (нові літерні
+     * та старі числові), далі галузь знань (літера або перші дві цифри),
+     * інакше — загальна «академічна шапочка».
      */
     public function getIconNameAttribute(): string
     {
-        $code = preg_replace('/\D/', '', (string) $this->code);
+        $code = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', (string) $this->code));
 
         return match ($code) {
-            '121' => 'code-bracket',
-            '123' => 'cpu-chip',
-            '181' => 'beaker',
+            'F2', '121' => 'code-bracket',
+            'F7', '123' => 'cpu-chip',
+            'G13', '181' => 'beaker',
             '071' => 'calculator',
-            default => match (substr($code, 0, 2)) {
-                '12' => 'computer-desktop',
-                '18' => 'beaker',
-                '07' => 'chart-bar',
+            'D2' => 'banknotes',
+            'D3' => 'briefcase',
+            'D5' => 'megaphone',
+            'D7' => 'scale',
+            'G4' => 'wrench-screwdriver',
+            'G15' => 'scissors',
+            default => match (true) {
+                str_starts_with($code, 'F'), str_starts_with($code, '12') => 'computer-desktop',
+                str_starts_with($code, 'G'), str_starts_with($code, '18') => 'wrench-screwdriver',
+                str_starts_with($code, 'D'), str_starts_with($code, '07') => 'chart-bar',
                 default => 'academic-cap',
             },
         };

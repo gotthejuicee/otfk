@@ -139,30 +139,40 @@ class SiteSeeder extends Seeder
     private function specialties(): void
     {
         $items = [
-            ['Інженерія програмного забезпечення', 'inzheneriya-programnoho-zabezpechennya', '121'],
-            ['Комп’ютерна інженерія', 'kompyuterna-inzheneriya', '123'],
-            ['Харчові технології', 'kharchovi-tekhnolohiyi', '181'],
+            ['Інженерія програмного забезпечення', 'inzheneriya-programnoho-zabezpechennya', 'F2'],
+            ['Комп’ютерна інженерія', 'kompyuterna-inzheneriya', 'F7'],
+            ['Харчові технології', 'kharchovi-tekhnolohiyi', 'G13'],
             ['Облік і оподаткування', 'oblik-i-opodatkuvannya', '071'],
         ];
 
         foreach ($items as $i => [$title, $slug, $code]) {
-            $sp = Specialty::updateOrCreate(['slug' => $slug], [
-                'title' => $title,
-                'code' => $code,
-                'short_description' => 'Сучасна підготовка фахівців за спеціальністю «' . $title . '».',
-                'description' => $this->placeholder($title),
-                'degree' => 'Фаховий молодший бакалавр',
-                'study_form' => 'Денна, заочна',
-                'duration' => 'на основі 9 класів - 3 р. 10 міс.',
-                'sort_order' => $i,
-                'is_published' => true,
-            ]);
-            $sp->programs()->delete();
-            $sp->programs()->create([
-                'title' => 'Освітньо-професійна програма «' . $title . '»',
-                'description' => 'Демонстраційний запис. Завантажте файл програми через адмінпанель.',
-                'sort_order' => 0,
-            ]);
+            // Реальні описи та ОПП завозить міграція import_specialties_content —
+            // сидер їх не перетирає: заглушки й демо-програма лише для нових записів.
+            $sp = Specialty::firstOrNew(['slug' => $slug]);
+
+            if (! $sp->exists) {
+                $sp->fill([
+                    'title' => $title,
+                    'code' => $code,
+                    'short_description' => 'Сучасна підготовка фахівців за спеціальністю «' . $title . '».',
+                    'description' => $this->placeholder($title),
+                    'degree' => 'Фаховий молодший бакалавр',
+                    'study_form' => 'Денна, заочна',
+                    'duration' => 'на основі 9 класів - 3 р. 10 міс.',
+                    'sort_order' => $i,
+                    'is_published' => true,
+                ]);
+            }
+
+            $sp->save();
+
+            if ($sp->programs()->doesntExist()) {
+                $sp->programs()->create([
+                    'title' => 'Освітньо-професійна програма «' . $title . '»',
+                    'description' => 'Демонстраційний запис. Завантажте файл програми через адмінпанель.',
+                    'sort_order' => 0,
+                ]);
+            }
         }
     }
 

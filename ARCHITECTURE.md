@@ -123,7 +123,7 @@ flowchart LR
 | `settings` | Key-value (key unique, group, type — тип виджета в Filament); кэш `settings.map` 600с. Соцсети: `social_facebook`, `social_instagram` (шапка + футер), `social_youtube` (блок-призыв на `/video`; пустое значение — блок скрыт). `bells_second_shift` — показывать ли вторую смену на `/rozklad-dzvinkiv` (кнопка-переключатель в разделе «Розклад дзвінків») |
 | `banners` | Слайдер главной: image, image_alt, окно дат starts_at/ends_at |
 | `documents`, `document_categories` | Публичная информация: file_path или external_url (external — приоритет) |
-| `specialties`, `programs` | Специальности (slug, code 121/123/181/071...) + файлы программ |
+| `specialties`, `programs` | Специальности (slug, code — новые буквенные F2/F7/G13/D2…/071) + файлы программ; реальные описания и ОПП завозит миграция `import_specialties_content` |
 | `departments`, `staff` | Структура (type: viddilennya/tsyklova-komisiya/kafedra) и персонал (category: administration/teacher); `staff.slug` — unique, автогенерация из ПИБ в `Staff::booted()`, адрес персональной страницы |
 | `galleries`, `photos` | Фотоальбомы; `is_archive` → сепия-режим |
 | `videos` | YouTube-ролики (youtube_id → accessors `thumbnail`, `watch_url`, `embed_url`, `private_embed_url` — youtube-nocookie для лайтбокса) |
@@ -142,7 +142,7 @@ flowchart LR
 ### Сидеры
 
 - `DatabaseSeeder` — админ (env или дефолт) → `SiteSeeder` → `QuizSeeder`.
-- `SiteSeeder` — **демо-данные и деструктивен при повторном запуске**: делает `delete()` по `menu_items`, `staff`, `videos`, `banners` и документам/программам сидируемых категорий. Никогда не запускать `db:seed` на живом проде с реальным контентом.
+- `SiteSeeder` — **демо-данные и деструктивен при повторном запуске**: делает `delete()` по `menu_items`, `staff`, `videos`, `banners` и документам сидируемых категорий. Исключение — специальности: их сидер создаёт только при отсутствии записи и не перетирает контент миграции `import_specialties_content` (демо-программу добавляет лишь специальности без единой ОПП). Никогда не запускать `db:seed` на живом проде с реальным контентом.
 - `QuizSeeder` — 6 вопросов × 4 варианта, привязка к специальностям по `code`; идемпотентен; также вызывается изнутри миграции `2026_06_12_100000_create_quiz_tables`.
 
 ## Импорт контента старого сайта (otfk:import-*)
