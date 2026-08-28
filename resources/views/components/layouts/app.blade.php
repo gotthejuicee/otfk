@@ -130,8 +130,8 @@
                             <x-ico name="envelope" class="h-3.5 w-3.5 text-gold-300" /> {{ $s['contact_email'] }}
                         </a>
                     @endif
-                    {{-- Жива позначка «зараз йде пара» (з розкладу дзвінків) --}}
-                    @php $bellPeriods = \App\Models\BellPeriod::active(); @endphp
+                    {{-- Жива позначка «зараз йде пара» (з розкладу дзвінків; вимикається перемикачем в адмінці) --}}
+                    @php $bellPeriods = \App\Models\BellPeriod::chipEnabled() ? \App\Models\BellPeriod::active() : collect(); @endphp
                     @if ($bellPeriods->isNotEmpty())
                         <a href="{{ route('bells') }}"
                            x-data="bellChip(@js($bellPeriods->map(fn ($b) => ['n' => $b->number, 'sh' => $b->shift, 's' => substr($b->starts, 0, 5), 'e' => substr($b->ends, 0, 5)])->values()))"

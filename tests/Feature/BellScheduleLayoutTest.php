@@ -2,8 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\BellPeriodResource;
-use App\Filament\Resources\BellPeriodResource\Pages\ListBellPeriods;
+use App\Filament\Pages\BellSchedule;
 use App\Models\BellPeriod;
 use App\Models\Setting;
 use App\Models\User;
@@ -60,27 +59,57 @@ class BellScheduleLayoutTest extends TestCase
             ->assertDontSee('12:50 – 14:00');
     }
 
-    public function test_admin_screen_lists_pairs_of_both_shifts(): void
+    public function test_admin_screen_shows_fixed_pairs_of_both_shifts(): void
     {
         $admin = User::firstOrFail(); // створюється сидером
 
-        $this->actingAs($admin)->get(BellPeriodResource::getUrl('index'))
+        $this->actingAs($admin)->get(BellSchedule::getUrl())
             ->assertOk()
-            ->assertSee('Вимкнути другу зміну')
-            ->assertSee('2 зміна');
+            ->assertSee('1 зміна')
+            ->assertSee('2 зміна')
+            ->assertSee('Показувати другу зміну')
+            ->assertSee('Показувати у верхньому меню, яка пара йде зараз')
+            ->assertDontSee('Створити');
     }
 
-    public function test_admin_button_toggles_second_shift(): void
+    public function test_admin_form_saves_times_and_toggles(): void
     {
         $this->actingAs(User::firstOrFail());
 
-        Livewire::test(ListBellPeriods::class)->callAction('toggleSecondShift');
-        $this->forgetCaches();
-        $this->assertFalse(BellPeriod::secondShiftEnabled());
+        Livewire::test(BellSchedule::class)
+            ->assertFormSet(['second_shift' => true, 'now_chip' => true])
+            ->fillForm(['s1_1_starts' => '08:00', 's1_1_ends' => '09:10', 'second_shift' => false, 'now_chip' => false])
+            ->call('save')
+            ->assertHasNoFormErrors();
 
-        Livewire::test(ListBellPeriods::class)->callAction('toggleSecondShift');
         $this->forgetCaches();
-        $this->assertTrue(BellPeriod::secondShiftEnabled());
+
+        $this->assertSame('08:00', substr((string) BellPeriod::where('shift', 1)->where('number', 1)->value('starts'), 0, 5));
+        $this->assertFalse(BellPeriod::secondShiftEnabled());
+        $this->assertFalse(BellPeriod::chipEnabled());
+
+        // Кількість пар фіксована: 4 на кожну зміну.
+        $this->assertSame(8, BellPeriod::count());
+    }
+
+    public function test_admin_form_rejects_end_before_start(): void
+    {
+        $this->actingAs(User::firstOrFail());
+
+        Livewire::test(BellSchedule::class)
+            ->fillForm(['s1_1_starts' => '10:00', 's1_1_ends' => '09:00'])
+            ->call('save')
+            ->assertHasFormErrors(['s1_1_ends']);
+    }
+
+    public function test_header_chip_is_hidden_by_setting(): void
+    {
+        $this->get('/')->assertOk()->assertSee('bellChip(', false);
+
+        BellPeriod::setFlag(BellPeriod::NOW_CHIP_SETTING, false);
+        $this->forgetCaches();
+
+        $this->get('/')->assertOk()->assertDontSee('bellChip(', false);
     }
 
     public function test_long_break_is_not_highlighted_statically(): void

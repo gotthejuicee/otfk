@@ -244,7 +244,9 @@ class ImportOtfkPages extends Command
     /** Всі md-файли content-export, крім новин та карт/службових файлів. */
     private function collectMarkdownFiles(): array
     {
-        $root = $this->exportPath('content-export');
+        // Шляхи нормалізуємо до "/" — на Windows ітератор віддає їх з "\",
+        // і префікс $root тоді не відрізається (news/ та files/ не відсіювались).
+        $root = str_replace('\\', '/', $this->exportPath('content-export'));
         $out = [];
 
         $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS));
@@ -253,11 +255,12 @@ class ImportOtfkPages extends Command
             if ($f->getExtension() !== 'md') {
                 continue;
             }
-            $rel = Str::after($f->getPathname(), $root . '/');
+            $pathname = str_replace('\\', '/', $f->getPathname());
+            $rel = Str::after($pathname, $root . '/');
             if (Str::startsWith($rel, ['news/', 'files/', 'images/'])) {
                 continue;
             }
-            $out[] = $f->getPathname();
+            $out[] = $pathname;
         }
 
         sort($out);
@@ -329,7 +332,10 @@ class ImportOtfkPages extends Command
     private function resolveParentId(string $path): ?int
     {
         $ancestor = $path;
-        while (($ancestor = rtrim(dirname($ancestor), '/')) !== '' && $ancestor !== '/') {
+        // dirname() на Windows повертає для "/section" саме "\", тож без заміни
+        // сепаратора умова виходу ніколи не спрацьовує і цикл стає нескінченним.
+        while (($ancestor = rtrim(str_replace('\\', '/', dirname($ancestor)), '/')) !== ''
+            && ! in_array($ancestor, ['/', '.'], true)) {
             $mapped = $this->existingMap[$ancestor] ?? null;
             $page = $mapped
                 ? Page::where('slug', $mapped)->first()
