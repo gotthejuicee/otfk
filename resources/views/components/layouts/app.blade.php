@@ -67,7 +67,8 @@
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700|manrope:600,700,800|cormorant-garamond:400,500,600,700|lora:400,500,600,700&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="flex min-h-screen flex-col bg-white text-slate-700">
+{{-- Фон body задається в app.css (брендові засвітки + сітка з крапок), тому без bg-white --}}
+<body class="flex min-h-screen flex-col text-slate-700">
 
     {{-- Пропустити навігацію (зʼявляється лише при фокусі з клавіатури) --}}
     <a href="#main-content"
