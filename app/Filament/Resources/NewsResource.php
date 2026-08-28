@@ -29,6 +29,7 @@ class NewsResource extends Resource
                 ->label('Заголовок')->required()->maxLength(255)->columnSpanFull(),
             Forms\Components\TextInput::make('slug')
                 ->label('URL (slug)')->maxLength(255)
+                ->prefix(url('/novyny') . '/')
                 ->helperText('Залиште порожнім - згенерується автоматично.'),
             Forms\Components\Select::make('category_id')
                 ->label('Категорія')->relationship('category', 'title')->searchable()->preload(),
@@ -67,6 +68,23 @@ class NewsResource extends Resource
                     ->tooltip(fn ($state) => $state ? 'Опубліковано в Telegram' : 'Не публікувалось у Telegram'),
             ])
             ->defaultSort('published_at', 'desc')
+            ->filters([
+                Tables\Filters\SelectFilter::make('category_id')->label('Категорія')
+                    ->relationship('category', 'title')->preload(),
+                Tables\Filters\SelectFilter::make('year')->label('Рік')
+                    ->options(fn () => News::query()->whereNotNull('published_at')
+                        ->pluck('published_at')
+                        ->map(fn ($date) => $date->format('Y'))
+                        ->unique()->sortDesc()->values()
+                        ->mapWithKeys(fn ($year) => [$year => $year])->all())
+                    ->query(fn ($query, array $data) => filled($data['value'] ?? null)
+                        ? $query->whereYear('published_at', $data['value'])
+                        : $query),
+                Tables\Filters\TernaryFilter::make('is_published')->label('Публікація')
+                    ->trueLabel('Опубліковані')->falseLabel('Лише чернетки')->placeholder('Всі'),
+            ])
+            ->emptyStateHeading('Новин ще немає')
+            ->emptyStateDescription('Новини зʼявляються на головній та на сторінці «Новини». Створіть першу новину - за потреби її можна зберегти чернеткою і опублікувати пізніше.')
             ->actions([
                 Tables\Actions\EditAction::make(),
                 ViewOnSite::table(fn (News $record) => route('news.show', $record)),

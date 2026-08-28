@@ -36,7 +36,8 @@ class MenuItemResource extends Resource
                 ->helperText('Для типу «Сторінка».'),
             Forms\Components\TextInput::make('url')->label('Посилання / назва маршруту')->maxLength(255)
                 ->helperText('Для типів «Зовнішнє посилання» (URL) або «Системний маршрут» (напр. home, news.index).'),
-            Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0),
+            Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0)
+                ->helperText('Простіше змінити перетягуванням рядків у списку (кнопка «Змінити порядок»).'),
             Forms\Components\Toggle::make('open_new_tab')->label('Відкривати в новій вкладці'),
             Forms\Components\Toggle::make('is_visible')->label('Видимий')->default(true),
         ]);
@@ -50,10 +51,14 @@ class MenuItemResource extends Resource
                 Tables\Columns\TextColumn::make('parent.label')->label('Батьківський')->badge()->placeholder('- верхній рівень -'),
                 Tables\Columns\TextColumn::make('link_type')->label('Тип')->badge()
                     ->formatStateUsing(fn ($state) => ['page' => 'Сторінка', 'url' => 'Посилання', 'route' => 'Маршрут'][$state] ?? $state),
-                Tables\Columns\IconColumn::make('is_visible')->label('Видимий')->boolean(),
+                Tables\Columns\ToggleColumn::make('is_visible')->label('Видимий'),
                 Tables\Columns\TextColumn::make('sort_order')->label('Порядок')->numeric()->sortable(),
             ])
             ->defaultSort('sort_order')
+            ->reorderable('sort_order')
+            ->defaultGroup('parent.label')
+            ->emptyStateHeading('Меню поки порожнє')
+            ->emptyStateDescription('Пункти меню - це верхня навігація сайту. Додайте пункт верхнього рівня, а потім вкладені підпункти з посиланнями на сторінки.')
             ->actions([
                 Tables\Actions\EditAction::make(),
                 ViewOnSite::table(fn (MenuItem $record) => $record->href)

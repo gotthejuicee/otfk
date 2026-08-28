@@ -56,9 +56,15 @@ class DocumentResource extends Resource
                 Tables\Columns\IconColumn::make('file_path')->label('Файл')->boolean()
                     ->getStateUsing(fn ($record) => filled($record->file_path) || filled($record->external_url)),
                 Tables\Columns\TextColumn::make('published_at')->label('Дата')->date('d.m.Y')->sortable(),
-                Tables\Columns\IconColumn::make('is_published')->label('Опубл.')->boolean(),
+                Tables\Columns\ToggleColumn::make('is_published')->label('Опубл.'),
             ])
             ->defaultSort('sort_order')
+            ->filters([
+                Tables\Filters\SelectFilter::make('document_category_id')->label('Категорія')
+                    ->relationship('category', 'title')->preload(),
+            ])
+            ->emptyStateHeading('Документів ще немає')
+            ->emptyStateDescription('Документи (PDF, DOC, XLS) показуються на сторінці «Публічна інформація» в своїх категоріях. Завантажте файл або додайте зовнішнє посилання.')
             ->actions([
                 Tables\Actions\EditAction::make(),
                 ViewOnSite::table(fn (Document $record) => route('documents.category', $record->category))

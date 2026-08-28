@@ -29,9 +29,11 @@ class DepartmentResource extends Resource
             Forms\Components\Select::make('type')->label('Тип')->required()->default('kafedra')
                 ->options(Department::TYPES),
             Forms\Components\TextInput::make('slug')->label('URL (slug)')->maxLength(255)
+                ->prefix(url('/struktura') . '/')
                 ->helperText('Залиште порожнім - згенерується автоматично.'),
             Forms\Components\RichEditor::make('description')->label('Опис')->columnSpanFull(),
-            Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0),
+            Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0)
+                ->helperText('Простіше змінити перетягуванням рядків у списку (кнопка «Змінити порядок»).'),
             Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true),
         ]);
     }
@@ -48,6 +50,9 @@ class DepartmentResource extends Resource
                 Tables\Columns\TextColumn::make('sort_order')->label('Порядок')->numeric()->sortable()->toggleable(),
             ])
             ->defaultSort('sort_order')
+            ->reorderable('sort_order')
+            ->emptyStateHeading('Підрозділів ще немає')
+            ->emptyStateDescription('Підрозділи - це циклові комісії, відділення та служби на сторінці «Структура». Додайте підрозділ, щоб закріплювати за ним працівників.')
             ->actions([
                 Tables\Actions\EditAction::make(),
                 ViewOnSite::table(fn (Department $record) => route('structure.show', $record)),

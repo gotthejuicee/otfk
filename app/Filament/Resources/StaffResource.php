@@ -28,6 +28,7 @@ class StaffResource extends Resource
             Forms\Components\FileUpload::make('photo')->label('Фото')->image()->avatar()->directory('staff')->imageEditor()->imageResizeMode('contain')->imageResizeTargetWidth('600')->imageResizeTargetHeight('600'),
             Forms\Components\TextInput::make('full_name')->label('ПІБ')->required()->maxLength(255)->columnSpanFull(),
             Forms\Components\TextInput::make('slug')->label('Слаг (URL персональної сторінки)')->maxLength(255)->unique(ignoreRecord: true)
+                ->prefix(url('/personal') . '/')
                 ->helperText('Порожній — згенерується з ПІБ.')->columnSpanFull(),
             Forms\Components\TextInput::make('position')->label('Посада')->maxLength(255)->columnSpanFull(),
             Forms\Components\Select::make('category')->label('Категорія')->required()->default('teacher')
@@ -38,7 +39,8 @@ class StaffResource extends Resource
             Forms\Components\TextInput::make('email')->label('Email')->email()->maxLength(255),
             Forms\Components\TextInput::make('phone')->label('Телефон')->maxLength(255),
             Forms\Components\Textarea::make('bio')->label('Біографія')->rows(3)->columnSpanFull(),
-            Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0),
+            Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0)
+                ->helperText('Простіше змінити перетягуванням рядків у списку (кнопка «Змінити порядок»).'),
             Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true),
         ]);
     }
@@ -53,9 +55,18 @@ class StaffResource extends Resource
                 Tables\Columns\TextColumn::make('category')->label('Категорія')->badge()
                     ->formatStateUsing(fn ($state) => Staff::CATEGORIES[$state] ?? $state),
                 Tables\Columns\TextColumn::make('department.title')->label('Підрозділ')->placeholder('-')->toggleable(),
-                Tables\Columns\IconColumn::make('is_published')->label('Опубл.')->boolean(),
+                Tables\Columns\ToggleColumn::make('is_published')->label('Опубл.'),
             ])
             ->defaultSort('sort_order')
+            ->reorderable('sort_order')
+            ->filters([
+                Tables\Filters\SelectFilter::make('department_id')->label('Підрозділ')
+                    ->relationship('department', 'title')->searchable()->preload(),
+                Tables\Filters\SelectFilter::make('category')->label('Категорія')
+                    ->options(Staff::CATEGORIES),
+            ])
+            ->emptyStateHeading('Працівників ще немає')
+            ->emptyStateDescription('Персонал показується на сторінках «Адміністрація» та в підрозділах. Додайте працівника з фото, посадою і підрозділом.')
             ->actions([
                 Tables\Actions\EditAction::make(),
                 ViewOnSite::table(fn (Staff $record) => route('staff.show', $record)),

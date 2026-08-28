@@ -27,8 +27,10 @@ class DocumentCategoryResource extends Resource
         return $form->schema([
             Forms\Components\TextInput::make('title')->label('Назва')->required()->maxLength(255),
             Forms\Components\TextInput::make('slug')->label('URL (slug)')->maxLength(255)
+                ->prefix(url('/dokumenty') . '/')
                 ->helperText('Залиште порожнім - згенерується автоматично.'),
-            Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0),
+            Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0)
+                ->helperText('Простіше змінити перетягуванням рядків у списку (кнопка «Змінити порядок»).'),
         ]);
     }
 
@@ -41,6 +43,9 @@ class DocumentCategoryResource extends Resource
                 Tables\Columns\TextColumn::make('sort_order')->label('Порядок')->numeric()->sortable(),
             ])
             ->defaultSort('sort_order')
+            ->reorderable('sort_order')
+            ->emptyStateHeading('Категорій документів ще немає')
+            ->emptyStateDescription('Категорії групують документи на сторінці «Публічна інформація»: установчі документи, звіти, положення тощо. Спершу створіть категорію, потім додавайте в неї документи.')
             ->actions([
                 Tables\Actions\EditAction::make(),
                 ViewOnSite::table(fn (DocumentCategory $record) => route('documents.category', $record)),

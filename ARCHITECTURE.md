@@ -100,6 +100,8 @@ flowchart LR
 
 Кроме того, на формах создания/редактирования страниц и новостей есть кнопка «Превʼю» (`app/Filament/Support/PreviewFormAction.php`) — превью *несохранённых* изменений в стиле GitHub wiki: текущее состояние формы кладётся слепком в кэш (`App\Support\AdminPreview`, TTL 10 мин), и `/admin-preview/{token}` открывается в новой вкладке с настоящим публичным шаблоном и плашкой «Попередній перегляд» — без записи в БД. Нескалярные поля (загрузка файлов) в слепок не попадают — для них показывается сохранённое значение. Тест: `FormPreviewTest`.
 
+UX-мелочи таблиц и форм (Этап 1 плана [ADMIN-UX-PLAN.md](ADMIN-UX-PLAN.md)): перетаскивание порядка (`->reorderable('sort_order')`) в MenuItem (с группировкой по родителю), QuickLink, Faq, StatItem, DocumentCategory, Specialty, Department, Staff; инлайн-тумблеры публикации (`ToggleColumn`) в таблицах Page, Document, Gallery, Staff и MenuItem (`is_visible`) — **у новостей тумблера в таблице сознательно нет**: `NewsObserver` шлёт автопост в Telegram при «оживлении» новости, переключение только в форме (закреплено тестом `AdminTablesTest`); превью итогового URL префиксом у полей slug; фильтры таблиц (страницы — по разделу и черновикам, новости — по категории/году/черновикам, документы — по категории, персонал — по подразделению и категории); осмысленные пустые состояния (`emptyStateHeading/Description`) во всех контентных ресурсах. Смоук-тест рендера всех List-страниц: `AdminTablesTest`.
+
 ### API / webhooks
 
 Отсутствуют. `routes/api.php` нет; Telegram — только исходящий. JSON отдают лишь `news.like` и `search.suggest` (обычные web-роуты с CSRF/сессией).

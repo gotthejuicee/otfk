@@ -74,7 +74,8 @@ class QuickLinkResource extends Resource
                 ->visible(fn (Forms\Get $get) => $get('location') === 'home_tile'),
 
             Forms\Components\Toggle::make('open_new_tab')->label('Відкривати у новій вкладці')->default(false),
-            Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0),
+            Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0)
+                ->helperText('Простіше змінити перетягуванням рядків у списку (кнопка «Змінити порядок»).'),
             Forms\Components\Toggle::make('is_visible')->label('Показувати')->default(true),
         ]);
     }
@@ -97,6 +98,8 @@ class QuickLinkResource extends Resource
                 Tables\Filters\SelectFilter::make('location')->label('Розташування')
                     ->options(['home_tile' => 'Плитки', 'footer_partner' => 'Партнери']),
             ])
+            ->emptyStateHeading('Плиток і партнерів ще немає')
+            ->emptyStateDescription('Плитки - 4 кольорові картки під банером на головній; партнери - посилання в підвалі сайту. Оберіть розташування при створенні.')
             ->actions([Tables\Actions\EditAction::make()])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
     }

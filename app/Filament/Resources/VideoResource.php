@@ -64,6 +64,8 @@ class VideoResource extends Resource
                 Tables\Columns\TextColumn::make('sort_order')->label('Порядок')->numeric()->sortable()->toggleable(),
             ])
             ->defaultSort('sort_order')
+            ->emptyStateHeading('Відео ще немає')
+            ->emptyStateDescription('Відео з YouTube показуються на сторінці «Відео». Просто вставте посилання на ролик - обкладинка підтягнеться автоматично.')
             ->actions([Tables\Actions\EditAction::make()])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
     }

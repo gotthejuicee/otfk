@@ -27,6 +27,7 @@ class GalleryResource extends Resource
         return $form->schema([
             Forms\Components\TextInput::make('title')->label('Назва альбому')->required()->maxLength(255)->columnSpanFull(),
             Forms\Components\TextInput::make('slug')->label('URL (slug)')->maxLength(255)
+                ->prefix(url('/halereya') . '/')
                 ->helperText('Залиште порожнім - згенерується автоматично.'),
             Forms\Components\DatePicker::make('published_at')->label('Дата')->default(now()),
             Forms\Components\Textarea::make('description')->label('Опис')->rows(2)->columnSpanFull(),
@@ -60,10 +61,12 @@ class GalleryResource extends Resource
                 Tables\Columns\TextColumn::make('title')->label('Назва')->searchable()->weight('bold'),
                 Tables\Columns\TextColumn::make('photos_count')->label('Фото')->counts('photos')->badge(),
                 Tables\Columns\TextColumn::make('published_at')->label('Дата')->date('d.m.Y')->sortable(),
-                Tables\Columns\IconColumn::make('is_published')->label('Опубл.')->boolean(),
+                Tables\Columns\ToggleColumn::make('is_published')->label('Опубл.'),
                 Tables\Columns\IconColumn::make('is_archive')->label('Архів')->boolean()->toggleable(),
             ])
             ->defaultSort('sort_order')
+            ->emptyStateHeading('Фотогалерей ще немає')
+            ->emptyStateDescription('Альбоми з фото показуються на сторінці «Галерея». Створіть альбом і додайте в нього фотографії з підписами.')
             ->actions([
                 Tables\Actions\EditAction::make(),
                 ViewOnSite::table(fn (Gallery $record) => route('galleries.show', $record)),

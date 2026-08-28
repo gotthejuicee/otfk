@@ -47,6 +47,8 @@ class EventResource extends Resource
                 Tables\Columns\IconColumn::make('is_published')->label('Опубл.')->boolean(),
             ])
             ->defaultSort('starts_at', 'desc')
+            ->emptyStateHeading('Подій ще немає')
+            ->emptyStateDescription('Події показуються в календарі на сторінці «Події»: дні відкритих дверей, конференції, свята. Додайте подію з датою і місцем проведення.')
             ->actions([Tables\Actions\EditAction::make()])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
     }

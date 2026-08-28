@@ -28,6 +28,7 @@ class PageResource extends Resource
             Forms\Components\Section::make('Контент')->schema([
                 Forms\Components\TextInput::make('title')->label('Назва сторінки')->required()->maxLength(255)->columnSpanFull(),
                 Forms\Components\TextInput::make('slug')->label('URL (slug)')->maxLength(255)
+                    ->prefix(url('/') . '/')
                     ->helperText('Залиште порожнім - згенерується автоматично.'),
                 Forms\Components\Select::make('parent_id')->label('Батьківський розділ')
                     ->relationship('parent', 'title')->searchable()->preload(),
@@ -60,12 +61,20 @@ class PageResource extends Resource
                 Tables\Columns\TextColumn::make('title')->label('Назва')->searchable()->weight('bold'),
                 Tables\Columns\TextColumn::make('parent.title')->label('Розділ')->badge()->placeholder('-')->sortable(),
                 Tables\Columns\TextColumn::make('slug')->label('URL')->color('gray')->toggleable(),
-                Tables\Columns\IconColumn::make('is_published')->label('Опубл.')->boolean(),
+                Tables\Columns\ToggleColumn::make('is_published')->label('Опубл.'),
                 Tables\Columns\IconColumn::make('is_heritage')->label('Heritage')->boolean()->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\IconColumn::make('is_featured')->label('Ключова')->boolean()->toggleable(),
                 Tables\Columns\TextColumn::make('sort_order')->label('Порядок')->numeric()->sortable()->toggleable(),
             ])
             ->defaultSort('title')
+            ->filters([
+                Tables\Filters\SelectFilter::make('parent_id')->label('Розділ')
+                    ->relationship('parent', 'title')->searchable()->preload(),
+                Tables\Filters\TernaryFilter::make('is_published')->label('Публікація')
+                    ->trueLabel('Опубліковані')->falseLabel('Лише чернетки')->placeholder('Всі'),
+            ])
+            ->emptyStateHeading('Сторінок ще немає')
+            ->emptyStateDescription('Сторінки - це постійні розділи сайту: «Історія», «Бібліотека», «Абітурієнту» тощо. Створіть першу сторінку, і вона зʼявиться на сайті за своєю адресою.')
             ->actions([
                 Tables\Actions\EditAction::make(),
                 ViewOnSite::table(fn (Page $record) => url('/' . $record->slug)),
