@@ -87,7 +87,7 @@ flowchart LR
 | GET | `/struktura`, `/struktura/{slug}` | structure.* | `StructureController` | Отделения/комиссии + персонал | нет |
 | GET | `/administratsiya` | staff.administration | `StaffController@administration` | Администрация | нет |
 | GET | `/personal/{staff:slug}` | staff.show | `StaffController@show` | Персональная страница работника: факты из `bio`, ссылки на CMS-страницы «проф. деятельность»/«повышение квалификации», коллеги по подразделению | нет |
-| GET | `/halereya`, `/halereya/{slug}` | galleries.* | `GalleryController` | Галереи, лайтбокс, архивный (сепия) режим | нет |
+| GET | `/halereya`, `/halereya/{slug}` | galleries.* | `GalleryController` | Галереи: список с пагинацией (12/стр.) и рекомендованным альбомом; альбом — мозаичная сетка + лайтбокс с перелистыванием, блок «Інші альбоми»; архивный (сепия) режим | нет |
 | GET | `/poshuk`, `/poshuk/pidkazky` | search.* | `SearchController` | LIKE-поиск + JSON-подсказки (`throttle:60,1`) | нет |
 | GET/POST | `/kontakty` | contacts.* | `ContactController` | Контакты + форма обратной связи (honeypot, письмо) | нет |
 | GET | `/sitemap.xml`, `/robots.txt` | sitemap, robots | `SitemapController` / closure | Sitemap (без кэша!), robots | нет |
