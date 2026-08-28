@@ -9,12 +9,12 @@
 - [x] **Главная** — `/` — `home.blade.php` + `components/home/hero-slider.blade.php` (коммит `f672178`)
 - [x] **Хедер: топбар, меню, мобильное меню, поиск** — `components/layouts/app.blade.php` (меню DB-driven, 12 пунктов — проверять на реальных данных)
 - [x] **Футер** — там же, `components/layouts/app.blade.php`
-- [ ] **Хлебные крошки** — `components/breadcrumbs.blade.php` (виден на всех внутренних)
+- [x] **Хлебные крошки** — `components/breadcrumbs.blade.php` (ChatGPT-макет новостей сохранил текущий вид: Головна › Новини в hero — оставлено как есть)
 - [ ] **Общие компоненты**: `page-hero`, `news-card`, `staff-card`, `empty-state`, `lead-excerpt`, `heritage-frame`, `prose/article` — обновлять по ходу первых внутренних страниц, фиксировать единый стиль
 
 ## 1. Новости и медиа
 
-- [ ] **Список новостей** — `/novyny` — `news/index.blade.php` (+ пагинация, фильтры если есть)
+- [x] **Список новостей** — `/novyny` — `news/index.blade.php` (featured-карточка на 1-й странице без фильтров; бейдж категории на фото; подзаголовок в hero; украинская пагинация `vendor/pagination/tailwind.blade.php` — общая, задействована и на `/video`)
 - [ ] **Новость (детальная)** — `/novyny/{slug}` — `news/show.blade.php` (лайк-кнопка, шаринг; помнить про `NewsObserver`/Telegram — контент не трогать)
 - [ ] **Видео** — `/video` — `videos/index.blade.php`
 - [ ] **Галереи (список)** — `/halereya` — `galleries/index.blade.php`
