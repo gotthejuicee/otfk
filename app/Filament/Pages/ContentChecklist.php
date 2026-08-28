@@ -105,6 +105,7 @@ class ContentChecklist extends FilamentPage
             'map_embed' => 'Карта на сторінці контактів',
             'social_facebook' => 'Facebook',
             'social_instagram' => 'Instagram',
+            'social_youtube' => 'YouTube-канал',
             'site_description' => 'Опис сайту (SEO)',
         ];
 

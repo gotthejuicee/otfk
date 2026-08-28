@@ -75,7 +75,7 @@ flowchart LR
 | GET | `/novyny/feed.xml` | news.feed | `NewsFeedController` | RSS 30 последних, `max-age=1800` | нет |
 | GET | `/novyny/{news:slug}` | news.show | `NewsController@show` | Статья; +1 просмотр раз в сессию | нет |
 | POST | `/novyny/{slug}/vpodobayka` | news.like | `NewsController@like` | Лайк-тоггл (JSON), fingerprint = sha1(ip+UA), `throttle:30,1` | нет |
-| GET | `/video` | video.index | `VideoController@index` | Видео, пагинация 12 | нет |
+| GET | `/video` | video.index | `VideoController@index` | Видео, пагинация 12; на 1-й странице — featured-ролик, плеер открывается в лайтбоксе (youtube-nocookie) | нет |
 | GET | `/rozklad-dzvinkiv` | bells | `BellScheduleController@index` | Расписание звонков + live-индикатор пары | нет |
 | GET | `/podiyi` | events | `EventController@index` | Предстоящие + 6 прошедших событий | нет |
 | GET | `/podiyi/{event}/ics` | events.ics | `EventController@ics` | Скачивание .ics | нет |
@@ -120,13 +120,13 @@ flowchart LR
 | `pages` | CMS-дерево (parent_id, slug unique, body longText, section, is_published, is_heritage, meta_*) |
 | `news`, `news_categories`, `news_likes` | Новости: category_id, published_at, is_featured, is_heritage, views, likes, telegram_posted_at; лайки — unique(news_id, fingerprint) |
 | `menu_items` | Дерево навигации: link_type page/url/route, page_id, is_visible; кэш `menu.navigation` 600с |
-| `settings` | Key-value (key unique, group, type — тип виджета в Filament); кэш `settings.map` 600с |
+| `settings` | Key-value (key unique, group, type — тип виджета в Filament); кэш `settings.map` 600с. Соцсети: `social_facebook`, `social_instagram` (шапка + футер), `social_youtube` (блок-призыв на `/video`; пустое значение — блок скрыт) |
 | `banners` | Слайдер главной: image, image_alt, окно дат starts_at/ends_at |
 | `documents`, `document_categories` | Публичная информация: file_path или external_url (external — приоритет) |
 | `specialties`, `programs` | Специальности (slug, code 121/123/181/071...) + файлы программ |
 | `departments`, `staff` | Структура (type: viddilennya/tsyklova-komisiya/kafedra) и персонал (category: administration/teacher); `staff.slug` — unique, автогенерация из ПИБ в `Staff::booted()`, адрес персональной страницы |
 | `galleries`, `photos` | Фотоальбомы; `is_archive` → сепия-режим |
-| `videos` | YouTube-ролики (youtube_id → accessors embed/thumb) |
+| `videos` | YouTube-ролики (youtube_id → accessors `thumbnail`, `watch_url`, `embed_url`, `private_embed_url` — youtube-nocookie для лайтбокса) |
 | `events` | События; **starts_at хранится как киевское wall-clock время**, UTC — через `utcStart()/utcEnd()` |
 | `bell_periods` | Расписание звонков; кэш `bell_periods` 600с |
 | `stat_items`, `testimonials`, `faqs` | Блоки главной («Коледж у цифрах», отзывы, FAQ) |

@@ -60,6 +60,7 @@ class SiteSeeder extends Seeder
             ['work_hours', 'Пн-Пт: 08:00-17:00', 'contacts', 'text'],
             ['social_facebook', 'https://www.facebook.com/', 'social', 'url'],
             ['social_instagram', 'https://www.instagram.com/', 'social', 'url'],
+            ['social_youtube', '', 'social', 'url'],
             ['map_embed', 'https://www.google.com/maps?q=Odesa&output=embed', 'contacts', 'url'],
         ];
 
