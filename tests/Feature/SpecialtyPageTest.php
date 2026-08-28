@@ -157,4 +157,20 @@ class SpecialtyPageTest extends TestCase
             ->assertOk()
             ->assertDontSee('Інші спеціальності');
     }
+
+    /**
+     * Кнопка «Детальніше» — справжнє посилання з розтягнутим ::after,
+     * інакше клік по низу картки нікуди не веде (раніше був <span>).
+     */
+    public function test_index_card_details_button_is_a_link(): void
+    {
+        $specialty = $this->makeSpecialty('Інженерія програмного забезпечення', 'inzheneriya-pz', '121', 0);
+
+        $html = $this->get('/spetsialnosti')->assertOk()->getContent();
+
+        $pattern = '~<a href="'.preg_quote(route('specialties.show', $specialty), '~')
+            .'"[^>]*class="[^"]*btn-outline[^"]*after:absolute after:inset-0[^"]*"[^>]*>\s*Детальніше~u';
+
+        $this->assertMatchesRegularExpression($pattern, $html);
+    }
 }

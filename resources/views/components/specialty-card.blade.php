@@ -26,7 +26,7 @@
                     <span class="block font-display text-4xl font-extrabold leading-none text-white sm:text-5xl">{{ $specialty->code }}</span>
                 @endif
                 <h3 class="mt-3 text-lg font-bold leading-snug text-white">
-                    <a href="{{ route('specialties.show', $specialty) }}" class="after:absolute after:inset-0 focus:outline-none focus-visible:underline">{{ $specialty->title }}</a>
+                    <a href="{{ route('specialties.show', $specialty) }}" class="focus:outline-none focus-visible:underline">{{ $specialty->title }}</a>
                 </h3>
             </div>
             <x-ico :name="$specialty->icon_name" aria-hidden="true"
@@ -60,8 +60,11 @@
             </div>
         @endif
 
-        <span class="btn-outline mt-6 self-start border-gold-300 text-gold-700 ring-gold-300 transition group-hover:bg-gold-50">
+        {{-- Розтягнуте посилання: ::after прив'язується до <article class="relative">,
+             бо між ними немає ані position, ані overflow-hidden — клікабельна вся картка --}}
+        <a href="{{ route('specialties.show', $specialty) }}" tabindex="-1" aria-hidden="true"
+           class="btn-outline mt-6 self-start border-gold-300 text-gold-700 ring-gold-300 transition after:absolute after:inset-0 group-hover:bg-gold-50">
             Детальніше <x-ico name="arrow-right" class="h-4 w-4 transition group-hover:translate-x-0.5" />
-        </span>
+        </a>
     </div>
 </article>
