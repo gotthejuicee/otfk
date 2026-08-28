@@ -8,9 +8,25 @@ class StaffController extends Controller
 {
     public function administration()
     {
-        $staff = Staff::published()->administration()->ordered()->get();
+        $staff = Staff::published()->administration()->ordered()->with('department')->get();
 
-        return view('staff.administration', compact('staff'));
+        // Директор — окремим блоком, решта групами (ролі виводяться з посади,
+        // див. Staff::administration_role); якщо посад немає — усі в одній групі.
+        $head = $staff->firstWhere('administration_role', 'head');
+
+        $groups = collect([
+            'head' => 'Керівництво коледжу',
+            'deputy' => 'Заступники директора',
+            'unit' => 'Керівники відділень та служб',
+        ])
+            ->map(fn (string $title, string $role) => [
+                'title' => $title,
+                'items' => $staff->filter(fn (Staff $person) => $person->administration_role === $role
+                    && ! ($head && $person->is($head))),
+            ])
+            ->filter(fn (array $group) => $group['items']->isNotEmpty());
+
+        return view('staff.administration', compact('staff', 'head', 'groups'));
     }
 
     public function show(Staff $staff)

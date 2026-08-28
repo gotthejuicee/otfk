@@ -144,6 +144,22 @@ class Staff extends Model
         return [$clean . substr($bio, $cursor), $links];
     }
 
+    /**
+     * Роль в адміністрації — для групування сторінки /administratsiya.
+     * Виводиться з посади (інших даних у БД немає): «заступник» перевіряємо
+     * першим, бо в посаді заступника теж є слово «директор».
+     */
+    public function getAdministrationRoleAttribute(): string
+    {
+        $position = mb_strtolower((string) $this->position);
+
+        return match (true) {
+            str_contains($position, 'заступник') => 'deputy',
+            str_contains($position, 'директор') => 'head',
+            default => 'unit',
+        };
+    }
+
     public function initials(): string
     {
         $parts = preg_split('/\s+/u', trim($this->full_name ?? ''));
