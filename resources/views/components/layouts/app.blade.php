@@ -11,6 +11,8 @@
     $logo = ! empty($s['logo']) ? asset('storage/' . $s['logo']) : null;
     $favicon = ! empty($s['favicon']) ? asset('storage/' . $s['favicon']) : asset('favicon.svg');
     $metaDesc = $description ?: ($s['site_description'] ?? 'Офіційний сайт Одеського технічного фахового коледжу ОНТУ.');
+    // Святкова тема (адмінка → «Підвал і вигляд»): null = звичайний вигляд
+    $holiday = \App\Support\HolidayTheme::config($s['holiday_theme'] ?? null);
     $year = date('Y');
     // Чи веде пункт меню на поточну сторінку (порівнюємо шлях без домену й слешів) — для aria-current
     $currentPath = rtrim(request()->getPathInfo(), '/') ?: '/';
@@ -69,6 +71,9 @@
 </head>
 {{-- Фон body задається в app.css (брендові засвітки + сітка з крапок), тому без bg-white --}}
 <body class="flex min-h-screen flex-col text-slate-700">
+
+    {{-- Святкові прикраси (стрічка + частинки), коли в адмінці обрано тему --}}
+    <x-holiday-decor :theme="$s['holiday_theme'] ?? null" />
 
     {{-- Пропустити навігацію (зʼявляється лише при фокусі з клавіатури) --}}
     <a href="#main-content"
@@ -171,13 +176,18 @@
                  :class="scrolled ? 'border-slate-200/80 bg-white/90 shadow-md backdrop-blur-md' : ''">
                 <div class="mx-auto flex h-16 w-full max-w-[1600px] items-center justify-between gap-2 px-4 sm:h-20 sm:gap-6 sm:px-6 lg:px-8">
                 <a href="{{ route('home') }}" class="flex min-w-0 items-center gap-2 sm:shrink-0 sm:gap-3">
-                    @if ($logo)
-                        <img src="{{ $logo }}" alt="ОТФК ОНТУ" class="h-9 w-auto shrink-0 sm:h-12 lg:h-16">
-                    @else
-                        <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-700 to-brand-900 text-white shadow-sm sm:h-12 sm:w-12">
-                            <x-ico name="academic-cap" class="h-7 w-7" />
-                        </span>
-                    @endif
+                    <span class="relative shrink-0">
+                        @if ($holiday)
+                            <span class="holiday-logo-badge" aria-hidden="true">{{ $holiday['badge'] }}</span>
+                        @endif
+                        @if ($logo)
+                            <img src="{{ $logo }}" alt="ОТФК ОНТУ" class="h-9 w-auto shrink-0 sm:h-12 lg:h-16">
+                        @else
+                            <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-brand-700 to-brand-900 text-white shadow-sm sm:h-12 sm:w-12">
+                                <x-ico name="academic-cap" class="h-7 w-7" />
+                            </span>
+                        @endif
+                    </span>
                     <span class="min-w-0 leading-tight">
                         <span class="font-display block truncate text-sm font-extrabold tracking-tight text-brand-900 sm:whitespace-nowrap sm:text-lg">{{ $s['brand_short'] ?? 'ОТФК ОНТУ' }}</span>
                         <span class="hidden whitespace-nowrap text-xs text-slate-500 sm:block">{{ $s['brand_name'] ?? 'Одеський технічний фаховий коледж' }}</span>

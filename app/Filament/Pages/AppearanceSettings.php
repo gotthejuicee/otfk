@@ -5,12 +5,16 @@ namespace App\Filament\Pages;
 use App\Filament\Support\SettingsFormPage;
 use App\Filament\Support\ViewOnSite;
 use App\Models\QuickLink;
+use App\Support\HolidayTheme;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Form;
 
 /**
- * Все, що показує підвал сайту, в одному місці: текст «Про коледж»,
+ * Вигляд сайту й підвал в одному місці. Святкова тема (ключ `holiday_theme`,
+ * довідник App\Support\HolidayTheme) вмикає прикраси на всіх сторінках:
+ * стрічку над шапкою, падаючі частинки та бейдж біля логотипа.
+ * Далі — все, що показує підвал сайту: текст «Про коледж»,
  * посилання-партнери (рядки quick_links з location=footer_partner —
  * редагуються репітером і синхронізуються при збереженні) та позначка
  * версії сайту. Контакти й соцмережі підвал бере зі сторінки «Контакти
@@ -32,12 +36,13 @@ class AppearanceSettings extends SettingsFormPage
 
     protected static function keys(): array
     {
-        return ['footer_about', 'site_version_label', 'site_version_color'];
+        return ['footer_about', 'site_version_label', 'site_version_color', 'holiday_theme'];
     }
 
     protected function fromSettings(array $state): array
     {
         $state['site_version_color'] = $state['site_version_color'] ?: 'gold';
+        $state['holiday_theme'] = $state['holiday_theme'] ?: '';
         $state['partners'] = $this->partnerState();
 
         return $state;
@@ -61,6 +66,15 @@ class AppearanceSettings extends SettingsFormPage
     {
         return $form
             ->schema([
+                Forms\Components\Section::make('Святкова тема')
+                    ->description('Прикраси на весь сайт до свята: стрічка над шапкою, падаючі сніжинки/прапорці та значок біля логотипа. «Звичайна» — сайт без прикрас.')
+                    ->schema([
+                        Forms\Components\Select::make('holiday_theme')
+                            ->label('Тема')
+                            ->options(HolidayTheme::options())
+                            ->selectablePlaceholder(false)
+                            ->helperText('Не забудьте вимкнути тему після свята — автоматично вона не зникає.'),
+                    ]),
                 Forms\Components\Section::make('Підвал сайту')
                     ->schema([
                         Forms\Components\Textarea::make('footer_about')
