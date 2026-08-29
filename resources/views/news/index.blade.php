@@ -3,7 +3,9 @@
     <x-page-hero title="Новини коледжу" :breadcrumbs="[
         ['label' => 'Головна', 'url' => route('home')],
         ['label' => 'Новини'],
-    ]" />
+    ]">
+        <p class="mt-3 max-w-2xl text-brand-100">Актуальні події, оголошення та досягнення коледжу</p>
+    </x-page-hero>
 
     <section class="container-site py-12">
         {{-- Фільтр за категоріями та роком --}}
@@ -39,12 +41,26 @@
         @endif
 
         @if ($news->isNotEmpty())
+            @php
+                // Головна новина — лише на першій сторінці без фільтрів, щоб не «губити» картки в сітці
+                $items = $news->getCollection();
+                $showFeatured = $news->onFirstPage() && ! $activeCategory && ! $activeYear && $items->count() > 1;
+                $featured = $showFeatured ? $items->first() : null;
+                $rest = $showFeatured ? $items->slice(1) : $items;
+            @endphp
+
+            @if ($featured)
+                <div class="mb-6">
+                    <x-news-card :item="$featured" featured />
+                </div>
+            @endif
+
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                @foreach ($news as $item)
+                @foreach ($rest as $item)
                     <x-news-card :item="$item" />
                 @endforeach
             </div>
-            <div class="mt-10">{{ $news->links() }}</div>
+            <div class="mt-10">{{ $news->onEachSide(1)->links() }}</div>
         @else
             <x-empty-state icon="newspaper" title="Новин поки немає." />
         @endif

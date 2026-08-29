@@ -1,8 +1,11 @@
 name: Deploy to production
 
+# УВАГА: прод-оточення одне. Пуш у feature/** теж деплоїться на нього (свідоме
+# рішення для прототипу): сервер стає на цю гілку, її міграції їдуть у живу БД.
+# Повернути сайт на master — просто запушити в master (або Run workflow з master).
 on:
   push:
-    branches: [master]
+    branches: [master, 'feature/**']
   workflow_dispatch:
 
 concurrency:
@@ -38,8 +41,9 @@ jobs:
           ssh -i ~/.ssh/deploy_key -p ${{ secrets.REMOTE_PORT || 22 }} ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} '
             set -e
             cd ${{ secrets.REMOTE_PATH }}
-            git fetch origin master
-            git reset --hard origin/master
+            git fetch origin "${{ github.ref_name }}"
+            git checkout -B "${{ github.ref_name }}" "origin/${{ github.ref_name }}"
+            git reset --hard "origin/${{ github.ref_name }}"
             composer install --no-dev --optimize-autoloader --no-interaction
           '
 

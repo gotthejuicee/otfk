@@ -1,6 +1,12 @@
 <x-layouts.app :title="$specialty->title" :description="$specialty->short_description"
                :og-image="$specialty->cover_image ? asset('storage/' . $specialty->cover_image) : null">
 
+    @if (! empty($adminPreview))
+        <x-draft-notice message="Попередній перегляд — так виглядатиме сторінка спеціальності. Зміни ще не збережено: поверніться до форми й натисніть «Зберегти»." />
+    @elseif (! $specialty->is_published)
+        <x-draft-notice />
+    @endif
+
     {{-- Розмітка Course для пошукових систем --}}
     @php
         $courseLd = array_filter([
@@ -12,30 +18,61 @@
             'url' => route('specialties.show', $specialty),
             'provider' => ['@type' => 'CollegeOrUniversity', 'name' => config('app.name'), 'url' => url('/')],
         ]);
+
+        $facts = array_filter([
+            ['academic-cap', $specialty->degree],
+            ['calendar-days', $specialty->study_form],
+            ['clock', $specialty->duration],
+        ], fn ($r) => filled($r[1]));
     @endphp
     <script type="application/ld+json">{!! json_encode($courseLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}</script>
 
-    <section class="bg-brand-950">
-        <div class="container-site py-12 lg:py-14">
+    {{-- Шапка: обкладинок у базі немає, тож праворуч — гігантський код спеціальності та іконка напряму --}}
+    <section class="relative overflow-hidden bg-brand-950">
+        <svg aria-hidden="true" class="pointer-events-none absolute inset-0 h-full w-full text-white/[0.06]">
+            <defs>
+                <pattern id="sp-hero-grid" width="34" height="34" patternUnits="userSpaceOnUse">
+                    <path d="M34 0H0V34" fill="none" stroke="currentColor" stroke-width="1" />
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#sp-hero-grid)" />
+        </svg>
+
+        {{-- Код і іконка живуть у потоці на мобільному та йдуть праворуч на широких екранах --}}
+        <div class="pointer-events-none absolute inset-y-0 right-0 hidden items-center gap-8 pr-8 lg:flex 2xl:pr-16">
+            @if ($specialty->code)
+                <span class="font-display text-[9rem] font-extrabold leading-none text-white/10 2xl:text-[11rem]">{{ $specialty->code }}</span>
+            @endif
+            <x-ico :name="$specialty->icon_name" aria-hidden="true" class="h-32 w-32 text-gold-400/80 2xl:h-40 2xl:w-40" />
+        </div>
+
+        <div class="container-site relative py-12 lg:py-16">
             <x-breadcrumbs :items="[
                 ['label' => 'Головна', 'url' => route('home')],
                 ['label' => 'Спеціальності', 'url' => route('specialties.index')],
                 ['label' => $specialty->title],
             ]" />
-            @if ($specialty->code)
-                <span class="mt-4 inline-block badge bg-white/10 text-brand-100 ring-1 ring-white/15">Код спеціальності: {{ $specialty->code }}</span>
-            @endif
-            <h1 class="mt-3 max-w-4xl text-3xl font-extrabold leading-tight text-white sm:text-4xl">{{ $specialty->title }}</h1>
-            <div class="mt-4 flex flex-wrap gap-2.5">
-                @foreach (array_filter([
-                    ['academic-cap', $specialty->degree],
-                    ['clock', $specialty->duration],
-                    ['user-group', $specialty->study_form],
-                ], fn ($r) => ! empty($r[1])) as [$icon, $value])
-                    <span class="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium text-brand-100 ring-1 ring-white/15">
-                        <x-ico :name="$icon" class="h-3.5 w-3.5 text-gold-300" /> {{ $value }}
-                    </span>
-                @endforeach
+
+            <div class="max-w-3xl lg:max-w-2xl xl:max-w-3xl">
+                @if ($specialty->code)
+                    <span class="badge mt-5 bg-white/10 text-brand-100 ring-1 ring-white/15">Код {{ $specialty->code }}</span>
+                @endif
+
+                <h1 class="mt-4 text-3xl font-extrabold leading-tight text-white sm:text-4xl lg:text-[2.75rem]">{{ $specialty->title }}</h1>
+
+                @if ($specialty->short_description)
+                    <p class="mt-4 text-lg leading-relaxed text-brand-100">{{ $specialty->short_description }}</p>
+                @endif
+
+                @if ($facts)
+                    <div class="mt-6 flex flex-wrap gap-2.5">
+                        @foreach ($facts as [$icon, $value])
+                            <span class="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-sm font-medium text-brand-100 ring-1 ring-white/15">
+                                <x-ico :name="$icon" class="h-4 w-4 text-gold-300" aria-hidden="true" /> {{ $value }}
+                            </span>
+                        @endforeach
+                    </div>
+                @endif
             </div>
         </div>
     </section>
@@ -45,11 +82,25 @@
             @if ($specialty->cover_image)
                 <x-picture :path="$specialty->cover_image" :alt="$specialty->title" loading="lazy" decoding="async" class="mb-8 w-full rounded-2xl object-cover" />
             @endif
+
+            {{-- «Про спеціальність»: короткий опис винесено в помітну картку над основним текстом --}}
             @if ($specialty->short_description)
-                <p class="mb-6 text-lg font-medium leading-relaxed text-slate-600">{{ $specialty->short_description }}</p>
+                <div class="card flex gap-4 bg-gradient-to-br from-gold-50 to-white p-6 ring-gold-200/70">
+                    <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-gold-100 text-gold-700">
+                        <x-ico name="book-open" class="h-6 w-6" aria-hidden="true" />
+                    </span>
+                    <div>
+                        <h2 class="font-bold text-slate-900">Про спеціальність</h2>
+                        <p class="mt-2 leading-relaxed text-slate-600">{{ $specialty->short_description }}</p>
+                    </div>
+                </div>
             @endif
+
             @if (filled($specialty->description))
-                <div class="prose prose-slate max-w-none prose-headings:font-display prose-a:text-brand-700">{!! $specialty->description !!}</div>
+                <div @class([
+                    'prose prose-slate max-w-none prose-headings:font-display prose-a:text-brand-700',
+                    'mt-8' => filled($specialty->short_description),
+                ])>{!! $specialty->description !!}</div>
             @endif
 
             {{-- Освітні програми --}}
@@ -76,47 +127,67 @@
                 </div>
             @endif
 
+            {{-- Золота смуга з виходом на приймальну комісію --}}
+            <div class="mt-10 flex flex-wrap items-center justify-between gap-4 rounded-2xl bg-gold-50 px-6 py-5 ring-1 ring-gold-200/80">
+                <div class="flex items-start gap-3">
+                    <span class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gold-100 text-gold-700">
+                        <x-ico name="light-bulb" class="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <div>
+                        <p class="font-bold text-slate-900">Потрібна консультація?</p>
+                        <p class="text-sm text-slate-600">Наші фахівці допоможуть відповісти на ваші запитання про навчання та вступ.</p>
+                    </div>
+                </div>
+                <a href="{{ route('contacts') }}" class="inline-flex items-center gap-1.5 text-sm font-semibold text-gold-700 transition hover:gap-2.5">
+                    Зв’язатися з приймальною комісією <x-ico name="arrow-right" class="h-4 w-4" />
+                </a>
+            </div>
+
             <a href="{{ route('specialties.index') }}" class="btn-outline mt-10"><x-ico name="arrow-left" class="h-4 w-4" /> До всіх спеціальностей</a>
         </div>
 
         <aside class="lg:col-span-4">
-            <div class="space-y-6 lg:sticky lg:top-28">
-                <div class="card p-6">
-                    <h2 class="font-bold text-slate-900">Деталі навчання</h2>
-                    <div class="accent-rule"></div>
-                    <dl class="mt-4 divide-y divide-slate-100 text-sm">
-                        @foreach (array_filter([
-                            'Освітній ступінь' => $specialty->degree,
-                            'Форма навчання' => $specialty->study_form,
-                            'Термін навчання' => $specialty->duration,
-                            'Код' => $specialty->code,
-                        ]) as $label => $value)
-                            <div class="flex justify-between gap-3 py-3">
-                                <dt class="text-slate-500">{{ $label }}</dt>
-                                <dd class="text-right font-semibold text-slate-800">{{ $value }}</dd>
-                            </div>
-                        @endforeach
-                    </dl>
-                    <a href="{{ url('/abituriyentu') }}" class="btn-primary mt-5 w-full">Як вступити</a>
-                </div>
+            <div class="card p-6 lg:sticky lg:top-28">
+                <h2 class="font-bold text-slate-900">Деталі навчання</h2>
+                <div class="accent-rule"></div>
+                <dl class="mt-4 divide-y divide-slate-100 text-sm">
+                    @foreach (array_filter([
+                        'Код спеціальності' => $specialty->code,
+                        'Освітній ступінь' => $specialty->degree,
+                        'Форма навчання' => $specialty->study_form,
+                        'Термін навчання' => $specialty->duration,
+                    ]) as $label => $value)
+                        <div class="flex justify-between gap-3 py-3">
+                            <dt class="shrink-0 text-slate-500">{{ $label }}</dt>
+                            <dd class="text-right font-semibold text-slate-800">{{ $value }}</dd>
+                        </div>
+                    @endforeach
+                </dl>
 
-                @if ($others->isNotEmpty())
-                    <div class="card p-6">
-                        <h2 class="font-bold text-slate-900">Інші спеціальності</h2>
-                        <ul class="mt-4 space-y-2">
-                            @foreach ($others as $o)
-                                <li>
-                                    <a href="{{ route('specialties.show', $o) }}" class="group flex items-center gap-2 rounded-lg p-2 transition hover:bg-slate-50">
-                                        <x-ico name="academic-cap" class="h-5 w-5 shrink-0 text-brand-500" />
-                                        <span class="min-w-0 flex-1 truncate text-sm font-medium text-slate-700 group-hover:text-brand-700">{{ $o->title }}</span>
-                                    </a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
+                <a href="{{ route('contacts') }}" class="btn-primary mt-5 w-full">
+                    Звʼязатися з приймальною комісією <x-ico name="arrow-right" class="h-4 w-4" />
+                </a>
+                <a href="{{ route('quiz') }}" class="btn-outline mt-3 w-full border-gold-300 text-gold-700 ring-gold-300 hover:bg-gold-50">
+                    Пройти квіз на вибір спеціальності <x-ico name="arrow-right" class="h-4 w-4" />
+                </a>
             </div>
         </aside>
     </section>
+
+    {{-- Інші спеціальності — тими самими картками, що й у списку --}}
+    @if ($others->isNotEmpty())
+        <section class="border-t border-slate-200/70 bg-slate-50/80 py-12">
+            <div class="container-site">
+                <h2 class="text-2xl font-extrabold text-brand-950">Інші спеціальності</h2>
+                <div class="accent-rule"></div>
+
+                <div class="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                    @foreach ($others as $other)
+                        <x-specialty-card :specialty="$other" :show-program="false" />
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
 
 </x-layouts.app>

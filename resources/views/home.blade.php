@@ -5,19 +5,25 @@
 
     {{-- ===================== ШВИДКІ РОЗДІЛИ ===================== --}}
     @if ($tiles->isNotEmpty())
-        <section class="container-site mt-12">
-            <h2 class="sr-only">Швидкі розділи</h2>
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <section class="container-site mt-14">
+            <div class="text-center">
+                <h2 class="text-2xl sm:text-3xl">Швидкі розділи</h2>
+                <div class="accent-rule mx-auto"></div>
+            </div>
+            <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
                 @foreach ($tiles as $tile)
                     <a href="{{ $tile->url }}" @if ($tile->open_new_tab) target="_blank" rel="noopener" @endif
-                       class="card card-interactive group flex flex-col p-5">
-                        <span class="grid h-12 w-12 place-items-center rounded-xl bg-{{ $tile->color }}-50 text-{{ $tile->color }}-600 transition group-hover:bg-{{ $tile->color }}-600 group-hover:text-white">
+                       class="card card-interactive group flex flex-col p-6">
+                        <span class="grid h-12 w-12 place-items-center rounded-full bg-{{ $tile->color }}-50 text-{{ $tile->color }}-600 transition group-hover:bg-{{ $tile->color }}-600 group-hover:text-white">
                             <x-ico :name="$tile->icon ?: 'academic-cap'" class="h-6 w-6" />
                         </span>
                         <h3 class="mt-4 font-bold text-slate-900">{{ $tile->title }}</h3>
                         @if ($tile->description)
-                            <p class="mt-1 text-sm text-slate-500">{{ $tile->description }}</p>
+                            <p class="mt-1 text-sm leading-relaxed text-slate-500">{{ $tile->description }}</p>
                         @endif
+                        <span class="mt-auto self-end pt-4 text-gold-600 transition group-hover:translate-x-1">
+                            <x-ico name="arrow-right" class="h-5 w-5" />
+                        </span>
                     </a>
                 @endforeach
             </div>
@@ -107,38 +113,6 @@
                         </a>
                     @endforeach
                 </div>
-            </div>
-        </section>
-    @endif
-
-    {{-- ===================== ВІДГУКИ ===================== --}}
-    @if ($testimonials->isNotEmpty())
-        <section data-reveal class="container-site py-16">
-            <div class="text-center">
-                <h2 class="text-3xl font-extrabold text-slate-900">Відгуки студентів та випускників</h2>
-                <div class="accent-rule mx-auto"></div>
-            </div>
-            <div class="mt-10 grid gap-6 md:grid-cols-3">
-                @foreach ($testimonials as $t)
-                    <figure class="card flex flex-col p-6">
-                        <x-ico name="chat-bubble-bottom-center-text" variant="solid" class="h-7 w-7 text-gold-400" />
-                        <blockquote class="mt-4 flex-1 text-sm leading-relaxed text-slate-600">«{{ $t->quote }}»</blockquote>
-                        <figcaption class="mt-5 flex items-center gap-3 border-t border-slate-100 pt-4">
-                            @if ($t->photo)
-                                <x-picture :path="$t->photo" :alt="$t->name" loading="lazy" decoding="async"
-                                           class="h-11 w-11 rounded-full object-cover ring-2 ring-brand-100" />
-                            @else
-                                <span class="grid h-11 w-11 place-items-center rounded-full bg-brand-700 text-sm font-bold text-white">{{ $t->initials }}</span>
-                            @endif
-                            <span>
-                                <span class="block text-sm font-bold text-slate-900">{{ $t->name }}</span>
-                                @if ($t->role)
-                                    <span class="block text-xs text-slate-500">{{ $t->role }}</span>
-                                @endif
-                            </span>
-                        </figcaption>
-                    </figure>
-                @endforeach
             </div>
         </section>
     @endif

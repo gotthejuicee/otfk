@@ -25,8 +25,10 @@ class QuizQuestionResource extends Resource
     {
         return $form->schema([
             Forms\Components\TextInput::make('question')->label('Питання')->required()->maxLength(255)->columnSpanFull(),
-            Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0),
-            Forms\Components\Toggle::make('is_active')->label('Активне')->default(true),
+            Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0)
+                ->helperText('Номер питання у квізі: менше число — раніше.'),
+            Forms\Components\Toggle::make('is_active')->label('Активне')->default(true)
+                ->helperText('Вимкнено — питання не ставиться у квізі, але лишається в адмінці.'),
             Forms\Components\Repeater::make('options')
                 ->relationship()
                 ->label('Варіанти відповідей')
@@ -55,6 +57,8 @@ class QuizQuestionResource extends Resource
                 Tables\Columns\IconColumn::make('is_active')->label('Активне')->boolean(),
             ])
             ->defaultSort('sort_order')
+            ->emptyStateHeading('Питань квізу ще немає')
+            ->emptyStateDescription('Квіз на сторінці /kviz допомагає вступнику обрати спеціальність: кожен варіант відповіді додає бали одній зі спеціальностей.')
             ->actions([Tables\Actions\EditAction::make()])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);
     }

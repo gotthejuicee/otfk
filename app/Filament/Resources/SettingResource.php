@@ -16,9 +16,10 @@ class SettingResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
     protected static ?string $navigationGroup = 'Налаштування';
-    protected static ?string $navigationLabel = 'Налаштування сайту';
+    protected static ?string $navigationLabel = 'Розширені налаштування';
     protected static ?string $modelLabel = 'налаштування';
-    protected static ?string $pluralModelLabel = 'Налаштування сайту';
+    protected static ?string $pluralModelLabel = 'Розширені налаштування';
+    protected static ?int $navigationSort = 9;
 
     public static function form(Form $form): Form
     {
@@ -49,7 +50,10 @@ class SettingResource extends Resource
                     'announcement_text' => 'Текст термінового оголошення у смузі над шапкою сайту. Порожнє — смуга прихована.',
                     'announcement_type' => 'Колір смуги: info (синій), warning (золотий) або danger (червоний).',
                     'announcement_url' => 'Необовʼязкове посилання, куди веде оголошення (напр., новина).',
+                    'footer_about' => 'Текст «Про коледж» у підвалі сайту. Посилання-партнери підвалу редагуються у розділі «Швидкі посилання» (локація «Партнер у підвалі»).',
+                    'social_youtube' => 'Посилання на YouTube-канал коледжу. Показується у блоці-заклику на сторінці «Відео»; порожнє — блок приховано.',
                     'banner_overlay_opacity' => 'Затемнення фото банера (0–100). Зручніше змінювати в розділі «Банери».',
+                    'bells_second_shift' => 'Друга зміна в розкладі дзвінків: 1 — показувати, 0 — сховати. Зручніше перемикати кнопкою в розділі «Розклад дзвінків».',
                     default => null,
                 }),
             Forms\Components\TextInput::make('group')->label('Група')->default('general')->maxLength(255),
@@ -59,6 +63,7 @@ class SettingResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->description('Сирий key-value доступ на аварійний випадок. Звичайні налаштування зручніше міняти на сторінках «Контакти та соцмережі», «Оголошення», «Telegram», «Підвал і вигляд».')
             ->columns([
                 Tables\Columns\TextColumn::make('key')->label('Ключ')->searchable()->weight('bold'),
                 Tables\Columns\TextColumn::make('value')->label('Значення')->limit(60)->color('gray'),

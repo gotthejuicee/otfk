@@ -8,14 +8,15 @@ class SpecialtyController extends Controller
 {
     public function index()
     {
-        $specialties = Specialty::published()->ordered()->get();
+        $specialties = Specialty::published()->ordered()->with('programs')->get();
 
         return view('specialties.index', compact('specialties'));
     }
 
     public function show(Specialty $specialty)
     {
-        abort_unless($specialty->is_published, 404);
+        // Чернетки бачать лише залогінені адміністратори (превʼю з адмінки).
+        abort_unless($specialty->is_published || auth()->check(), 404);
 
         $specialty->load('programs');
 
