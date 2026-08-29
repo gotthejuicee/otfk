@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\Department;
 use App\Models\News;
 use App\Models\Page;
+use App\Models\Specialty;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -88,5 +90,38 @@ class DraftPreviewTest extends TestCase
             ->assertSee('Чернетка');
 
         $this->assertSame(0, (int) $news->fresh()->views);
+    }
+
+    public function test_specialty_draft_only_for_admin(): void
+    {
+        $specialty = Specialty::create([
+            'title' => 'Таємна спеціальність',
+            'slug' => 'tayemna-spetsialnist',
+            'is_published' => false,
+        ]);
+
+        $this->get('/spetsialnosti/' . $specialty->slug)->assertNotFound();
+
+        $this->actingAs($this->admin())
+            ->get('/spetsialnosti/' . $specialty->slug)
+            ->assertOk()
+            ->assertSee('Чернетка');
+    }
+
+    public function test_department_draft_only_for_admin(): void
+    {
+        $department = Department::create([
+            'title' => 'Таємний підрозділ',
+            'slug' => 'tayemnyy-pidrozdil',
+            'type' => 'kafedra',
+            'is_published' => false,
+        ]);
+
+        $this->get('/struktura/' . $department->slug)->assertNotFound();
+
+        $this->actingAs($this->admin())
+            ->get('/struktura/' . $department->slug)
+            ->assertOk()
+            ->assertSee('Чернетка');
     }
 }

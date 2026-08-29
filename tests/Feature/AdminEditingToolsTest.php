@@ -139,6 +139,8 @@ class AdminEditingToolsTest extends TestCase
     {
         Page::create(['title' => 'Чернетка сторінки', 'slug' => 'chernetka-vidzhet-1', 'is_published' => false]);
         News::create(['title' => 'Чернетка новини', 'slug' => 'chernetka-vidzhet-2', 'is_published' => false, 'published_at' => now()]);
+        \App\Models\Specialty::create(['title' => 'Чернетка спеціальності', 'slug' => 'chernetka-vidzhet-3', 'is_published' => false]);
+        \App\Models\Department::create(['title' => 'Чернетка підрозділу', 'slug' => 'chernetka-vidzhet-4', 'type' => 'kafedra', 'is_published' => false]);
 
         $this->assertTrue(Drafts::canView());
 
@@ -146,5 +148,7 @@ class AdminEditingToolsTest extends TestCase
 
         $this->assertContains('Чернетка сторінки', $titles);
         $this->assertContains('Чернетка новини', $titles);
+        $this->assertContains('Чернетка спеціальності', $titles);
+        $this->assertContains('Чернетка підрозділу', $titles);
     }
 }

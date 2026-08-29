@@ -4,14 +4,19 @@ namespace App\Filament\Pages;
 
 use App\Filament\Support\SettingsFormPage;
 use App\Filament\Support\ViewOnSite;
+use App\Models\QuickLink;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Form;
 
 /**
- * Тексти підвалу та позначка версії сайту. Затемнення фото банерів
- * сюди свідомо не винесено — воно редагується в розділі «Банери»
- * (одне місце керування, див. ADMIN-UX-PLAN Етап 2 п. 4).
+ * Все, що показує підвал сайту, в одному місці: текст «Про коледж»,
+ * посилання-партнери (рядки quick_links з location=footer_partner —
+ * редагуються репітером і синхронізуються при збереженні) та позначка
+ * версії сайту. Контакти й соцмережі підвал бере зі сторінки «Контакти
+ * та соцмережі». Затемнення фото банерів сюди свідомо не винесено — воно
+ * редагується в розділі «Банери» (одне місце керування, див.
+ * ADMIN-UX-PLAN Етап 2 п. 4).
  */
 class AppearanceSettings extends SettingsFormPage
 {
@@ -33,8 +38,23 @@ class AppearanceSettings extends SettingsFormPage
     protected function fromSettings(array $state): array
     {
         $state['site_version_color'] = $state['site_version_color'] ?: 'gold';
+        $state['partners'] = $this->partnerState();
 
         return $state;
+    }
+
+    /** @return array<int, array<string, mixed>> рядки footer_partner для репітера */
+    private function partnerState(): array
+    {
+        return QuickLink::location('footer_partner')->ordered()->get()
+            ->map(fn (QuickLink $link) => [
+                'id' => $link->id,
+                'title' => $link->title,
+                'url' => $link->url,
+                'open_new_tab' => $link->open_new_tab,
+                'is_visible' => $link->is_visible,
+            ])
+            ->all();
     }
 
     public function form(Form $form): Form
@@ -46,7 +66,26 @@ class AppearanceSettings extends SettingsFormPage
                         Forms\Components\Textarea::make('footer_about')
                             ->label('Текст «Про коледж»')
                             ->rows(3)
-                            ->helperText('Абзац під назвою коледжу в підвалі. Посилання-партнери редагуються у розділі «Швидкі посилання» (локація «Партнер у підвалі»).'),
+                            ->helperText('Абзац під назвою коледжу в підвалі. Контакти та соцмережі підвал бере зі сторінки «Контакти та соцмережі».'),
+                    ]),
+                Forms\Components\Section::make('Партнери в підвалі')
+                    ->description('Колонка «Партнери» в підвалі кожної сторінки. Порядок міняється перетягуванням. Якщо список порожній, сайт показує стандартні посилання (ОНТУ, МОН).')
+                    ->schema([
+                        Forms\Components\Repeater::make('partners')
+                            ->hiddenLabel()
+                            ->schema([
+                                Forms\Components\Hidden::make('id'),
+                                Forms\Components\TextInput::make('title')->label('Назва')->required()->maxLength(255),
+                                Forms\Components\TextInput::make('url')->label('Посилання')->required()->maxLength(255)
+                                    ->placeholder('https://...'),
+                                Forms\Components\Toggle::make('open_new_tab')->label('У новій вкладці')->default(true)->inline(false),
+                                Forms\Components\Toggle::make('is_visible')->label('Показувати')->default(true)->inline(false),
+                            ])
+                            ->columns(['sm' => 2, 'lg' => 4])
+                            ->reorderable()
+                            ->addActionLabel('Додати партнера')
+                            ->itemLabel(fn (array $state): ?string => $state['title'] ?? null)
+                            ->defaultItems(0),
                     ]),
                 Forms\Components\Section::make('Позначка версії сайту')
                     ->description('Маленький бейдж у нижньому рядку підвалу (напр. «Альфа-версія»). Порожній напис — бейдж приховано.')
@@ -73,6 +112,45 @@ class AppearanceSettings extends SettingsFormPage
                     ]),
             ])
             ->statePath('data');
+    }
+
+    public function save(): void
+    {
+        $this->syncPartners($this->form->getState()['partners'] ?? []);
+
+        parent::save();
+
+        // Повторне наповнення: репітер отримує свіжі id щойно створених рядків.
+        $this->mount();
+    }
+
+    /**
+     * Синхронізація репітера з таблицею quick_links (location=footer_partner):
+     * наявні рядки оновлюються за прихованим id, нові створюються, прибрані
+     * з форми — видаляються; порядок = позиція в репітері.
+     *
+     * @param  array<int, array<string, mixed>>  $partners
+     */
+    private function syncPartners(array $partners): void
+    {
+        $keptIds = [];
+
+        foreach (array_values($partners) as $index => $partner) {
+            $link = QuickLink::location('footer_partner')->find($partner['id'] ?? null)
+                ?? new QuickLink(['location' => 'footer_partner']);
+
+            $link->fill([
+                'title' => (string) $partner['title'],
+                'url' => (string) $partner['url'],
+                'open_new_tab' => (bool) ($partner['open_new_tab'] ?? true),
+                'is_visible' => (bool) ($partner['is_visible'] ?? true),
+                'sort_order' => $index,
+            ])->save();
+
+            $keptIds[] = $link->id;
+        }
+
+        QuickLink::location('footer_partner')->whereNotIn('id', $keptIds)->delete();
     }
 
     /** @return array<Action> */

@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
 use App\Models\News;
 use App\Models\Page;
+use App\Models\Specialty;
 use App\Support\AdminPreview;
 use Illuminate\Support\Str;
 
 /**
- * Превʼю несохранённой форми з адмінки: рендерить публічний шаблон
- * сторінки/новини з даними слепка (App\Support\AdminPreview), без запису
- * в БД. Доступ — лише залогіненим адмінам, інакше 404 (як і чернетки).
+ * Превʼю несохранённої форми з адмінки: рендерить публічний шаблон
+ * сторінки/новини/спеціальності/підрозділу з даними слепка
+ * (App\Support\AdminPreview), без запису в БД. Доступ — лише залогіненим
+ * адмінам, інакше 404 (як і чернетки).
  */
 class AdminPreviewController extends Controller
 {
@@ -24,6 +27,8 @@ class AdminPreviewController extends Controller
         return match ($snapshot['type']) {
             'page' => $this->page($snapshot['attributes']),
             'news' => $this->news($snapshot['attributes']),
+            'specialty' => $this->specialty($snapshot['attributes']),
+            'department' => $this->department($snapshot['attributes']),
             default => abort(404),
         };
     }
@@ -57,6 +62,49 @@ class AdminPreviewController extends Controller
             'prev' => null,
             'next' => null,
             'abiturientLinks' => collect(),
+            'adminPreview' => true,
+        ]);
+    }
+
+    /** @param array<string, mixed> $attributes */
+    private function specialty(array $attributes)
+    {
+        $specialty = new Specialty;
+        $specialty->forceFill($attributes);
+        $specialty->id = $specialty->id ?? 0;
+        $specialty->slug = $specialty->slug ?: (Str::slug((string) $specialty->title) ?: 'preview');
+
+        // Для наявного запису підтягнуться його ОПП, для нового (id=0) — порожньо.
+        $specialty->load('programs');
+
+        return view('specialties.show', [
+            'specialty' => $specialty,
+            'others' => Specialty::published()->ordered()->whereKeyNot($specialty->id)->get(),
+            'adminPreview' => true,
+        ]);
+    }
+
+    /** @param array<string, mixed> $attributes */
+    private function department(array $attributes)
+    {
+        $department = new Department;
+        $department->forceFill($attributes);
+        $department->id = $department->id ?? 0;
+        $department->slug = $department->slug ?: (Str::slug((string) $department->title) ?: 'preview');
+
+        $department->load(['staff' => fn ($q) => $q->where('is_published', true)->orderBy('sort_order')]);
+
+        $others = Department::published()
+            ->where('type', $department->type)
+            ->whereKeyNot($department->id)
+            ->ordered()
+            ->withCount('staff')
+            ->take(4)
+            ->get();
+
+        return view('structure.show', [
+            'department' => $department,
+            'others' => $others,
             'adminPreview' => true,
         ]);
     }

@@ -12,7 +12,7 @@
 
 ## Конвенции кода (фактические, из существующего кода)
 
-- Комментарии и docblocks — **на украинском**; UI-строки захардкожены в Blade по-украински (lang/-файлы почти не используются).
+- Комментарии и docblocks — **на украинском**; UI-строки захардкожены в Blade по-украински. Локаль приложения — `uk` (`APP_LOCALE=uk` во всех env, fallback в `config/app.php` тоже `uk`): даты через `translatedFormat`, хром Filament и `lang/uk` (validation, pagination) — украинские; не возвращать `en`.
 - URL-слаги — транслит украинского: `/novyny`, `/spetsialnosti`, `/rozklad-dzvinkiv`. Новые роуты именовать так же.
 - Отступы 4 пробела (2 для YAML), LF — `.editorconfig`. Форматтер `laravel/pint` установлен, но в CI не гоняется.
 - Контроллеры публичной части тонкие; списки — через модельные scopes (`published`, `ordered`, `active`, `visible`). Автослаг — в `booted()`/`saving` моделей.

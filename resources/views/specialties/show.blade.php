@@ -1,6 +1,12 @@
 <x-layouts.app :title="$specialty->title" :description="$specialty->short_description"
                :og-image="$specialty->cover_image ? asset('storage/' . $specialty->cover_image) : null">
 
+    @if (! empty($adminPreview))
+        <x-draft-notice message="Попередній перегляд — так виглядатиме сторінка спеціальності. Зміни ще не збережено: поверніться до форми й натисніть «Зберегти»." />
+    @elseif (! $specialty->is_published)
+        <x-draft-notice />
+    @endif
+
     {{-- Розмітка Course для пошукових систем --}}
     @php
         $courseLd = array_filter([

@@ -32,6 +32,33 @@ class AdminTablesTest extends TestCase
         }
     }
 
+    public function test_menu_items_list_shows_level_tabs(): void
+    {
+        // Меню редагується вкладками рівнів: «Верхній рівень» + вкладка
+        // підпунктів на кожен головний пункт (замість однієї плоскої таблиці).
+        $root = \App\Models\MenuItem::create(['label' => 'Тестовий пункт меню', 'link_type' => 'url', 'url' => '#']);
+        \App\Models\MenuItem::create(['label' => 'Тестовий підпункт', 'link_type' => 'url', 'url' => '#', 'parent_id' => $root->id]);
+
+        $this->actingAs(User::factory()->create())
+            ->get('/admin/menu-items')
+            ->assertOk()
+            ->assertSee('Верхній рівень')
+            ->assertSee('Тестовий пункт меню');
+    }
+
+    public function test_quick_links_resource_lists_only_home_tiles(): void
+    {
+        // Партнери підвалу редагуються у «Підвал і вигляд», а не в цьому ресурсі.
+        \App\Models\QuickLink::create(['location' => 'home_tile', 'title' => 'Тестова плитка', 'url' => '/']);
+        \App\Models\QuickLink::create(['location' => 'footer_partner', 'title' => 'Тестовий партнер підвалу', 'url' => 'https://example.com']);
+
+        $this->actingAs(User::factory()->create())
+            ->get('/admin/quick-links')
+            ->assertOk()
+            ->assertSee('Тестова плитка')
+            ->assertDontSee('Тестовий партнер підвалу');
+    }
+
     public function test_news_table_has_no_publish_toggle_column(): void
     {
         // Тумблер публікації новин у таблиці свідомо відсутній:

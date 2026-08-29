@@ -21,7 +21,8 @@ class StructureController extends Controller
 
     public function show(Department $department)
     {
-        abort_unless($department->is_published, 404);
+        // Чернетки бачать лише залогінені адміністратори (превʼю з адмінки).
+        abort_unless($department->is_published || auth()->check(), 404);
 
         $department->load(['staff' => fn ($q) => $q->where('is_published', true)->orderBy('sort_order')]);
 

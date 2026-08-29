@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\Department;
 use App\Models\News;
 use App\Models\Page;
+use App\Models\Specialty;
 use App\Models\User;
 use App\Support\AdminPreview;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -94,6 +96,47 @@ class FormPreviewTest extends TestCase
             ->assertSee('Попередній перегляд');
 
         $this->assertSame($before, News::count());
+    }
+
+    public function test_specialty_form_state_renders_without_saving(): void
+    {
+        $before = Specialty::count();
+
+        $token = AdminPreview::store('specialty', new Specialty, [
+            'title' => 'Ще не збережена спеціальність',
+            'code' => 'F2',
+            'short_description' => 'Опис з форми.',
+            'is_published' => false,
+        ]);
+
+        $this->actingAs(User::factory()->create())
+            ->get('/admin-preview/' . $token)
+            ->assertOk()
+            ->assertSee('Ще не збережена спеціальність')
+            ->assertSee('Опис з форми.')
+            ->assertSee('Попередній перегляд');
+
+        $this->assertSame($before, Specialty::count());
+    }
+
+    public function test_department_preview_shows_unsaved_changes(): void
+    {
+        $department = Department::create([
+            'title' => 'Стара назва підрозділу',
+            'slug' => 'stara-nazva-pidrozdilu',
+            'type' => 'kafedra',
+            'is_published' => true,
+        ]);
+
+        $token = AdminPreview::store('department', $department, ['title' => 'Нова назва підрозділу']);
+
+        $this->actingAs(User::factory()->create())
+            ->get('/admin-preview/' . $token)
+            ->assertOk()
+            ->assertSee('Нова назва підрозділу')
+            ->assertSee('Попередній перегляд');
+
+        $this->assertSame('Стара назва підрозділу', $department->fresh()->title);
     }
 
     public function test_unknown_array_state_keeps_saved_value(): void

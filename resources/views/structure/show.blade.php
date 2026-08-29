@@ -1,5 +1,11 @@
 <x-layouts.app :title="$department->title" :description="\Illuminate\Support\Str::limit(trim(preg_replace('/\s+/u', ' ', strip_tags((string) $department->description))), 160)">
 
+    @if (! empty($adminPreview))
+        <x-draft-notice message="Попередній перегляд — так виглядатиме сторінка підрозділу. Зміни ще не збережено: поверніться до форми й натисніть «Зберегти»." />
+    @elseif (! $department->is_published)
+        <x-draft-notice />
+    @endif
+
     @php
         // Українське відмінювання лічильника співробітників
         $staffWord = function (int $n): string {

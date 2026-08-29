@@ -146,6 +146,38 @@ class SettingsPagesTest extends TestCase
         $this->get('/')->assertOk()->assertSee('Бета-версія');
     }
 
+    public function test_appearance_page_syncs_footer_partners(): void
+    {
+        // Партнери підвалу тепер редагуються тут (репітер поверх quick_links
+        // location=footer_partner): створення, оновлення за id, видалення прибраних.
+        $old = \App\Models\QuickLink::create([
+            'location' => 'footer_partner', 'title' => 'Старий партнер', 'url' => 'https://old.example',
+        ]);
+        $gone = \App\Models\QuickLink::create([
+            'location' => 'footer_partner', 'title' => 'Зайвий партнер', 'url' => 'https://gone.example',
+        ]);
+        $tile = \App\Models\QuickLink::create([
+            'location' => 'home_tile', 'title' => 'Плитка', 'url' => '/',
+        ]);
+
+        Livewire::test(AppearanceSettings::class)
+            ->fillForm([
+                'partners' => [
+                    ['id' => null, 'title' => 'Новий партнер', 'url' => 'https://new.example', 'open_new_tab' => true, 'is_visible' => true],
+                    ['id' => $old->id, 'title' => 'Оновлений партнер', 'url' => 'https://old.example', 'open_new_tab' => true, 'is_visible' => true],
+                ],
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $partners = \App\Models\QuickLink::location('footer_partner')->ordered()->get();
+
+        $this->assertSame(['Новий партнер', 'Оновлений партнер'], $partners->pluck('title')->all());
+        $this->assertSame([0, 1], $partners->pluck('sort_order')->all());
+        $this->assertNull(\App\Models\QuickLink::find($gone->id));
+        $this->assertNotNull($tile->fresh()); // плиток головної синхронізація не торкається
+    }
+
     public function test_raw_setting_resource_is_renamed_to_advanced(): void
     {
         $this->get('/admin/settings')->assertOk()

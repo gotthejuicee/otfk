@@ -1,7 +1,7 @@
 <x-filament-widgets::widget>
     <x-filament::section
         heading="Чернетки"
-        description="Неопубліковані сторінки та новини. «Перегляд» відкриє чернетку на сайті — її бачите лише ви.">
+        description="Неопубліковані сторінки, новини, спеціальності та підрозділи. «Перегляд» відкриє чернетку на сайті — її бачите лише ви.">
         <ul class="divide-y divide-gray-100 dark:divide-white/5">
             @foreach ($this->drafts() as $draft)
                 <li class="flex items-center justify-between gap-4 py-2">
