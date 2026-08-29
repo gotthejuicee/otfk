@@ -7,6 +7,8 @@ use App\Models\Page;
 use App\Models\User;
 use App\Support\AdminPreview;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Tests\TestCase;
 
 /**
@@ -94,16 +96,79 @@ class FormPreviewTest extends TestCase
         $this->assertSame($before, News::count());
     }
 
-    public function test_non_scalar_form_state_is_ignored(): void
+    public function test_unknown_array_state_keeps_saved_value(): void
     {
-        $token = AdminPreview::store('page', new Page, [
-            'title' => 'Сторінка з файлом',
-            'cover_image' => ['tmp-upload-object'],
+        $page = Page::create([
+            'title' => 'Сторінка',
+            'slug' => 'storinka-z-oblozhkoyu',
+            'cover_image' => 'pages/zberezhena.jpg',
+            'is_published' => true,
         ]);
+
+        $token = AdminPreview::store('page', $page, [
+            'title' => 'Сторінка з файлом',
+            'cover_image' => [['not' => 'a-file-upload-state']],
+        ]);
+
+        $this->assertSame('pages/zberezhena.jpg', AdminPreview::get($token)['attributes']['cover_image']);
 
         $this->actingAs(User::factory()->create())
             ->get('/admin-preview/' . $token)
             ->assertOk()
             ->assertSee('Сторінка з файлом');
+    }
+
+    public function test_saved_file_path_in_upload_state_passes_through(): void
+    {
+        $token = AdminPreview::store('page', new Page, [
+            'title' => 'Сторінка',
+            'cover_image' => ['uuid' => 'pages/zberezhena.jpg'],
+        ]);
+
+        $this->assertSame('pages/zberezhena.jpg', AdminPreview::get($token)['attributes']['cover_image']);
+    }
+
+    public function test_removed_cover_previews_without_cover(): void
+    {
+        $page = Page::create([
+            'title' => 'Сторінка',
+            'slug' => 'storinka-bez-oblozhky',
+            'cover_image' => 'pages/zberezhena.jpg',
+            'is_published' => true,
+        ]);
+
+        $token = AdminPreview::store('page', $page, ['cover_image' => []]);
+
+        $this->assertNull(AdminPreview::get($token)['attributes']['cover_image']);
+    }
+
+    public function test_fresh_upload_is_copied_to_public_disk_and_shown(): void
+    {
+        Storage::fake('public');
+
+        // Протухла копія від попереднього превʼю — має прибратися при новому слепку.
+        Storage::disk('public')->put('admin-preview/stara-kopiya.jpg', 'old');
+        touch(Storage::disk('public')->path('admin-preview/stara-kopiya.jpg'), now()->subHour()->getTimestamp());
+
+        $tmpName = 'abc123-meta' . base64_encode('oblozhka.jpg') . '-.jpg';
+        Storage::disk('local')->put('livewire-tmp/' . $tmpName, 'fake-image-bytes');
+        $upload = new TemporaryUploadedFile($tmpName, 'local');
+
+        $token = AdminPreview::store('page', new Page, [
+            'title' => 'Сторінка зі свіжою обкладинкою',
+            'cover_image' => ['uuid' => $upload],
+        ]);
+
+        $copied = 'admin-preview/' . $token . '-cover_image.jpg';
+        Storage::disk('public')->assertExists($copied);
+        Storage::disk('public')->assertMissing('admin-preview/stara-kopiya.jpg');
+        $this->assertSame($copied, AdminPreview::get($token)['attributes']['cover_image']);
+
+        $this->actingAs(User::factory()->create())
+            ->get('/admin-preview/' . $token)
+            ->assertOk()
+            ->assertSee('storage/' . $copied, false);
+
+        Storage::disk('local')->delete('livewire-tmp/' . $tmpName);
     }
 }
