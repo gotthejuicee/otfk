@@ -27,13 +27,17 @@ class SpecialtyResource extends Resource
         return $form->schema([
             Forms\Components\Section::make('Основне')->schema([
                 Forms\Components\TextInput::make('title')->label('Назва спеціальності')->required()->maxLength(255)->columnSpanFull(),
-                Forms\Components\TextInput::make('code')->label('Код')->maxLength(255)->placeholder('напр., 121'),
+                Forms\Components\TextInput::make('code')->label('Код')->maxLength(255)->placeholder('напр., 121')
+                    ->helperText('Офіційний код спеціальності — бейдж на картці.'),
                 Forms\Components\TextInput::make('slug')->label('URL (slug)')->maxLength(255)
                     ->prefix(url('/spetsialnosti') . '/')
                     ->helperText('Залиште порожнім - згенерується автоматично.'),
-                Forms\Components\Textarea::make('short_description')->label('Короткий опис')->rows(2)->columnSpanFull(),
-                Forms\Components\RichEditor::make('description')->label('Повний опис')->columnSpanFull(),
-                Forms\Components\FileUpload::make('cover_image')->label('Зображення')->image()->directory('specialties')->imageEditor()->imageResizeMode('contain')->imageResizeTargetWidth('1600')->imageResizeTargetHeight('1600')->columnSpanFull(),
+                Forms\Components\Textarea::make('short_description')->label('Короткий опис')->rows(2)->columnSpanFull()
+                    ->helperText('1-2 речення в картці спеціальності у списку та в результаті квізу.'),
+                Forms\Components\RichEditor::make('description')->label('Повний опис')->columnSpanFull()
+                    ->helperText('Основний текст на сторінці спеціальності.'),
+                Forms\Components\FileUpload::make('cover_image')->label('Зображення')->image()->directory('specialties')->imageEditor()->imageResizeMode('contain')->imageResizeTargetWidth('1600')->imageResizeTargetHeight('1600')->columnSpanFull()
+                    ->helperText('Горизонтальне фото в картці та вгорі сторінки спеціальності.'),
             ])->columns(2),
             Forms\Components\Section::make('Деталі навчання')->schema([
                 Forms\Components\TextInput::make('degree')->label('Освітній ступінь')->maxLength(255)->placeholder('Фаховий молодший бакалавр'),

@@ -28,10 +28,14 @@ class VideoResource extends Resource
             Forms\Components\TextInput::make('youtube_id')->label('Посилання на YouTube або ID')->required()->maxLength(255)
                 ->helperText('Просто вставте посилання (youtube.com/watch?v=…, youtu.be/…, shorts) — ID збережеться сам.')
                 ->dehydrateStateUsing(fn (?string $state) => static::extractYoutubeId((string) $state)),
-            Forms\Components\DatePicker::make('published_at')->label('Дата')->default(now()),
-            Forms\Components\Textarea::make('description')->label('Опис')->rows(3)->columnSpanFull(),
-            Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0),
-            Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true),
+            Forms\Components\DatePicker::make('published_at')->label('Дата')->default(now())
+                ->helperText('Показується підписом під відео на сторінці «Відео».'),
+            Forms\Components\Textarea::make('description')->label('Опис')->rows(3)->columnSpanFull()
+                ->helperText('Кілька речень під назвою відео. Необовʼязково.'),
+            Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0)
+                ->helperText('Менше число — вище у списку; перше відео стає головним (великим).'),
+            Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true)
+                ->helperText('Вимкнено — відео зникає зі сторінки «Відео», але лишається в адмінці.'),
         ]);
     }
 

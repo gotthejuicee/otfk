@@ -33,9 +33,11 @@ class NewsResource extends Resource
                 ->prefix(url('/novyny') . '/')
                 ->helperText('Залиште порожнім - згенерується автоматично.'),
             Forms\Components\Select::make('category_id')
-                ->label('Категорія')->relationship('category', 'title')->searchable()->preload(),
+                ->label('Категорія')->relationship('category', 'title')->searchable()->preload()
+                ->helperText('Необовʼязково. За категоріями працює фільтр на сторінці «Новини».'),
             Forms\Components\Textarea::make('excerpt')
-                ->label('Короткий опис')->rows(2)->maxLength(1000)->columnSpanFull(),
+                ->label('Короткий опис')->rows(2)->maxLength(1000)->columnSpanFull()
+                ->helperText('1-2 речення: показується в картці новини у списку та при поширенні в соцмережах і месенджерах.'),
             Forms\Components\RichEditor::make('body')
                 ->label('Текст новини')
                 ->fileAttachmentsDisk('public')
@@ -44,11 +46,15 @@ class NewsResource extends Resource
                 ->helperText('Зображення можна вставляти просто в текст — кнопкою прикріплення в редакторі.')
                 ->columnSpanFull(),
             Forms\Components\FileUpload::make('cover_image')
-                ->label('Обкладинка')->image()->directory('news')->imageEditor()->imageResizeMode('contain')->imageResizeTargetWidth('1600')->imageResizeTargetHeight('1600'),
+                ->label('Обкладинка')->image()->directory('news')->imageEditor()->imageResizeMode('contain')->imageResizeTargetWidth('1600')->imageResizeTargetHeight('1600')
+                ->helperText('Горизонтальне фото: показується в картці у списку новин і вгорі самої новини.'),
             Forms\Components\DateTimePicker::make('published_at')
-                ->label('Дата публікації')->default(now())->seconds(false),
-            Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true),
-            Forms\Components\Toggle::make('is_featured')->label('Рекомендована'),
+                ->label('Дата публікації')->default(now())->seconds(false)
+                ->helperText('Новина з майбутньою датою зʼявиться на сайті лише коли дата настане.'),
+            Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true)
+                ->helperText('Вимкнено — чернетка: на сайті не видно, лишається в адмінці та у віджеті «Чернетки».'),
+            Forms\Components\Toggle::make('is_featured')->label('Рекомендована')
+                ->helperText('Службова позначка «на майбутнє» — на сайті поки не використовується.'),
             Forms\Components\Toggle::make('is_heritage')
                 ->label('Урочисте оформлення (heritage)')
                 ->helperText('Листоподібний стиль для ювілеїв, історичних та особливих матеріалів.'),

@@ -30,15 +30,20 @@ class StaffResource extends Resource
             Forms\Components\TextInput::make('slug')->label('Слаг (URL персональної сторінки)')->maxLength(255)->unique(ignoreRecord: true)
                 ->prefix(url('/personal') . '/')
                 ->helperText('Порожній — згенерується з ПІБ.')->columnSpanFull(),
-            Forms\Components\TextInput::make('position')->label('Посада')->maxLength(255)->columnSpanFull(),
+            Forms\Components\TextInput::make('position')->label('Посада')->maxLength(255)->columnSpanFull()
+                ->helperText('Показується під ПІБ. На сторінці «Адміністрація» за посадою людей групують у блоки.'),
             Forms\Components\Select::make('category')->label('Категорія')->required()->default('teacher')
-                ->options(Staff::CATEGORIES),
+                ->options(Staff::CATEGORIES)
+                ->helperText('«Адміністрація» — людина показується на сторінці «Адміністрація»; «Викладач» — на сторінці свого підрозділу.'),
             Forms\Components\Select::make('department_id')->label('Підрозділ')
-                ->relationship('department', 'title')->searchable()->preload(),
+                ->relationship('department', 'title')->searchable()->preload()
+                ->helperText('На сторінці цього підрозділу людина зʼявиться у списку колективу.'),
             Forms\Components\TextInput::make('academic_degree')->label('Науковий ступінь / звання')->maxLength(255),
-            Forms\Components\TextInput::make('email')->label('Email')->email()->maxLength(255),
+            Forms\Components\TextInput::make('email')->label('Email')->email()->maxLength(255)
+                ->helperText('Показується на персональній сторінці працівника. Необовʼязково.'),
             Forms\Components\TextInput::make('phone')->label('Телефон')->maxLength(255),
-            Forms\Components\Textarea::make('bio')->label('Біографія')->rows(3)->columnSpanFull(),
+            Forms\Components\Textarea::make('bio')->label('Біографія')->rows(3)->columnSpanFull()
+                ->helperText('Кілька речень на персональній сторінці працівника. Необовʼязково.'),
             Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0)
                 ->helperText('Простіше змінити перетягуванням рядків у списку (кнопка «Змінити порядок»).'),
             Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true),

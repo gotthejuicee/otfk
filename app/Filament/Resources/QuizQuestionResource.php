@@ -25,8 +25,10 @@ class QuizQuestionResource extends Resource
     {
         return $form->schema([
             Forms\Components\TextInput::make('question')->label('Питання')->required()->maxLength(255)->columnSpanFull(),
-            Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0),
-            Forms\Components\Toggle::make('is_active')->label('Активне')->default(true),
+            Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0)
+                ->helperText('Номер питання у квізі: менше число — раніше.'),
+            Forms\Components\Toggle::make('is_active')->label('Активне')->default(true)
+                ->helperText('Вимкнено — питання не ставиться у квізі, але лишається в адмінці.'),
             Forms\Components\Repeater::make('options')
                 ->relationship()
                 ->label('Варіанти відповідей')

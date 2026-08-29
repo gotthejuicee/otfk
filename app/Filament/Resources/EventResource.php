@@ -30,10 +30,12 @@ class EventResource extends Resource
                 ->after('starts_at'),
             Forms\Components\TextInput::make('location')->label('Місце проведення')->maxLength(255)
                 ->placeholder('Актова зала коледжу')->columnSpanFull(),
-            Forms\Components\Textarea::make('description')->label('Опис')->rows(3)->columnSpanFull(),
+            Forms\Components\Textarea::make('description')->label('Опис')->rows(3)->columnSpanFull()
+                ->helperText('Кілька речень у картці події на сторінці «Події»; потрапляє і в подію календаря відвідувача.'),
             Forms\Components\TextInput::make('url')->label('Посилання «Детальніше»')->url()->maxLength(255)
                 ->helperText('Необовʼязково: новина на сайті або зовнішня сторінка.')->columnSpanFull(),
-            Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true),
+            Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true)
+                ->helperText('Майбутні опубліковані події видно на головній та на сторінці «Події»; минулі — в архіві подій.'),
         ]);
     }
 

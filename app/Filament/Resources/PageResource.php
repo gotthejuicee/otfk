@@ -32,8 +32,10 @@ class PageResource extends Resource
                     ->prefix(url('/') . '/')
                     ->helperText('Залиште порожнім - згенерується автоматично.'),
                 Forms\Components\Select::make('parent_id')->label('Батьківський розділ')
-                    ->relationship('parent', 'title')->searchable()->preload(),
-                Forms\Components\Textarea::make('excerpt')->label('Короткий опис')->rows(2)->columnSpanFull(),
+                    ->relationship('parent', 'title')->searchable()->preload()
+                    ->helperText('Якщо обрати — сторінка стане підсторінкою і зʼявиться плиткою на сторінці розділу.'),
+                Forms\Components\Textarea::make('excerpt')->label('Короткий опис')->rows(2)->columnSpanFull()
+                    ->helperText('Показується у плитці сторінки на сторінці батьківського розділу та в результатах пошуку по сайту.'),
                 Forms\Components\Toggle::make('is_heritage')
                     ->label('Урочисте оформлення (heritage)')
                     ->helperText('Увімкніть для сторінок історії, хроніки та ювілейних матеріалів — стиль «листа» на сайті.')
@@ -48,14 +50,20 @@ class PageResource extends Resource
                     ->fileAttachmentsVisibility('public')
                     ->helperText('Зображення можна вставляти просто в текст — кнопкою прикріплення в редакторі.')
                     ->columnSpanFull(),
-                Forms\Components\FileUpload::make('cover_image')->label('Зображення')->image()->directory('pages')->imageEditor()->imageResizeMode('contain')->imageResizeTargetWidth('1600')->imageResizeTargetHeight('1600')->columnSpanFull(),
+                Forms\Components\FileUpload::make('cover_image')->label('Зображення')->image()->directory('pages')->imageEditor()->imageResizeMode('contain')->imageResizeTargetWidth('1600')->imageResizeTargetHeight('1600')->columnSpanFull()
+                    ->helperText('Горизонтальне фото вгорі сторінки та в її плитці. Необовʼязково.'),
             ])->columns(2),
             Forms\Components\Section::make('Налаштування')->schema([
-                Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true),
-                Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0),
-                Forms\Components\TextInput::make('section')->label('Розділ (службове поле)')->maxLength(255),
-                Forms\Components\TextInput::make('meta_title')->label('SEO-заголовок')->maxLength(255),
-                Forms\Components\Textarea::make('meta_description')->label('SEO-опис')->rows(2)->maxLength(500)->columnSpanFull(),
+                Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true)
+                    ->helperText('Вимкнено — чернетка: відвідувачам сторінка не видна (404), адміну відкривається з плашкою «Чернетка».'),
+                Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0)
+                    ->helperText('Порядок плитки серед сусідніх сторінок розділу: менше число — вище.'),
+                Forms\Components\TextInput::make('section')->label('Розділ (службове поле)')->maxLength(255)
+                    ->helperText('Технічна позначка з імпорту старого сайту — заповнювати не потрібно.'),
+                Forms\Components\TextInput::make('meta_title')->label('SEO-заголовок')->maxLength(255)
+                    ->helperText('Заголовок вкладки браузера та в Google. Порожнє — використовується назва сторінки.'),
+                Forms\Components\Textarea::make('meta_description')->label('SEO-опис')->rows(2)->maxLength(500)->columnSpanFull()
+                    ->helperText('Опис сторінки для Google. Порожнє — використовується короткий опис.'),
             ])->columns(2)->collapsed(),
         ]);
     }

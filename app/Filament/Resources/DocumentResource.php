@@ -39,11 +39,16 @@ class DocumentResource extends Resource
                 ])
                 ->maxSize(20480)
                 ->helperText('PDF, DOC(X), XLS(X), до 20 МБ. Або вкажіть зовнішнє посилання нижче.'),
-            Forms\Components\TextInput::make('external_url')->label('Зовнішнє посилання')->url()->maxLength(255),
-            Forms\Components\Textarea::make('description')->label('Опис')->rows(2)->columnSpanFull(),
-            Forms\Components\DatePicker::make('published_at')->label('Дата документа')->default(now()),
-            Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0),
-            Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true),
+            Forms\Components\TextInput::make('external_url')->label('Зовнішнє посилання')->url()->maxLength(255)
+                ->helperText('Якщо документ розміщено на іншому сайті — замість файла.'),
+            Forms\Components\Textarea::make('description')->label('Опис')->rows(2)->columnSpanFull()
+                ->helperText('Короткий підпис під назвою документа. Необовʼязково.'),
+            Forms\Components\DatePicker::make('published_at')->label('Дата документа')->default(now())
+                ->helperText('Показується поруч із документом у списку.'),
+            Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0)
+                ->helperText('Порядок усередині категорії: менше число — вище.'),
+            Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true)
+                ->helperText('Вимкнено — документ зникає зі сторінки «Публічна інформація», але лишається в адмінці.'),
         ]);
     }
 

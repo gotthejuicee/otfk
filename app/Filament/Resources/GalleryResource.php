@@ -29,10 +29,14 @@ class GalleryResource extends Resource
             Forms\Components\TextInput::make('slug')->label('URL (slug)')->maxLength(255)
                 ->prefix(url('/halereya') . '/')
                 ->helperText('Залиште порожнім - згенерується автоматично.'),
-            Forms\Components\DatePicker::make('published_at')->label('Дата')->default(now()),
-            Forms\Components\Textarea::make('description')->label('Опис')->rows(2)->columnSpanFull(),
-            Forms\Components\FileUpload::make('cover_image')->label('Обкладинка')->image()->directory('gallery')->imageEditor()->imageResizeMode('contain')->imageResizeTargetWidth('1600')->imageResizeTargetHeight('1600'),
-            Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true),
+            Forms\Components\DatePicker::make('published_at')->label('Дата')->default(now())
+                ->helperText('Дата альбому в картці; новіші альбоми показуються першими.'),
+            Forms\Components\Textarea::make('description')->label('Опис')->rows(2)->columnSpanFull()
+                ->helperText('1-2 речення під назвою альбому. Необовʼязково.'),
+            Forms\Components\FileUpload::make('cover_image')->label('Обкладинка')->image()->directory('gallery')->imageEditor()->imageResizeMode('contain')->imageResizeTargetWidth('1600')->imageResizeTargetHeight('1600')
+                ->helperText('Картка альбому на сторінці «Галерея». Порожнє — використовується перше фото альбому.'),
+            Forms\Components\Toggle::make('is_published')->label('Опубліковано')->default(true)
+                ->helperText('Вимкнено — альбом не видно на сайті, але він лишається в адмінці.'),
             Forms\Components\Toggle::make('is_archive')
                 ->label('Архівний стиль фото')
                 ->helperText('Сепія, рамки та «ламповий» вигляд для історичних альбомів.')

@@ -29,7 +29,8 @@ class FaqResource extends Resource
                 ->helperText('Звичайний текст; перенесення рядків зберігаються.'),
             Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0)
                 ->helperText('Простіше змінити перетягуванням рядків у списку (кнопка «Змінити порядок»).'),
-            Forms\Components\Toggle::make('is_active')->label('Показувати')->default(true),
+            Forms\Components\Toggle::make('is_active')->label('Показувати')->default(true)
+                ->helperText('Вимкнено — питання зникає зі сторінки «Питання та відповіді», але лишається в адмінці.'),
         ]);
     }
 

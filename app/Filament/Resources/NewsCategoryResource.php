@@ -27,7 +27,8 @@ class NewsCategoryResource extends Resource
             Forms\Components\TextInput::make('title')->label('Назва')->required()->maxLength(255),
             Forms\Components\TextInput::make('slug')->label('URL (slug)')->maxLength(255)
                 ->helperText('Залиште порожнім - згенерується автоматично.'),
-            Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0),
+            Forms\Components\TextInput::make('sort_order')->label('Порядок')->numeric()->default(0)
+                ->helperText('Порядок категорії у фільтрі на сторінці «Новини»: менше число — раніше.'),
             Forms\Components\Toggle::make('is_heritage')
                 ->label('Heritage-стиль для всіх новин категорії')
                 ->helperText('Урочисте листоподібне оформлення для архіву, історії, ювілеїв. Можна вимкнути окремо в новині.')
