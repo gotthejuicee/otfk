@@ -67,7 +67,7 @@ class AppearanceSettings extends SettingsFormPage
         return $form
             ->schema([
                 Forms\Components\Section::make('Святкова тема')
-                    ->description('Прикраси на весь сайт до свята: стрічка над шапкою, падаючі сніжинки/прапорці та значок біля логотипа. «Звичайна» — сайт без прикрас.')
+                    ->description('Прикраси на весь сайт до свята: шапка й підвал у кольорах свята, стрічка з гірляндою, значок біля логотипа та короткий «снігопад» при відкритті сторінки. «Звичайна» — сайт без прикрас.')
                     ->schema([
                         Forms\Components\Select::make('holiday_theme')
                             ->label('Тема')

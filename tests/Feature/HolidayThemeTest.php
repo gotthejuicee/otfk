@@ -32,10 +32,15 @@ class HolidayThemeTest extends TestCase
         Setting::updateOrCreate(['key' => 'holiday_theme'], ['value' => 'new_year', 'group' => 'appearance']);
 
         $this->get('/')->assertOk()
-            ->assertSee('data-holiday="new_year"', false)
+            ->assertSee('<body class="flex min-h-screen flex-col text-slate-700" data-holiday="new_year">', false)
             ->assertSee('holiday-ribbon')
+            ->assertSee('holiday-garland')
             ->assertSee('holiday-particles')
+            ->assertSee('holiday-corner')
             ->assertSee('holiday-logo-badge')
+            // тема перефарбовує темний «хром» шапки й підвалу
+            ->assertSee('body[data-holiday] header nav.bg-brand-900', false)
+            ->assertSee('body[data-holiday] footer.bg-brand-950', false)
             ->assertSee('🎄');
     }
 
@@ -52,6 +57,9 @@ class HolidayThemeTest extends TestCase
             $this->assertNotSame('', $theme['label'], "Тема {$key} без назви");
             $this->assertNotSame('', $theme['badge'], "Тема {$key} без бейджа");
             $this->assertNotSame('', $theme['ribbon'], "Тема {$key} без стрічки");
+            $this->assertNotSame('', $theme['chrome'], "Тема {$key} без кольору навігації");
+            $this->assertNotSame('', $theme['chrome_dark'], "Тема {$key} без кольору підвалу");
+            $this->assertNotSame('', $theme['accent'], "Тема {$key} без акцентного кольору");
 
             Setting::updateOrCreate(['key' => 'holiday_theme'], ['value' => $key, 'group' => 'appearance']);
 

@@ -70,7 +70,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 {{-- Фон body задається в app.css (брендові засвітки + сітка з крапок), тому без bg-white --}}
-<body class="flex min-h-screen flex-col text-slate-700">
+<body class="flex min-h-screen flex-col text-slate-700"@if ($holiday) data-holiday="{{ $s['holiday_theme'] }}"@endif>
 
     {{-- Святкові прикраси (стрічка + частинки), коли в адмінці обрано тему --}}
     <x-holiday-decor :theme="$s['holiday_theme'] ?? null" />
