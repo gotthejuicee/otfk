@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PageResource\Pages;
 use App\Filament\Support\ViewOnSite;
 use App\Models\Page;
+use App\Support\UniqueSlug;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -41,7 +42,12 @@ class PageResource extends Resource
                     ->label('Ключова сторінка розділу')
                     ->helperText('На сторінці батьківського розділу така сторінка виноситься нагору окремою великою карткою.')
                     ->columnSpanFull(),
-                Forms\Components\RichEditor::make('body')->label('Основний текст')->columnSpanFull(),
+                Forms\Components\RichEditor::make('body')->label('Основний текст')
+                    ->fileAttachmentsDisk('public')
+                    ->fileAttachmentsDirectory('pages')
+                    ->fileAttachmentsVisibility('public')
+                    ->helperText('Зображення можна вставляти просто в текст — кнопкою прикріплення в редакторі.')
+                    ->columnSpanFull(),
                 Forms\Components\FileUpload::make('cover_image')->label('Зображення')->image()->directory('pages')->imageEditor()->imageResizeMode('contain')->imageResizeTargetWidth('1600')->imageResizeTargetHeight('1600')->columnSpanFull(),
             ])->columns(2),
             Forms\Components\Section::make('Налаштування')->schema([
@@ -77,6 +83,15 @@ class PageResource extends Resource
             ->emptyStateDescription('Сторінки - це постійні розділи сайту: «Історія», «Бібліотека», «Абітурієнту» тощо. Створіть першу сторінку, і вона зʼявиться на сайті за своєю адресою.')
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\ReplicateAction::make()
+                    ->label('Дублювати')
+                    ->beforeReplicaSaved(function (Page $replica, Page $record) {
+                        $replica->title = $record->title . ' (копія)';
+                        $replica->slug = UniqueSlug::copyOf(Page::class, $record->slug);
+                        $replica->is_published = false;
+                    })
+                    ->successRedirectUrl(fn (Page $replica) => static::getUrl('edit', ['record' => $replica]))
+                    ->successNotificationTitle('Копію створено чернеткою'),
                 ViewOnSite::table(fn (Page $record) => url('/' . $record->slug)),
             ])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);

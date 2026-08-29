@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\NewsResource\Pages;
 use App\Filament\Support\ViewOnSite;
 use App\Models\News;
+use App\Support\UniqueSlug;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -36,7 +37,12 @@ class NewsResource extends Resource
             Forms\Components\Textarea::make('excerpt')
                 ->label('Короткий опис')->rows(2)->maxLength(1000)->columnSpanFull(),
             Forms\Components\RichEditor::make('body')
-                ->label('Текст новини')->columnSpanFull(),
+                ->label('Текст новини')
+                ->fileAttachmentsDisk('public')
+                ->fileAttachmentsDirectory('news')
+                ->fileAttachmentsVisibility('public')
+                ->helperText('Зображення можна вставляти просто в текст — кнопкою прикріплення в редакторі.')
+                ->columnSpanFull(),
             Forms\Components\FileUpload::make('cover_image')
                 ->label('Обкладинка')->image()->directory('news')->imageEditor()->imageResizeMode('contain')->imageResizeTargetWidth('1600')->imageResizeTargetHeight('1600'),
             Forms\Components\DateTimePicker::make('published_at')
@@ -87,6 +93,19 @@ class NewsResource extends Resource
             ->emptyStateDescription('Новини зʼявляються на головній та на сторінці «Новини». Створіть першу новину - за потреби її можна зберегти чернеткою і опублікувати пізніше.')
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\ReplicateAction::make()
+                    ->label('Дублювати')
+                    ->beforeReplicaSaved(function (News $replica, News $record) {
+                        $replica->title = $record->title . ' (копія)';
+                        $replica->slug = UniqueSlug::copyOf(News::class, $record->slug);
+                        $replica->is_published = false; // чернетка → NewsObserver не автопостить у Telegram
+                        $replica->published_at = now();
+                        $replica->views = 0;
+                        $replica->likes = 0;
+                        $replica->telegram_posted_at = null;
+                    })
+                    ->successRedirectUrl(fn (News $replica) => static::getUrl('edit', ['record' => $replica]))
+                    ->successNotificationTitle('Копію створено чернеткою'),
                 ViewOnSite::table(fn (News $record) => route('news.show', $record)),
             ])
             ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()])]);

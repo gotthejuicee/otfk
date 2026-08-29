@@ -17,13 +17,13 @@
 |---|---|
 | `app/Http/Controllers/` | Контроллеры публичной части (админка их не использует) |
 | `app/Http/Middleware/` | `SecurityHeaders`, `TrackVisits` — оба глобально в `web`-группе |
-| `app/Filament/` | Вся админка: Resources (23 шт.), Pages (`ContentChecklist`, `BellSchedule`), Widgets |
+| `app/Filament/` | Вся админка: Resources (23 шт.), Pages (`ContentChecklist`, `BellSchedule`, `BrokenLinks`, страницы настроек), Widgets |
 | `app/Models/` | 28 Eloquent-моделей + трейт `Concerns/OptimizesUploadedImages` |
 | `app/Services/` | `TelegramPoster` — исходящий постинг новостей в Telegram-канал |
-| `app/Support/` | `ImageOptimizer` (GD → WebP), `BannerOverlay` (inline-CSS градиенты) |
+| `app/Support/` | `ImageOptimizer` (GD → WebP), `BannerOverlay` (inline-CSS градиенты), `AdminPreview` (слепки форм для превью), `LinkChecker` (битые внутренние ссылки), `UniqueSlug` (слаг копии при «Дублювати») |
 | `app/Jobs/`, `app/Mail/` | `PostNewsToTelegram` (писем больше нет — формы заявок/обращений удалены) |
 | `app/Observers/` | `NewsObserver` — триггер Telegram-автопоста (подключён атрибутом на модели!) |
-| `app/Console/Commands/` | `otfk:backup`, `images:webp` и пять импорт-команд контента старого сайта: `otfk:import-news`, `otfk:import-docs`, `otfk:import-pages`, `otfk:import-staff`, `otfk:import-contacts` (см. «Импорт контента старого сайта»); общий трейт чтения зеркала — `Concerns/ReadsOtfkExport` |
+| `app/Console/Commands/` | `otfk:backup`, `images:webp`, `otfk:check-links` (битые внутренние ссылки в контенте, тот же движок — страница «Биті посилання» в админке) и пять импорт-команд контента старого сайта: `otfk:import-news`, `otfk:import-docs`, `otfk:import-pages`, `otfk:import-staff`, `otfk:import-contacts` (см. «Импорт контента старого сайта»); общий трейт чтения зеркала — `Concerns/ReadsOtfkExport` |
 | `bootstrap/app.php` | Регистрация роутов, health `/up`, кастомные middleware |
 | `config/` | Сток Laravel 12, кроме `blade-icons.php` (отключён дефолтный `<x-icon>`) |
 | `database/migrations/` | Схема **и контент-фикстуры** (см. «Миграции как контент») |
@@ -34,7 +34,7 @@
 | `resources/views/` | Blade: единый layout `components/layouts/app.blade.php` + страницы |
 | `resources/css/app.css`, `resources/js/app.js` | Tailwind v4 тема + Alpine; весь кастомный JS — inline в layout |
 | `public/build/` | Прод-бандл Vite; **в git не входит** — собирается локально (`npm run build`) и в CI при деплое |
-| `tests/Feature/` | 25 фиче-тестов; многие фиксируют поведенческие контракты |
+| `tests/Feature/` | 44 фиче-теста; многие фиксируют поведенческие контракты |
 | `docs/posibnyk-administratora.html` | Ручной (не генерируемый) мануал админа для персонала |
 | `DocsHtml/generate.mjs` | Генератор HTML-твинов этой документации |
 | `.github/workflows/` | `tests.yml` (тесты + сборка фронта) и `deploy.yml` (автодеплой `master` на хостинг) |
@@ -51,7 +51,7 @@ flowchart LR
     Misc["/podiyi /faq /kviz /dokumenty /kontakty ..."] --> MiscC[Прочие контроллеры]
   end
   subgraph Admin["Админка /admin"]
-    Filament[Filament 3 Panel<br/>20 Resources + Checklist + Widgets]
+    Filament[Filament 3 Panel<br/>23 Resources + Pages + Widgets]
   end
   HomeC & NewsC & PageC & MiscC --> DB[(MySQL / SQLite<br/>~32 таблицы)]
   Filament --> DB
@@ -94,7 +94,7 @@ flowchart LR
 
 ### Админка
 
-Ручных админ-роутов **нет** — всё генерирует Filament (`app/Providers/Filament/AdminPanelProvider.php`): путь `/admin`, login/logout/profile встроенные, **регистрация и сброс пароля отключены**. Auto-discovery ресурсов из `app/Filament/Resources` (Banner, Department, Document(+Category), Event, Faq, Gallery, MenuItem, News(+Category), Page, Program, QuickLink, QuizQuestion, Setting, Specialty, Staff, StatItem, User, Video), страницы `ContentChecklist` («Що ще наповнити»; страницы-плитки перехватываемых роутов — `rozklad-dzvinkiv`, `faq`, `kviz` — и хабы с опубликованными детьми не считаются заглушками) и `BellSchedule` («Розклад дзвінків» — форма настроек вместо CRUD), виджеты дашборда (QuickActions, StatsOverview, VisitsChart, TopNews, TopPages).
+Ручных админ-роутов **нет** — всё генерирует Filament (`app/Providers/Filament/AdminPanelProvider.php`): путь `/admin`, login/logout/profile встроенные, **регистрация и сброс пароля отключены**. Auto-discovery ресурсов из `app/Filament/Resources` (Banner, Department, Document(+Category), Event, Faq, Gallery, MenuItem, News(+Category), Page, Program, QuickLink, QuizQuestion, Setting, Specialty, Staff, StatItem, User, Video), страницы `ContentChecklist` («Що ще наповнити»; страницы-плитки перехватываемых роутов — `rozklad-dzvinkiv`, `faq`, `kviz` — и хабы с опубликованными детьми не считаются заглушками), `BellSchedule` («Розклад дзвінків» — форма настроек вместо CRUD) и `BrokenLinks` («Биті посилання» — отчёт `App\Support\LinkChecker` с кэшем 10 мин и кнопкой перепроверки), виджеты дашборда (QuickActions, Drafts — «Чернетки», скрыт при их отсутствии, StatsOverview, VisitsChart, TopNews, TopPages).
 
 Группа «Налаштування» (Этап 2 [ADMIN-UX-PLAN.md](ADMIN-UX-PLAN.md)) — четыре «человеческие» страницы-формы поверх таблицы `settings` (общая база `app/Filament/Support/SettingsFormPage.php`: страница объявляет `keys()`, mount читает `Setting::map()`, save пишет `firstOrNew`+`save`, кэш скидывает обсервер модели): «Контакти та соцмережі» (`contact_*`, `work_hours`, `map_embed`, `social_*`), «Оголошення» (`announcement_*` + живой предпросмотр полосы), «Telegram» (`telegram_autopost`/`telegram_bot_token` — поле-пароль/`telegram_channel` + кнопка «Надіслати тестове повідомлення» — `TelegramPoster::sendTest()` с незохранённых значений формы), «Підвал і вигляд» (`footer_about`, `site_version_label/color`; затемнение баннеров осталось только в «Банери»). Сырой key-value `SettingResource` переименован в «Розширені налаштування» и опущен в низ группы как аварийный доступ. Тест: `SettingsPagesTest`.
 
@@ -103,6 +103,8 @@ flowchart LR
 Кроме того, на формах создания/редактирования страниц и новостей есть кнопка «Превʼю» (`app/Filament/Support/PreviewFormAction.php`) — превью *несохранённых* изменений в стиле GitHub wiki: текущее состояние формы кладётся слепком в кэш (`App\Support\AdminPreview`, TTL 10 мин), и `/admin-preview/{token}` открывается в новой вкладке с настоящим публичным шаблоном и плашкой «Попередній перегляд» — без записи в БД. Нескалярные поля (загрузка файлов) в слепок не попадают — для них показывается сохранённое значение. Тест: `FormPreviewTest`.
 
 UX-мелочи таблиц и форм (Этап 1 плана [ADMIN-UX-PLAN.md](ADMIN-UX-PLAN.md)): перетаскивание порядка (`->reorderable('sort_order')`) в MenuItem (с группировкой по родителю), QuickLink, Faq, StatItem, DocumentCategory, Specialty, Department, Staff; инлайн-тумблеры публикации (`ToggleColumn`) в таблицах Page, Document, Gallery, Staff и MenuItem (`is_visible`) — **у новостей тумблера в таблице сознательно нет**: `NewsObserver` шлёт автопост в Telegram при «оживлении» новости, переключение только в форме (закреплено тестом `AdminTablesTest`); превью итогового URL префиксом у полей slug; фильтры таблиц (страницы — по разделу и черновикам, новости — по категории/году/черновикам, документы — по категории, персонал — по подразделению и категории); осмысленные пустые состояния (`emptyStateHeading/Description`) во всех контентных ресурсах. Смоук-тест рендера всех List-страниц: `AdminTablesTest`.
+
+Удобство редактирования контента (Этап 3 плана [ADMIN-UX-PLAN.md](ADMIN-UX-PLAN.md)): у `RichEditor` страниц и новостей включена загрузка изображений прямо в текст (attachments, диск `public`, каталоги `pages`/`news`); действие «Дублювати» в таблицах страниц и новостей — копия-черновик с заголовком «… (копія)» и слагом `-kopiya[-N]` (`App\Support\UniqueSlug`), у новостей обнуляются `views`/`likes`/`telegram_posted_at` (автопост в Telegram не срабатывает — копия не опубликована), после дублирования — редирект в редактирование копии; проверка битых внутренних ссылок — `App\Support\LinkChecker` (сканирует href/src в телах страниц и новостей: несуществующие страницы/разделы, черновики, отсутствующие файлы `storage`, ссылки на старый otfk.od.ua; внешние сайты не проверяет) с двумя интерфейсами: artisan `otfk:check-links` (exit 1, если нашёл) и страница админки «Биті посилання»; виджет «Чернетки» на дашборде — неопубликованные страницы/новости одним списком со ссылками «Редагувати» и «Перегляд» (превью черновика на сайте, см. `DraftPreviewTest`). Тест: `AdminEditingToolsTest`.
 
 ### API / webhooks
 
